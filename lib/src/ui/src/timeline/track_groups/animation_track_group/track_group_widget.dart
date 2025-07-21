@@ -113,11 +113,12 @@ class TrackGroupWidget<V extends AnimationTrackGroup> extends StatelessWidget {
                             controller: controller,
                           ),
                         ),
+                        Expanded(child:
                         TrackKeyframesWidget(
                           controller: controller,
                           scrollController: scrollController,
                           track: track,
-                        ),
+                        )),
                       ],
                     ),
                   )

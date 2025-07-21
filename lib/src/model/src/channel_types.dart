@@ -24,6 +24,10 @@ sealed class ChannelValueType<V> {
 
   static V fromJson<V extends ChannelValueType>(dynamic json) {
     switch (V) {
+      case const (ScalarChannelValueType):
+        return ScalarChannelValueType((json as List<double>).first) as V;
+      case const (Vector2ChannelValueType):
+        return Vector2ChannelValueType.fromJson(json as List<double>) as V;
       case const (Vector3ChannelValueType):
         return Vector3ChannelValueType.fromJson(json as List<double>) as V;
       case const (QuaternionChannelValueType):
@@ -172,7 +176,7 @@ class Vector2ChannelValueType extends ChannelValueType<Vector2> {
 
   @override
   factory Vector2ChannelValueType.fromJson(List<double> json) {
-    if (json.length != 3) throw ArgumentError("Expected 3 values for Vector3");
+    if (json.length != 2) throw ArgumentError("Expected 3 values for Vector3");
     return Vector2ChannelValueType(Vector2(json[0], json[1]));
   }
 

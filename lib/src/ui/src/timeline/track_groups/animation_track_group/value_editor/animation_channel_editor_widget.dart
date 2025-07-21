@@ -77,7 +77,6 @@ class _AnimationChannelEditorWidgetState
           var value = viewModel.getValue(currentFrame);
           var unwrapped = value.unwrap();
           return NumericControlRow(
-            key: ObjectKey(value),
             label: "Position",
             dimensionLabels: labels,
             values: unwrapped,

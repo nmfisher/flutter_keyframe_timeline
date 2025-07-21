@@ -130,22 +130,12 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                                   SliverToBoxAdapter(
                                     child: Container(
                                       height: 100,
-                                      width: 10000,
+                                      width: controller.maxFrames.value.toDouble() * controller.pixelsPerFrame.value,
                                       color: Colors.transparent,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 0,
-                            bottom: 0,
-                            left: trackNameWidth,
-                            child: FrameDragHandle(
-                              scrollController: _horizontalScrollController,
-                              playheadHeight: playheadHeight,
-                              controller: controller,
                             ),
                           ),
                         ],
@@ -161,6 +151,16 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                       // ),
                     ),
                   ],
+                ),
+              ),
+              Positioned(
+                top: 0,
+                bottom: 0,
+                left: trackNameWidth,
+                child: FrameDragHandle(
+                  scrollController: _horizontalScrollController,
+                  playheadHeight: playheadHeight,
+                  controller: controller,
                 ),
               ),
             ],

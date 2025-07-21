@@ -56,77 +56,84 @@ class _FrameDragHandleState extends State<FrameDragHandle> {
       valueListenable: widget.controller.pixelsPerFrame,
       builder: (_, pixelsPerFrame, __) => ValueListenableBuilder(
         valueListenable: widget.controller.currentFrame,
-        builder: (_, frameNumber, __) => Transform.translate(
-          offset: Offset(
-            (frameNumber.toDouble() * pixelsPerFrame) -
-                (widget.playheadWidth / 2) -
-                widget.scrollController.offset,
+        builder: (_, frameNumber, __) {
+          if (widget.scrollController.offset > (frameNumber * pixelsPerFrame)) {
+            return SizedBox.shrink();
+          }
+          return Transform.translate(
+            offset: Offset(
+              (frameNumber.toDouble() * pixelsPerFrame) -
+                  (widget.playheadWidth / 2) -
+                  widget.scrollController.offset,
 
-            0,
-          ),
-          child: SizedBox(
-            width: widget.playheadWidth,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                MouseRegion(
-                  onEnter: _handleMouseEnter,
-                  onExit: _handleMouseExit,
-                  cursor: isDragging
-                      ? SystemMouseCursors.grabbing
-                      : SystemMouseCursors.grab,
-                  child: Listener(
-                    behavior: HitTestBehavior.opaque,
-                    onPointerMove: (event) {
-                      if (!widget.scrollController.hasClients) {
-                        return;
-                      }
-                      final parentBox = context.findRenderObject() as RenderBox;
-                      final localPosition = parentBox.globalToLocal(
-                        event.position,
-                      );
+              0,
+            ),
+            child: SizedBox(
+              width: widget.playheadWidth,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  MouseRegion(
+                    onEnter: _handleMouseEnter,
+                    onExit: _handleMouseExit,
+                    cursor: isDragging
+                        ? SystemMouseCursors.grabbing
+                        : SystemMouseCursors.grab,
+                    child: Listener(
+                      behavior: HitTestBehavior.opaque,
+                      onPointerMove: (event) {
+                        if (!widget.scrollController.hasClients) {
+                          return;
+                        }
+                        final parentBox =
+                            context.findRenderObject() as RenderBox;
+                        final localPosition = parentBox.globalToLocal(
+                          event.position,
+                        );
 
-                      var currentFrame =
-                          ((widget.scrollController.offset + localPosition.dx) /
-                                  widget.controller.pixelsPerFrame.value)
-                              .floor();
-                      if (currentFrame >= 0) {
-                        widget.controller.setCurrentFrame(currentFrame);
-                      }
-                    },
-                    child: Box(
-                      style: Style(
-                        $box.width(widget.playheadWidth),
-                        $box.height(widget.playheadHeight),
-                        // $box.padding.vertical(12.0),
-                        $box.alignment.center(),
-                        $box.color(Colors.purple),
-                        $box.borderRadius(4),
-                        $with.cursor.grab(),
-                        $on.press($with.cursor.grabbing()),
-                      ),
-                      child: StyledText(
-                        frameNumber.toString(),
+                        var currentFrame =
+                            ((widget.scrollController.offset +
+                                        localPosition.dx) /
+                                    widget.controller.pixelsPerFrame.value)
+                                .floor();
+                        if (currentFrame >= 0) {
+                          widget.controller.setCurrentFrame(currentFrame);
+                        }
+                      },
+                      child: Box(
                         style: Style(
-                          $text.textAlign.center(),
-                          $text.style.fontSize(12),
-                          $text.style.color(
-                            Colors.white,
-                            // $box.color.white
-                            // $token.color.onSurfaceVariant
+                          $box.width(widget.playheadWidth),
+                          $box.height(widget.playheadHeight),
+                          // $box.padding.vertical(12.0),
+                          $box.alignment.center(),
+                          $box.color(Colors.purple),
+                          $box.borderRadius(4),
+                          $with.cursor.grab(),
+                          $on.press($with.cursor.grabbing()),
+                        ),
+                        child: StyledText(
+                          frameNumber.toString(),
+                          style: Style(
+                            $text.textAlign.center(),
+                            $text.style.fontSize(12),
+                            $text.style.color(
+                              Colors.white,
+                              // $box.color.white
+                              // $token.color.onSurfaceVariant
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Box(style: Style($box.width(2), $box.color.black())),
-                ),
-              ],
+                  Expanded(
+                    child: Box(style: Style($box.width(2), $box.color.black())),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

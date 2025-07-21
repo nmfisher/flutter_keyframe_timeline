@@ -31,7 +31,6 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
 
   late final _focusNode = FocusNode();
 
-
   void _showContextMenu(BuildContext context, Offset offset) {
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
@@ -65,9 +64,8 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.translate(
-      offset: Offset(widget.frameNumber.toDouble() * widget.pixelsPerFrame, 0.0),
-      child: Focus(
+
+    return Focus(
       focusNode: _focusNode,
       onKeyEvent: (node, event) {
         if (event.logicalKey == LogicalKeyboardKey.delete) {
@@ -76,7 +74,8 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
         }
         return KeyEventResult.ignored;
       },
-      child:  MouseHoverWidget(builder: (isHovered) => GestureDetector(
+      child: MouseHoverWidget(
+        builder: (isHovered) => GestureDetector(
           behavior: HitTestBehavior.translucent,
           onPanStart: (details) {
             dragStart = details.localPosition;
@@ -92,13 +91,10 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
           },
           onPanUpdate: (details) {
             if (dragStart != null) {
-              final dragDelta =
-                  details.localPosition.dx - dragStart!.dx;
-              final frameDelta =
-                  (dragDelta / widget.pixelsPerFrame).round();
+              final dragDelta = details.localPosition.dx - dragStart!.dx;
+              final frameDelta = (dragDelta / widget.pixelsPerFrame).round();
               final newFrame = initialFrame + frameDelta;
-              final clampedFrame =
-                  newFrame.clamp(0, double.infinity).toInt();
+              final clampedFrame = newFrame.clamp(0, double.infinity).toInt();
               widget.onFrameNumberChanged?.call(clampedFrame);
             }
           },
@@ -108,54 +104,52 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
           child: Transform.translate(
             offset: const Offset(-16, 0.0),
             child: Container(
-              padding:EdgeInsets.all(4), child:Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color:
-                    widget.isSelected
-                        ? Colors.amber.withOpacity(0.2)
-                        : Colors.transparent,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    // color:
-                    //     darkNeonTheme.colors[$token
-                    //         .color
-                    //         .primary],
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      // color:
-                      //     isHovered || widget.isSelected
-                      //         ? Colors.white
-                      //         : darkNeonTheme.colors[$token
-                      //             .color
-                      //             .onSurfaceVariant]!,
-                      width: isHovered || widget.isSelected ? 2 : 1,
-                    ),
-                    boxShadow:
-                        widget.isSelected
-                            ? [
+              padding: EdgeInsets.all(4),
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: widget.isSelected
+                      ? Colors.amber.withOpacity(0.2)
+                      : Colors.black,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      // darkNeonTheme.colors[$token
+                      //     .color
+                      //     .primary],
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        // color:
+                        //     isHovered || widget.isSelected
+                        //         ? Colors.white
+                        //         : darkNeonTheme.colors[$token
+                        //             .color
+                        //             .onSurfaceVariant]!,
+                        width: isHovered || widget.isSelected ? 2 : 1,
+                      ),
+                      boxShadow: widget.isSelected
+                          ? [
                               BoxShadow(
-                                color: Colors.amber.withOpacity(
-                                  0.5,
-                                ),
+                                color: Colors.amber.withOpacity(0.5),
                                 spreadRadius: 2,
                                 blurRadius: 2,
                               ),
                             ]
-                            : null,
+                          : null,
+                    ),
                   ),
                 ),
               ),
-            )),
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 }
