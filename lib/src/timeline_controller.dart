@@ -41,7 +41,10 @@ abstract class TimelineController<V extends AnimationTrackGroup> {
   ValueListenable<Set<Keyframe>> get selected;
 
   //
-  U getCurrentValue<U extends ChannelValueType>(V target, AnimationTrack<U> track);
+  U getCurrentValue<U extends ChannelValueType>(
+    V target,
+    AnimationTrack<U> track,
+  );
 
   //
   ValueListenable<Set<V>> get active;
@@ -51,6 +54,12 @@ abstract class TimelineController<V extends AnimationTrackGroup> {
 
   //
   void setSelectionMode(SelectionMode mode);
+
+  //
+  ValueListenable<Set<V>> get expanded;
+
+  //
+  void setExpanded(V group, bool expanded);
 }
 
 abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
@@ -58,7 +67,6 @@ abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
   
   @override
   final ValueNotifier<List<V>> trackGroups = ValueNotifier<List<V>>([]);
-  
 
   TimelineControllerImpl(List<V> initial) {
     trackGroups.value.addAll(initial);
@@ -71,7 +79,7 @@ abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
   ValueNotifier<int> maxFrames = ValueNotifier<int>(10000);
 
   @override
-  ValueNotifier<int> pixelsPerFrame = ValueNotifier<int>(75);
+  ValueNotifier<int> pixelsPerFrame = ValueNotifier<int>(5);
 
   @override
   void setCurrentFrame(int frame) {
@@ -101,15 +109,13 @@ abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
   }
 
   @override
-  // TODO: implement selected
-  ValueListenable<Set<Keyframe<ChannelValueType>>> get selected =>
-      throw UnimplementedError();
+  ValueNotifier<Set<Keyframe<ChannelValueType>>> selected =
+      ValueNotifier<Set<Keyframe<ChannelValueType>>>({});
 
   @override
   void setVisible(V trackGroup, bool visible) {
     // TODO: implement setVisible
   }
-
 
   var _mode = SelectionMode.replace;
   void setSelectionMode(SelectionMode mode) {
@@ -141,5 +147,20 @@ abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
   void deleteGroup(V group) {
     this.active.value.remove(group);
     this.active.notifyListeners();
+  }
+
+  //
+  @override
+  ValueNotifier<Set<V>> expanded = ValueNotifier<Set<V>>({});
+
+  //
+  @override
+  void setExpanded(V group, bool expanded) {
+    if (expanded) {
+      this.expanded.value.add(group);
+    } else {
+      this.expanded.value.remove(group);
+    }
+    this.expanded.notifyListeners();
   }
 }

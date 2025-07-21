@@ -158,7 +158,7 @@ class Vector2ChannelValueType extends ChannelValueType<Vector2> {
   Vector3 get zero => Vector3.zero();
 
   @override
-  final String label = "VEC3";
+  final String label = "VEC2";
 
   @override
   final Vector2 value;

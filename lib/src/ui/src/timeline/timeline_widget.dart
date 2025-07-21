@@ -1,4 +1,5 @@
-import 'package:flutter/gestures.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
@@ -6,8 +7,7 @@ import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/middle_mouse_scroll_view.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/frame_drag_handle.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_background.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_group_widget.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/keyframe_track_list_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_groups_widget.dart';
 import 'package:mix/mix.dart';
 
 // Displays a vertical list of all objects of type [V] (each of which is assumed to
@@ -64,130 +64,109 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
     return false;
   }
 
-  Widget _trackGroupNameList() {
-    return Container(
-      color: Colors.transparent,
-      child: ValueListenableBuilder(valueListenable: controller.trackGroups, builder: (_, groups, __) => Column(
-        key: ObjectKey(controller.trackGroups),
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: groups
-            .asMap()
-            .map(
-              (idx, group) => MapEntry(
-                idx,
-                TrackGroupWidget(
-                  key: ObjectKey(group),
-                  group: group,
-                  index: idx,
-                  controller: controller,
-                ),
-              ),
-            )
-            .values
-            .cast<Widget>()
-            .toList(),
-      )),
-    );
-  }
-
   final trackNameWidth = 280.0;
   final trackHeight = 50.0;
   final playheadHeight = 50.0;
 
-  Widget _trackGroupKeyframeTracks() {
-    final width =
-        (widget.controller.maxFrames.value *
-                widget.controller.pixelsPerFrame.value)
-            .toDouble();
-    final height = (widget.controller.trackGroups.value.length * trackHeight);
-
-    return SizedBox(
-      height: controller.trackGroups.value.length * 50,
-      child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(
-          dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
-          scrollbars: true,
-        ),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: MiddleMouseScrollView(
-                physics: ClampingScrollPhysics(),
-                hitTestBehavior: HitTestBehavior.translucent,
-                clipBehavior: Clip.hardEdge,
-                controller: _horizontalScrollController,
-                scrollDirection: Axis.horizontal,
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      width: width,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            width: width,
-                            // top: 0,
-                            // bottom: 0,
-                            height: height,
-                            child: TimelineBackground(
-                              controller: controller,
-                              tickColor: Colors.black,
-                            ),
-                          ),
-                          KeyframeTrackListWidget(controller: controller),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned(
-          top: 0,
-          bottom: 0,
-          left: trackNameWidth,
-          child: FrameDragHandle(
-            scrollController: _horizontalScrollController,
-            playheadHeight: playheadHeight,
-            controller: controller,
-          ),
-        ),
-        Positioned.fill(
-          top: playheadHeight,
-          child: CustomScrollView(
-            physics: ClampingScrollPhysics(),
-            hitTestBehavior: HitTestBehavior.translucent,
-            scrollDirection: Axis.vertical,
-            shrinkWrap: false,
-            slivers: [
-              SliverToBoxAdapter(
-                child: HBox(
-                  style: Style($flex.crossAxisAlignment.start()),
-                  children: [
-                    SizedBox(
-                      width: trackNameWidth,
-                      child: _trackGroupNameList(),
+    return LayoutBuilder(
+      builder: (ctx, constraints) {
+        return TimelineBackground(
+          trackNameWidth: trackNameWidth,
+          controller: controller,
+          scrollController: _horizontalScrollController,
+          tickColor: Colors.black,
+          inner: Stack(
+            children: [
+              Positioned.fill(
+                top: playheadHeight,
+                child: CustomScrollView(
+                  physics: ClampingScrollPhysics(),
+                  hitTestBehavior: HitTestBehavior.translucent,
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: false,
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: ZBox(
+                        style: Style(
+                          $box.clipBehavior.none(),
+                          $box.width(constraints.maxWidth),
+                        ),
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(top: 30),
+                            child: TrackGroupsWidget(
+                              trackNameWidth: trackNameWidth,
+                              controller: controller,
+                              horizontalScrollController:
+                                  _horizontalScrollController,
+                              showTrackKeyframes: false,
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            bottom: 0,
+                            right: 0,
+                            // height: constraints.maxHeight,
+                            left: trackNameWidth,
+                            // child:Container(color: Colors.red, height:100, width: 1000,)
+                            child: ScrollConfiguration(
+                              behavior: ScrollConfiguration.of(context)
+                                  .copyWith(
+                                    dragDevices: {
+                                      PointerDeviceKind.touch,
+                                      PointerDeviceKind.mouse,
+                                    },
+                                    scrollbars: true,
+                                  ),
+                              child: MiddleMouseScrollView(
+                                physics: ClampingScrollPhysics(),
+                                hitTestBehavior: HitTestBehavior.translucent,
+                                clipBehavior: Clip.hardEdge,
+                                controller: _horizontalScrollController,
+                                scrollDirection: Axis.horizontal,
+                                slivers: [
+                                  SliverToBoxAdapter(
+                                    child: Container(
+                                      height: 100,
+                                      width: 10000,
+                                      color: Colors.transparent,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            bottom: 0,
+                            left: trackNameWidth,
+                            child: FrameDragHandle(
+                              scrollController: _horizontalScrollController,
+                              playheadHeight: playheadHeight,
+                              controller: controller,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Expanded(
+                      //   child: TrackGroupsWidget(
+                      //     controller: controller,
+                      //     horizontalScrollController: _horizontalScrollController,
+                      //     showTrackGroupNames: false,
+                      //     showTrackKeyframes: true,
+                      //   ),
+                      // ),
                     ),
-                    Expanded(child: _trackGroupKeyframeTracks()),
                   ],
                 ),
               ),
             ],
           ),
-        ),
-        
-      ],
+        );
+      },
     );
   }
 }

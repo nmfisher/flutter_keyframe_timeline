@@ -78,6 +78,9 @@ class _FrameDragHandleState extends State<FrameDragHandle> {
                   child: Listener(
                     behavior: HitTestBehavior.opaque,
                     onPointerMove: (event) {
+                      if (!widget.scrollController.hasClients) {
+                        return;
+                      }
                       final parentBox = context.findRenderObject() as RenderBox;
                       final localPosition = parentBox.globalToLocal(
                         event.position,
@@ -95,8 +98,9 @@ class _FrameDragHandleState extends State<FrameDragHandle> {
                       style: Style(
                         $box.width(widget.playheadWidth),
                         $box.height(widget.playheadHeight),
-                        $box.padding.vertical(12.0),
-                        $box.color(Colors.black),
+                        // $box.padding.vertical(12.0),
+                        $box.alignment.center(),
+                        $box.color(Colors.purple),
                         $box.borderRadius(4),
                         $with.cursor.grab(),
                         $on.press($with.cursor.grabbing()),
@@ -105,8 +109,12 @@ class _FrameDragHandleState extends State<FrameDragHandle> {
                         frameNumber.toString(),
                         style: Style(
                           $text.textAlign.center(),
-                          $text.style.fontSize(10),
-                          // $text.style.color.ref($token.color.onSurfaceVariant),
+                          $text.style.fontSize(12),
+                          $text.style.color(
+                            Colors.white,
+                            // $box.color.white
+                            // $token.color.onSurfaceVariant
+                          ),
                         ),
                       ),
                     ),
