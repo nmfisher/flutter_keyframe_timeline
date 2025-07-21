@@ -67,11 +67,11 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
   Widget _trackGroupNameList() {
     return Container(
       color: Colors.transparent,
-      child: Column(
+      child: ValueListenableBuilder(valueListenable: controller.trackGroups, builder: (_, groups, __) => Column(
         key: ObjectKey(controller.trackGroups),
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
-        children: controller.trackGroups
+        children: groups
             .asMap()
             .map(
               (idx, group) => MapEntry(
@@ -87,7 +87,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
             .values
             .cast<Widget>()
             .toList(),
-      ),
+      )),
     );
   }
 
@@ -100,10 +100,10 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
         (widget.controller.maxFrames.value *
                 widget.controller.pixelsPerFrame.value)
             .toDouble();
-    final height = (widget.controller.trackGroups.length * trackHeight);
+    final height = (widget.controller.trackGroups.value.length * trackHeight);
 
     return SizedBox(
-      height: controller.trackGroups.length * 50,
+      height: controller.trackGroups.value.length * 50,
       child: ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(
           dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},

@@ -3,10 +3,10 @@ import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-abstract class AnimationChannelEditorViewModel {
+abstract class AnimationChannelEditorViewModel<V extends ChannelValueType> {
   ValueListenable<bool> get hasKeyframeAtCurrentFrame;
 
-  ValueListenable<ChannelValueType> get valueAtCurrentFrame;
+  ValueListenable<V> get valueAtCurrentFrame;
 
   ///
   Future addKeyframeForCurrentFrame();
@@ -20,8 +20,8 @@ abstract class AnimationChannelEditorViewModel {
   Future dispose();
 }
 
-class AnimationChannelEditorViewModelImpl
-    extends AnimationChannelEditorViewModel {
+class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
+    extends AnimationChannelEditorViewModel<V> {
   final Set<Keyframe> keyframes = {};
 
   @override
@@ -30,14 +30,14 @@ class AnimationChannelEditorViewModelImpl
   );
 
   @override
-  late final ValueNotifier<ChannelValueType> valueAtCurrentFrame;
+  late final ValueNotifier<V> valueAtCurrentFrame;
 
-  final AnimationTrack track;
+  final AnimationTrack<V> track;
   final TimelineController controller;
 
   AnimationChannelEditorViewModelImpl(this.track, this.controller) {
     final currentValue = track.calculate(controller.currentFrame.value);
-    valueAtCurrentFrame = ValueNotifier<ChannelValueType>(currentValue);
+    valueAtCurrentFrame = ValueNotifier<V>(currentValue);
     track.keyframes.addListener(_onKeyframesUpdated);
     _onKeyframesUpdated();
 
@@ -93,46 +93,18 @@ class AnimationChannelEditorViewModelImpl
   Future deleteKeyframeForCurrentFrame() async {
     final currentFrame = controller.currentFrame.value;
     track.removeKeyframeAt(currentFrame);
-
   }
 
   ///
   @override
   Future addKeyframeForCurrentFrame() async {
     final currentFrame = controller.currentFrame.value;
-    
-    track.addOrUpdateKeyframe(
-          currentFrame,
-          controller.getCurrentValue(track)
-
-      );
-    }
-  
+    var value = controller.getCurrentValue<V>(track);
+    track.addOrUpdateKeyframe(currentFrame, value);
+  }
 
   @override
   void setCurrentFrameValue(List<double> values) {
-    // var value = track.set
-    // track.set(
-    //       currentFrame,
-    //       controller.getCurrentValue(track)
-
-    //   );
-    // }
-    // switch (channel) {
-    //   case AnimationChannel():
-    //     model.setCurrentPosition(
-    //       Vector3.fromFloat64List(Float64List.fromList(values)),
-    //     );
-    //   case ScaleChannel():
-    //     model.setCurrentScale(
-    //       Vector3.fromFloat64List(Float64List.fromList(values)),
-    //     );
-    //     break;
-    //   case RotationChannel():
-    //     model.setCurrentRotation(
-    //       Quaternion.fromFloat64List(Float64List.fromList(values)),
-    //     );
-    //     break;
-    // }
+    track.setFromValues(values);
   }
 }

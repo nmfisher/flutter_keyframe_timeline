@@ -4,31 +4,65 @@ import 'package:flutter_keyframe_timeline/src/model/src/animation_track_group.da
 import 'package:flutter_keyframe_timeline/src/model/src/channel_types.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/keyframe.dart';
 
-abstract class TimelineController<V extends AnimationTrackGroup> {
-  List<V> get trackGroups;
+enum SelectionMode { append, replace }
 
+abstract class TimelineController<V extends AnimationTrackGroup> {
+  //
+  ValueNotifier<List<V>> get trackGroups;
+
+  //
+  void addGroup(V group);
+
+  //
+  void deleteGroup(V group);
+
+  //
   ValueListenable<int> get pixelsPerFrame;
 
+  //
   ValueListenable<int> get currentFrame;
+
+  //
   ValueListenable<int> get maxFrames;
 
+  //
   void setCurrentFrame(int frame);
 
+  //
   void setZoomLevel(double level);
+
+  //
   void skipToStart();
+
+  //
   void skipToEnd();
 
+  //
   ValueListenable<Set<Keyframe>> get selected;
 
+  //
   U getCurrentValue<U extends ChannelValueType>(AnimationTrack<U> track);
+
+  //
+  ValueListenable<Set<V>> get active;
+
+  //
+  void setActive(V group, bool active);
+
+  //
+  void setSelectionMode(SelectionMode mode);
 }
 
-class TimelineControllerImpl<V extends AnimationTrackGroup>
+abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
     extends TimelineController<V> {
+  
   @override
-  final List<V> trackGroups;
+  final ValueNotifier<List<V>> trackGroups = ValueNotifier<List<V>>([]);
+  
 
-  TimelineControllerImpl(this.trackGroups);
+  TimelineControllerImpl(List<V> initial) {
+    trackGroups.value.addAll(initial);
+  }
 
   @override
   ValueNotifier<int> currentFrame = ValueNotifier<int>(0);
@@ -37,7 +71,7 @@ class TimelineControllerImpl<V extends AnimationTrackGroup>
   ValueNotifier<int> maxFrames = ValueNotifier<int>(10000);
 
   @override
-  ValueNotifier<int> pixelsPerFrame = ValueNotifier<int>(1);
+  ValueNotifier<int> pixelsPerFrame = ValueNotifier<int>(75);
 
   @override
   void setCurrentFrame(int frame) {
@@ -45,16 +79,15 @@ class TimelineControllerImpl<V extends AnimationTrackGroup>
   }
 
   @override
-  ValueListenable<Iterable<V>> get expanded => throw UnimplementedError();
-
-  @override
-  void setExpanded(V asset, bool expanded) {
-    throw UnimplementedError();
-  }
-
-  @override
   void setZoomLevel(double level) {
-    // TODO: implement setZoomLevel
+    // Clamp the input level between 0 and 1
+    final clampedLevel = level.clamp(0.0, 1.0);
+
+    // Map the 0-1 range to 1-10 range for pixels per frame
+    // Using round() to ensure we get an integer
+    final newPixelsPerFrame = ((clampedLevel * 9) + 1).round();
+
+    pixelsPerFrame.value = newPixelsPerFrame;
   }
 
   @override
@@ -76,10 +109,37 @@ class TimelineControllerImpl<V extends AnimationTrackGroup>
   void setVisible(V trackGroup, bool visible) {
     // TODO: implement setVisible
   }
-  
+
+
+  var _mode = SelectionMode.replace;
+  void setSelectionMode(SelectionMode mode) {
+    this._mode = mode;
+  }
+
+  ValueNotifier<Set<V>> active = ValueNotifier<Set<V>>({});
+
   @override
-  U getCurrentValue<U extends ChannelValueType>(AnimationTrack<U> track) {
-    // TODO: implement getCurrentValue
-    throw UnimplementedError();
+  void setActive(V group, bool active) {
+    if (!active) {
+      this.active.value.remove(group);
+    } else {
+      if (_mode != SelectionMode.append) {
+        this.active.value.clear();
+      }
+      this.active.value.add(group);
+    }
+    this.active.notifyListeners();
+  }
+
+  @override
+  void addGroup(V group) {
+    this.active.value.add(group);
+    this.active.notifyListeners();
+  }
+
+  @override
+  void deleteGroup(V group) {
+    this.active.value.remove(group);
+    this.active.notifyListeners();
   }
 }

@@ -55,7 +55,7 @@ class _AnimationChannelEditorWidgetState
           PhosphorIcons.diamond(),
           color: hasKeyframeAtCurrentFrame
               ? Colors.amber
-              : Colors.pink,// $token.color.onSurfaceVariant.resolve(context),
+              : Colors.pink, // $token.color.onSurfaceVariant.resolve(context),
           size: 12,
         ),
         padding: EdgeInsets.zero,
@@ -67,15 +67,18 @@ class _AnimationChannelEditorWidgetState
       height: 48,
       child: ValueListenableBuilder(
         valueListenable: viewModel.valueAtCurrentFrame,
-        builder: (_, value, __) => NumericControlRow(
-          key: ObjectKey(value),
-          label: "Position",
-          dimensionLabels: labels,
-          values: (value.value is double ? [value.value] : value as List<double>),
-          onValuesChanged: (values) => viewModel.setCurrentFrameValue(values),
-          icon: icon,
-          step: 0.01,
-        ),
+        builder: (_, ChannelValueType value, __) {
+          var unwrapped = value.unwrap();
+          return NumericControlRow(
+            key: ObjectKey(value),
+            label: "Position",
+            dimensionLabels: labels,
+            values: unwrapped,
+            onValuesChanged: (values) => viewModel.setCurrentFrameValue(values),
+            icon: icon,
+            step: 0.01,
+          );
+        },
       ),
     );
   }

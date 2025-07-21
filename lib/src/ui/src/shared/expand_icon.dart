@@ -25,7 +25,7 @@ class CustomExpandIcon extends StatelessWidget {
       child: StyledIcon(
         isExpanded ? Icons.expand_more : Icons.chevron_right,
         style: Style(
-          $icon.color.white.withOpacity(isActive || isExpanded ? 1.0 : 0.5),
+          $icon.color.black.withOpacity(isActive || isExpanded ? 1.0 : 0.5),
         ),
       ),
     );

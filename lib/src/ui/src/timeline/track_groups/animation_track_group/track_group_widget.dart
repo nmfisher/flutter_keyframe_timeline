@@ -23,8 +23,9 @@ class TrackGroupWidget<V extends AnimationTrackGroup> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: group.isActive,
-      builder: (_, isActive, __) {
+      valueListenable: controller.active,
+      builder: (_, active, __) {
+        final isActive = active.contains(group);
         return ValueListenableBuilder(
           valueListenable: group.isVisible,
           builder: (_, isVisible, __) {
@@ -49,7 +50,7 @@ class TrackGroupWidget<V extends AnimationTrackGroup> extends StatelessWidget {
                             onPointerDown: (details) {
                               if (details.buttons & kPrimaryMouseButton ==
                                   kPrimaryMouseButton) {
-                                group.setActive(true);
+                                controller.setActive(group, true);
                               }
                             },
                             child: HBox(

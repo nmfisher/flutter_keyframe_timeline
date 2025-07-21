@@ -6,8 +6,6 @@ abstract class AnimationTrackGroup<V extends ChannelValueType> {
   void setVisible(bool visible);
   ValueListenable<bool> get isExpanded;
   void setExpanded(bool expanded);
-  ValueListenable<bool> get isActive;
-  void setActive(bool active);
 
   ValueListenable<String> get displayName;
   List<AnimationTrack<V>> get tracks;
@@ -51,18 +49,12 @@ class AnimationTrackGroupImpl<V extends ChannelValueType>
   ValueNotifier<bool> isVisible = ValueNotifier<bool>(true);
 
   @override
-  void setActive(bool active) {
-    this.isActive.value = active;
-  }
-
-  @override
-  ValueNotifier<bool> isActive = ValueNotifier<bool>(false);
-
-  @override
   void setExpanded(bool expanded) {
     this.isExpanded.value = expanded;
   }
 
   @override
   ValueNotifier<bool> isExpanded = ValueNotifier<bool>(false);
+  
+
 }

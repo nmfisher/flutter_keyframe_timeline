@@ -18,6 +18,8 @@ sealed class ChannelValueType<V> {
 
   V get value;
 
+  List<num> unwrap();
+
   dynamic toJson();
 
   static V fromJson<V extends ChannelValueType>(dynamic json) {
@@ -36,6 +38,14 @@ sealed class ChannelValueType<V> {
     switch (V) {
       case const (ScalarChannelValueType):
         return ScalarChannelValueType(0.0);
+      case const (Vector4ChannelValueType):
+        return Vector4ChannelValueType(Vector4.zero());
+      case const (Vector3ChannelValueType):
+        return Vector3ChannelValueType(Vector3.zero());
+      case const (Vector2ChannelValueType):
+        return Vector2ChannelValueType(Vector2.zero());
+      case const (QuaternionChannelValueType):
+        return QuaternionChannelValueType(Quaternion.identity());
     }
   }
 }
@@ -60,6 +70,49 @@ class ScalarChannelValueType extends ChannelValueType<double> {
   @override
   dynamic toJson() {
     return value;
+  }
+
+  @override
+  List<num> unwrap() {
+    return [value];
+  }
+}
+
+class Vector4ChannelValueType extends ChannelValueType<Vector4> {
+  Vector4 get zero => Vector4.zero();
+
+  @override
+  final String label = "VEC4";
+
+  @override
+  final Vector4 value;
+
+  Vector4ChannelValueType(this.value);
+
+  @override
+  List<double> toJson() {
+    return [value.x, value.y, value.z];
+  }
+
+  @override
+  factory Vector4ChannelValueType.fromJson(List<double> json) {
+    if (json.length != 4) throw ArgumentError("Expected 4 values for Vector4");
+    return Vector4ChannelValueType(Vector4(json[0], json[1], json[2], json[3]));
+  }
+
+  @override
+  ChannelValueType<Vector4> interpolate(
+    ChannelValueType<Vector4> next,
+    double ratio,
+  ) {
+    return Vector4ChannelValueType(
+      value.scaled(1 - ratio) + next.value.scaled(ratio),
+    );
+  }
+
+  @override
+  List<num> unwrap() {
+    return value.storage;
   }
 }
 
@@ -95,7 +148,48 @@ class Vector3ChannelValueType extends ChannelValueType<Vector3> {
     );
   }
 
-  List<double> get values => value.storage;
+  @override
+  List<num> unwrap() {
+    return value.storage;
+  }
+}
+
+class Vector2ChannelValueType extends ChannelValueType<Vector2> {
+  Vector3 get zero => Vector3.zero();
+
+  @override
+  final String label = "VEC3";
+
+  @override
+  final Vector2 value;
+
+  Vector2ChannelValueType(this.value);
+
+  @override
+  List<double> toJson() {
+    return [value.x, value.y];
+  }
+
+  @override
+  factory Vector2ChannelValueType.fromJson(List<double> json) {
+    if (json.length != 3) throw ArgumentError("Expected 3 values for Vector3");
+    return Vector2ChannelValueType(Vector2(json[0], json[1]));
+  }
+
+  @override
+  ChannelValueType<Vector2> interpolate(
+    ChannelValueType<Vector2> next,
+    double ratio,
+  ) {
+    return Vector2ChannelValueType(
+      value.scaled(1 - ratio) + next.value.scaled(ratio),
+    );
+  }
+
+  @override
+  List<num> unwrap() {
+    return value.storage;
+  }
 }
 
 class QuaternionChannelValueType extends ChannelValueType<Quaternion> {
@@ -131,5 +225,10 @@ class QuaternionChannelValueType extends ChannelValueType<Quaternion> {
     return QuaternionChannelValueType(
       value.scaled(1 - ratio) + next.value.scaled(ratio),
     );
+  }
+
+  @override
+  List<num> unwrap() {
+    return value.storage;
   }
 }

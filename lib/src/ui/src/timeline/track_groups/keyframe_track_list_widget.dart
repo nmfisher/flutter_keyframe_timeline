@@ -25,8 +25,12 @@ class _TrackGroupWidgetState extends State<KeyframeTrackListWidget> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: widget.controller.pixelsPerFrame,
-      builder: (_, pixelsPerFrame, __) => VBox(
-        children: widget.controller.trackGroups
+      builder: (_, pixelsPerFrame, __) =>
+      ValueListenableBuilder(
+      valueListenable: widget.controller.trackGroups,
+      builder: (_, groups, __) =>
+       VBox(
+        children: groups
             .map(
               (group) => _SingleObjectKeyframeTracksWidget(
                 group: group,
@@ -36,7 +40,7 @@ class _TrackGroupWidgetState extends State<KeyframeTrackListWidget> {
             )
             .toList(),
       ),
-    );
+    ));
   }
 }
 

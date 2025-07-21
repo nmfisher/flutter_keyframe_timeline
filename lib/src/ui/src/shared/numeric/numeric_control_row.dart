@@ -13,7 +13,7 @@ class NumericControlRow extends StatefulWidget {
   final double step;
   final double max;
   final double min;
-  final List<double> values;
+  final List<num> values;
 
   final void Function(List<double>) onValuesChanged;
 
@@ -76,7 +76,7 @@ class _NumericControlRowState extends State<NumericControlRow> {
     super.dispose();
   }
 
-  void _updateControllers(List<double> values) {
+  void _updateControllers(List<num> values) {
     isUpdatingControllers = true;
     for (var i = 0; i < controllers.length; i++) {
       final newText = values[i].toStringAsFixed(2);

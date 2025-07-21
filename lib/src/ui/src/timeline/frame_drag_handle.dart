@@ -49,6 +49,9 @@ class _FrameDragHandleState extends State<FrameDragHandle> {
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.scrollController.hasClients) {
+      return SizedBox.shrink();
+    }
     return ValueListenableBuilder(
       valueListenable: widget.controller.pixelsPerFrame,
       builder: (_, pixelsPerFrame, __) => ValueListenableBuilder(
@@ -81,7 +84,7 @@ class _FrameDragHandleState extends State<FrameDragHandle> {
                       );
 
                       var currentFrame =
-                          ((widget.scrollController.offset + localPosition.dx ) /
+                          ((widget.scrollController.offset + localPosition.dx) /
                                   widget.controller.pixelsPerFrame.value)
                               .floor();
                       if (currentFrame >= 0) {
