@@ -41,7 +41,7 @@ abstract class TimelineController<V extends AnimationTrackGroup> {
   ValueListenable<Set<Keyframe>> get selected;
 
   //
-  U getCurrentValue<U extends ChannelValueType>(AnimationTrack<U> track);
+  U getCurrentValue<U extends ChannelValueType>(V target, AnimationTrack<U> track);
 
   //
   ValueListenable<Set<V>> get active;

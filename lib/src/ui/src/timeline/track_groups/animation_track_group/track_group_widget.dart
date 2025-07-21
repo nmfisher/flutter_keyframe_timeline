@@ -103,6 +103,7 @@ class TrackGroupWidget<V extends AnimationTrackGroup> extends StatelessWidget {
                       ...group.tracks
                           .map(
                             (track) => AnimationChannelEditorWidget(
+                              group:group,
                               track: track,
                               controller: controller,
                             ),

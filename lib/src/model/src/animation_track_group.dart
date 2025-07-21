@@ -15,16 +15,9 @@ abstract class AnimationTrackGroup<V extends ChannelValueType> {
   Iterable<Keyframe<V>> getKeyframesAtFrame(int frame);
 }
 
-class AnimationTrackGroupImpl<V extends ChannelValueType>
+abstract class AnimationTrackGroupImpl<V extends ChannelValueType>
     extends AnimationTrackGroup<V> {
-  
-  @override
-  final List<AnimationTrack<V>> tracks;
-    
-  AnimationTrackGroupImpl(this.tracks, String displayName) {
-    this.displayName.value = displayName;
-  }
-
+      
   @override
   ValueNotifier<String> displayName = ValueNotifier<String>("");
 

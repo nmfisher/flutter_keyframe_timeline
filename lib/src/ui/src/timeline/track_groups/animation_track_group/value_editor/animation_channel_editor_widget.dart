@@ -9,11 +9,13 @@ import 'animation_channel_editor_viewmodel.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class AnimationChannelEditorWidget extends StatefulWidget {
+  final AnimationTrackGroup group;
   final AnimationTrack track;
   final TimelineController controller;
 
   const AnimationChannelEditorWidget({
     super.key,
+    required this.group,
     required this.track,
     required this.controller,
   });
@@ -26,7 +28,11 @@ class AnimationChannelEditorWidget extends StatefulWidget {
 class _AnimationChannelEditorWidgetState
     extends State<AnimationChannelEditorWidget> {
   late final AnimationChannelEditorViewModel viewModel =
-      AnimationChannelEditorViewModelImpl(widget.track, widget.controller);
+      AnimationChannelEditorViewModelImpl(
+        widget.group,
+        widget.track,
+        widget.controller,
+      );
 
   @override
   void dispose() {
@@ -66,8 +72,9 @@ class _AnimationChannelEditorWidgetState
     return SizedBox(
       height: 48,
       child: ValueListenableBuilder(
-        valueListenable: viewModel.valueAtCurrentFrame,
-        builder: (_, ChannelValueType value, __) {
+        valueListenable: widget.controller.currentFrame,
+        builder: (_, int currentFrame, __) {
+          var value = viewModel.getValue(currentFrame);
           var unwrapped = value.unwrap();
           return NumericControlRow(
             key: ObjectKey(value),

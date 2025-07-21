@@ -6,17 +6,19 @@ import 'package:vector_math/vector_math_64.dart';
 abstract class AnimationChannelEditorViewModel<V extends ChannelValueType> {
   ValueListenable<bool> get hasKeyframeAtCurrentFrame;
 
-  ValueListenable<V> get valueAtCurrentFrame;
-
   ///
   Future addKeyframeForCurrentFrame();
 
   ///
   Future deleteKeyframeForCurrentFrame();
 
-  ///
+  //
   void setCurrentFrameValue(List<double> values);
 
+  //
+  V getValue(int frame);
+
+  //
   Future dispose();
 }
 
@@ -29,15 +31,11 @@ class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
     false,
   );
 
-  @override
-  late final ValueNotifier<V> valueAtCurrentFrame;
-
+  final AnimationTrackGroup group;
   final AnimationTrack<V> track;
   final TimelineController controller;
 
-  AnimationChannelEditorViewModelImpl(this.track, this.controller) {
-    final currentValue = track.calculate(controller.currentFrame.value);
-    valueAtCurrentFrame = ValueNotifier<V>(currentValue);
+  AnimationChannelEditorViewModelImpl(this.group, this.track, this.controller) {
     track.keyframes.addListener(_onKeyframesUpdated);
     _onKeyframesUpdated();
 
@@ -49,13 +47,13 @@ class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
   }
 
   void _updateHasKeyframeAtCurrentFrame() {
-    valueAtCurrentFrame.value = track.calculate(controller.currentFrame.value);
+    var hasKeyframeAtCurrentFrame = false;
     for (final kf in this.keyframes) {
       if (kf.frameNumber.value == controller.currentFrame.value) {
-        this.hasKeyframeAtCurrentFrame.value = true;
+        hasKeyframeAtCurrentFrame = true;
       }
     }
-    this.hasKeyframeAtCurrentFrame.value = false;
+    this.hasKeyframeAtCurrentFrame.value = hasKeyframeAtCurrentFrame;
   }
 
   void _onKeyframesUpdated() {
@@ -82,6 +80,7 @@ class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
     }
 
     track.keyframes.removeListener(_onKeyframesUpdated);
+    hasKeyframeAtCurrentFrame.dispose();
   }
 
   void _onKeyframeUpdated() {
@@ -99,8 +98,13 @@ class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
   @override
   Future addKeyframeForCurrentFrame() async {
     final currentFrame = controller.currentFrame.value;
-    var value = controller.getCurrentValue<V>(track);
+    var value = controller.getCurrentValue<V>(group, track);
     track.addOrUpdateKeyframe(currentFrame, value);
+  }
+
+  @override
+  V getValue(int frame) {
+    return controller.getCurrentValue<V>(group, track);
   }
 
   @override
