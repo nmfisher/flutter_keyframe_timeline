@@ -3,6 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/mouse_hover_widget.dart';
 import 'package:mix/mix.dart';
 
+typedef KeyframeIconBuilder = Widget Function(
+  BuildContext context,
+  bool isSelected,
+  bool isHovered,
+  int frameNumber,
+);
+
 class KeyframeDisplayWidget extends StatefulWidget {
   final int pixelsPerFrame;
   final int frameNumber;
@@ -10,12 +17,14 @@ class KeyframeDisplayWidget extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
   final ValueChanged<int>? onFrameNumberChanged;
+  final KeyframeIconBuilder keyframeIconBuilder;
 
   const KeyframeDisplayWidget({
     super.key,
     required this.pixelsPerFrame,
     required this.frameNumber,
     required this.isSelected,
+    required this.keyframeIconBuilder,
     this.onTap,
     this.onDelete,
     this.onFrameNumberChanged,
@@ -105,46 +114,11 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
             offset: const Offset(-16, 0.0),
             child: Container(
               padding: EdgeInsets.all(4),
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: widget.isSelected
-                      ? Colors.amber.withOpacity(0.2)
-                      : Colors.black,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      // darkNeonTheme.colors[$token
-                      //     .color
-                      //     .primary],
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        // color:
-                        //     isHovered || widget.isSelected
-                        //         ? Colors.white
-                        //         : darkNeonTheme.colors[$token
-                        //             .color
-                        //             .onSurfaceVariant]!,
-                        width: isHovered || widget.isSelected ? 2 : 1,
-                      ),
-                      boxShadow: widget.isSelected
-                          ? [
-                              BoxShadow(
-                                color: Colors.amber.withOpacity(0.5),
-                                spreadRadius: 2,
-                                blurRadius: 2,
-                              ),
-                            ]
-                          : null,
-                    ),
-                  ),
-                ),
+              child: widget.keyframeIconBuilder(
+                context,
+                widget.isSelected,
+                isHovered,
+                widget.frameNumber,
               ),
             ),
           ),

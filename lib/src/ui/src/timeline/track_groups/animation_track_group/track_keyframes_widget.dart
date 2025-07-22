@@ -6,12 +6,14 @@ class TrackKeyframesWidget extends StatelessWidget {
   final AnimationTrack track;
   final TimelineController controller;
   final ScrollController scrollController;
+  final KeyframeIconBuilder keyframeIconBuilder;
 
   const TrackKeyframesWidget({
     super.key,
     required this.track,
     required this.controller,
     required this.scrollController,
+    required this.keyframeIconBuilder,
   });
 
   @override
@@ -47,6 +49,7 @@ class TrackKeyframesWidget extends StatelessWidget {
                             pixelsPerFrame: controller.pixelsPerFrame.value,
                             frameNumber: frameNumber,
                             isSelected: isSelected,
+                            keyframeIconBuilder: keyframeIconBuilder,
                           ),
                         );
                       },

@@ -10,12 +10,14 @@ class TrackGroupKeyframesWidget extends StatelessWidget {
   final TimelineController controller;
   final AnimationTrackGroup group;
   final int pixelsPerFrame;
+  final KeyframeIconBuilder keyframeIconBuilder;
 
   const TrackGroupKeyframesWidget({
     super.key,
     required this.controller,
     required this.group,
     required this.pixelsPerFrame,
+    required this.keyframeIconBuilder,
   });
 
   Widget _channel(double width, AnimationTrack track) {
@@ -38,6 +40,7 @@ class TrackGroupKeyframesWidget extends StatelessWidget {
                     pixelsPerFrame: pixelsPerFrame,
                     frameNumber: frameNumber,
                     isSelected: isSelected,
+                    keyframeIconBuilder: keyframeIconBuilder,
                   );
                 },
               );
@@ -58,6 +61,7 @@ class TrackGroupKeyframesWidget extends StatelessWidget {
               pixelsPerFrame: pixelsPerFrame,
               frameNumber: kf.frameNumber.value,
               isSelected: false,
+              keyframeIconBuilder: keyframeIconBuilder,
             ),
           )
           .toList(),
@@ -83,8 +87,7 @@ class TrackGroupKeyframesWidget extends StatelessWidget {
                 _allKeyframes(constraints.maxWidth),
                 if (isExpanded)
                   ...group.tracks
-                      .map((track) => _channel(constraints.maxWidth, track))
-                      .toList(),
+                      .map((track) => _channel(constraints.maxWidth, track)),
               ],
             );
           },
@@ -94,19 +97,3 @@ class TrackGroupKeyframesWidget extends StatelessWidget {
   }
 }
 
-// GestureDetector(
-//         onTapUp: (event) {
-//           _focusNode.requestFocus();
-//           final RenderBox parentBox = context.findRenderObject() as RenderBox;
-//           final localPosition = parentBox.globalToLocal(event.globalPosition);
-
-//           var currentFrame =
-//               ((localPosition.dx - controller.trackNameWidth) /
-//                       controller.pixelsPerFrame.value)
-//                   .floor();
-//           if (currentFrame >= 0) {
-//             controller.setCurrentFrame(currentFrame);
-//           }
-//         },
-//         // vertical ScrollView when track are expanded
-//         child:

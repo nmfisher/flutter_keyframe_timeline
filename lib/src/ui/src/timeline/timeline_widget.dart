@@ -8,6 +8,7 @@ import 'package:flutter_keyframe_timeline/src/ui/src/shared/middle_mouse_scroll_
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/frame_drag_handle.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_background.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_groups_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/keyframe/keyframe_display_widget.dart';
 import 'package:mix/mix.dart';
 
 // Displays a vertical list of all objects of type [V] (each of which is assumed to
@@ -20,8 +21,13 @@ import 'package:mix/mix.dart';
 //
 class TimelineWidget extends StatefulWidget {
   final TimelineController controller;
+  final KeyframeIconBuilder? keyframeIconBuilder;
 
-  const TimelineWidget({super.key, required this.controller});
+  const TimelineWidget({
+    super.key,
+    required this.controller,
+    this.keyframeIconBuilder,
+  });
 
   @override
   // ignore: no_logic_in_create_state
@@ -31,6 +37,46 @@ class TimelineWidget extends StatefulWidget {
 class _TimelineWidgetState<V extends AnimationTrackGroup>
     extends State<TimelineWidget> {
   final TimelineController controller;
+
+  static Widget _defaultIconBuilder(
+    BuildContext context,
+    bool isSelected,
+    bool isHovered,
+    int frameNumber,
+  ) {
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        color: isSelected
+            ? Colors.amber.withOpacity(0.2)
+            : Colors.black,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: Colors.black,
+            shape: BoxShape.circle,
+            border: Border.all(
+              width: isHovered || isSelected ? 2 : 1,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: Colors.amber.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 2,
+                    ),
+                  ]
+                : null,
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -149,6 +195,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                                 controller: controller,
                                 horizontalScrollController:
                                     _horizontalScrollController,
+                                keyframeIconBuilder: widget.keyframeIconBuilder ?? _defaultIconBuilder,
                               ),
                             ),
                             Positioned(
