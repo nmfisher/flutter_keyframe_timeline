@@ -165,6 +165,8 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
       }
     }
 
+    print("$label: start ${start?.value.value} end ${end?.value.value}");
+
     if (start == null) {
       return keyframes.value[keyedFrames.first]!.value.value;
     }

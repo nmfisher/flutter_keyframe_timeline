@@ -33,12 +33,9 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
   Offset? dragStart;
   int initialFrame = 0;
 
-  late final _focusNode = FocusNode();
-
   @override
   void didUpdateWidget(KeyframeDisplayWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    print("didUpdateWidget");
   }
 
   void _showContextMenu(BuildContext context, Offset offset) {
@@ -74,22 +71,14 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      focusNode: _focusNode,
-      onKeyEvent: (node, event) {
-        if (event.logicalKey == LogicalKeyboardKey.delete) {
-          widget.onDelete?.call();
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
-      },
-      child: GestureDetector(
+    return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onPanStart: (details) {
           dragStart = details.localPosition;
           initialFrame = widget.frameNumber;
         },
         onTap: () {
+
           widget.onTap?.call();
         },
         onSecondaryTapDown: (details) {
@@ -119,7 +108,7 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
             );
           },
         ),
-      ),
+      
     );
   }
 }

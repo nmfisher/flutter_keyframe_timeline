@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/keyframe/keyframe_display_widget.dart';
 
@@ -36,23 +37,32 @@ class TrackKeyframesWidget extends StatelessWidget {
                 keyframes: keyframes.values.toList(),
               ),
               children: keyframes.values.map((kf) {
-                    return ValueListenableBuilder(
-                      valueListenable: controller.selected,
-                      builder: (_, selected, __) {
-                        var isSelected = selected.contains(kf);
-                        return Align(
-                          alignment: Alignment.centerLeft,
-                          child: KeyframeDisplayWidget(
-                            pixelsPerFrame: controller.pixelsPerFrame.value,
-                            frameNumber: kf.frameNumber.value,
-                            isSelected: isSelected,
-                            keyframeIconBuilder: keyframeIconBuilder,
-                            onFrameNumberChanged: (int value) {
-                              kf.setFrameNumber(value);
-                            },
-                          ),
-                        );
-                    
+                return ValueListenableBuilder(
+                  valueListenable: controller.selected,
+                  builder: (_, selected, __) {
+                    var isSelected = selected.contains(kf);
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: KeyframeDisplayWidget(
+                        pixelsPerFrame: controller.pixelsPerFrame.value,
+                        frameNumber: kf.frameNumber.value,
+                        isSelected: isSelected,
+                        keyframeIconBuilder: keyframeIconBuilder,
+                        onDelete: () {
+                          track.removeKeyframeAt(kf.frameNumber.value);
+                        },
+                        onTap: () {
+                          controller.select(
+                            kf,
+                            track,
+                            append: HardwareKeyboard.instance.isShiftPressed,
+                          );
+                        },
+                        onFrameNumberChanged: (int value) {
+                          kf.setFrameNumber(value);
+                        },
+                      ),
+                    );
                   },
                 );
               }).toList(),
@@ -73,7 +83,12 @@ class _KeyframeFlowDelegate extends FlowDelegate {
     required this.controller,
     required this.scrollController,
     required this.keyframes,
-  }) : super(repaint: Listenable.merge([scrollController, ...keyframes.map((kf) => kf.frameNumber)]));
+  }) : super(
+         repaint: Listenable.merge([
+           scrollController,
+           ...keyframes.map((kf) => kf.frameNumber),
+         ]),
+       );
 
   @override
   void paintChildren(FlowPaintingContext context) {

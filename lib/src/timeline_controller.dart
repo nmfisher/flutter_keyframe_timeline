@@ -3,9 +3,6 @@ import 'package:flutter_keyframe_timeline/src/model/src/animation_track.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/animation_track_group.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/channel_types.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/keyframe.dart';
-import 'package:vector_math/vector_math_64.dart';
-
-enum SelectionMode { append, replace }
 
 abstract class TimelineController {
   //
@@ -42,6 +39,15 @@ abstract class TimelineController {
   ValueListenable<Set<Keyframe>> get selected;
 
   //
+  void select(Keyframe keyframe, AnimationTrack track, {bool append = false});
+
+  //
+  void clearSelectedKeyframes();
+
+  //
+  void deleteSelectedKeyframes();
+
+  //
   U getCurrentValue<U extends ChannelValueType>(
     AnimationTrackGroup target,
     AnimationTrack<U> track,
@@ -58,10 +64,7 @@ abstract class TimelineController {
   ValueListenable<Set<AnimationTrackGroup>> get active;
 
   //
-  void setActive(AnimationTrackGroup group, bool active);
-
-  //
-  void setSelectionMode(SelectionMode mode);
+  void setActive(AnimationTrackGroup group, bool active, {bool append = false});
 
   //
   ValueListenable<Set<AnimationTrackGroup>> get expanded;
@@ -155,25 +158,41 @@ class TimelineControllerImpl extends TimelineController {
   ValueNotifier<Set<Keyframe<ChannelValueType>>> selected =
       ValueNotifier<Set<Keyframe<ChannelValueType>>>({});
 
+  final _selected = <Keyframe, AnimationTrack>{};
+
+  void select(Keyframe keyframe, AnimationTrack track, {bool append = false}) {
+    if (!append) {
+      clearSelectedKeyframes(notify: false);
+    }
+
+    selected.value.add(keyframe);
+    _selected[keyframe] = track;
+    selected.notifyListeners();
+  }
+
+  void clearSelectedKeyframes({bool notify = true}) {
+    selected.value.clear();
+    _selected.clear();
+  }
+
   @override
   void setVisible(AnimationTrackGroup trackGroup, bool visible) {
     // TODO: implement setVisible
-  }
-
-  var _mode = SelectionMode.replace;
-  void setSelectionMode(SelectionMode mode) {
-    this._mode = mode;
   }
 
   ValueNotifier<Set<AnimationTrackGroup>> active =
       ValueNotifier<Set<AnimationTrackGroup>>({});
 
   @override
-  void setActive(AnimationTrackGroup group, bool active) {
+  void setActive(
+    AnimationTrackGroup group,
+    bool active, {
+    bool append = false,
+  }) {
     if (!active) {
       this.active.value.remove(group);
     } else {
-      if (_mode != SelectionMode.append) {
+      if (!append) {
         this.active.value.clear();
       }
       this.active.value.add(group);
@@ -224,5 +243,15 @@ class TimelineControllerImpl extends TimelineController {
     AnimationTrack<U> track,
   ) {
     return valueBridge.getCurrentValue<U>(target, track);
+  }
+
+  //
+  @override
+  void deleteSelectedKeyframes() {
+    for (final kf in selected.value) {
+      var track = _selected[kf]!;
+      track.removeKeyframeAt(kf.frameNumber.value);
+    }
+    clearSelectedKeyframes(notify: true);
   }
 }
