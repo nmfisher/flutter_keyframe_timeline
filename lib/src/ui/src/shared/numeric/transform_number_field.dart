@@ -10,7 +10,7 @@ class TransformNumberField extends StatefulWidget {
   final Function(DragStartDetails) onDragStart;
   final Function(DragUpdateDetails) onDragUpdate;
   final Function(DragEndDetails) onDragEnd;
-  final ValueChanged<String>? onSubmitted;
+  final ValueChanged<double>? onSubmitted;
   final VoidCallback? onEditingComplete;
   final double min;
   final double max;
@@ -108,7 +108,7 @@ class _TransformNumberFieldState extends State<TransformNumberField>
                   widget.onChanged(clampedValue);
                 }
               },
-              onSubmitted: widget.onSubmitted,
+              onSubmitted: (val) => widget.onSubmitted!(double.parse(val)),
               onEditingComplete: widget.onEditingComplete,
             ),
             Positioned(

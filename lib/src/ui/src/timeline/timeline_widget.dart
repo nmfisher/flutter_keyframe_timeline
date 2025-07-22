@@ -18,19 +18,19 @@ import 'package:mix/mix.dart';
 //
 // Each entry in this inner list displays an editor for the values in that track.
 //
-class TimelineWidget<V extends AnimationTrackGroup> extends StatefulWidget {
-  final TimelineController<V> controller;
+class TimelineWidget extends StatefulWidget {
+  final TimelineController controller;
 
   const TimelineWidget({super.key, required this.controller});
 
   @override
   // ignore: no_logic_in_create_state
-  State<TimelineWidget> createState() => _TimelineWidgetState<V>(controller);
+  State<TimelineWidget> createState() => _TimelineWidgetState(controller);
 }
 
 class _TimelineWidgetState<V extends AnimationTrackGroup>
     extends State<TimelineWidget> {
-  final TimelineController<V> controller;
+  final TimelineController controller;
 
   @override
   void initState() {

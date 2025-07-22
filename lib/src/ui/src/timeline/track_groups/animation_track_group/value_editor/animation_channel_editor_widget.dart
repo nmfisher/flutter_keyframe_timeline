@@ -77,7 +77,7 @@ class _AnimationChannelEditorWidgetState
           var value = viewModel.getValue(currentFrame);
           var unwrapped = value.unwrap();
           return NumericControlRow(
-            label: "Position",
+            label: widget.track.label,
             dimensionLabels: labels,
             values: unwrapped,
             onValuesChanged: (values) => viewModel.setCurrentFrameValue(values),

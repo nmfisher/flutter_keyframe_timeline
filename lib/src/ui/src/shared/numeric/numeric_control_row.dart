@@ -30,7 +30,7 @@ class NumericControlRow extends StatefulWidget {
     this.step = 0.5,
     this.max = 100.0,
     this.min = -100.0,
-    this.showLabel = false, 
+    this.showLabel = false,
   });
 
   @override
@@ -128,17 +128,21 @@ class _NumericControlRowState extends State<NumericControlRow> {
   Widget _buildNumberField(
     String label,
     TextEditingController controller,
-    Function(double) onChanged,
     int index,
   ) {
     return TransformNumberField(
       label: label,
       controller: controller,
-      onChanged: onChanged,
+      onChanged: (value) {
+        // (value) => _onDimensionChanged(index, value),
+      },
       onDragStart: (details) => _handleDragStart(index, details),
       onDragUpdate: (details) => _handleDragUpdate(details),
       onDragEnd: _handleDragEnd,
-      onSubmitted: (_) => setState(() => editingIndex = null),
+      onSubmitted: (value) {
+        _onDimensionChanged(index, value);
+        setState(() => editingIndex = null);
+      },
       onEditingComplete: () => setState(() => editingIndex = null),
       min: widget.min,
       max: widget.max,
@@ -147,23 +151,18 @@ class _NumericControlRowState extends State<NumericControlRow> {
 
   @override
   Widget build(BuildContext context) {
-    return 
-        HBox(
-          // style: Style.combine([TransformControlsStyle.transformRow, Style($box.height(TimelineStyle.lineHeight), $flex.gap(4.0)),]),
-          
-          children: [
-            widget.icon,
-            ...List.generate(
-              widget.dimensionLabels.length,
-              (index) => _buildNumberField(
-                widget.dimensionLabels[index],
-                controllers[index],
-                (value) => _onDimensionChanged(index, value),
-                index,
-              ),
-            ),
-          ],
-        
+    return HBox(
+      children: [
+        widget.icon,
+        ...List.generate(
+          widget.dimensionLabels.length,
+          (index) => _buildNumberField(
+            widget.dimensionLabels[index],
+            controllers[index],
+            index,
+          ),
+        ),
+      ],
     );
   }
 }

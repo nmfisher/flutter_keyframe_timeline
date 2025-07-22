@@ -3,18 +3,19 @@ import 'package:flutter_keyframe_timeline/src/model/src/animation_track.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/animation_track_group.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/channel_types.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/keyframe.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 enum SelectionMode { append, replace }
 
-abstract class TimelineController<V extends AnimationTrackGroup> {
+abstract class TimelineController {
   //
-  ValueNotifier<List<V>> get trackGroups;
+  ValueNotifier<List<AnimationTrackGroup>> get trackGroups;
 
   //
-  void addGroup(V group);
+  void addGroup(AnimationTrackGroup group);
 
   //
-  void deleteGroup(V group);
+  void deleteGroup(AnimationTrackGroup group);
 
   //
   ValueListenable<int> get pixelsPerFrame;
@@ -42,34 +43,59 @@ abstract class TimelineController<V extends AnimationTrackGroup> {
 
   //
   U getCurrentValue<U extends ChannelValueType>(
-    V target,
+    AnimationTrackGroup target,
     AnimationTrack<U> track,
   );
 
   //
-  ValueListenable<Set<V>> get active;
+  void applyValue<U extends ChannelValueType>(
+    AnimationTrackGroup group,
+    AnimationTrack<U> track,
+    List<num> values,
+  );
 
   //
-  void setActive(V group, bool active);
+  ValueListenable<Set<AnimationTrackGroup>> get active;
+
+  //
+  void setActive(AnimationTrackGroup group, bool active);
 
   //
   void setSelectionMode(SelectionMode mode);
 
   //
-  ValueListenable<Set<V>> get expanded;
+  ValueListenable<Set<AnimationTrackGroup>> get expanded;
 
   //
-  void setExpanded(V group, bool expanded);
+  void setExpanded(AnimationTrackGroup group, bool expanded);
 }
 
-abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
-    extends TimelineController<V> {
-  
+abstract class TimelineControllerImpl extends TimelineController {
   @override
-  final ValueNotifier<List<V>> trackGroups = ValueNotifier<List<V>>([]);
+  final ValueNotifier<List<AnimationTrackGroup>> trackGroups =
+      ValueNotifier<List<AnimationTrackGroup>>([]);
 
-  TimelineControllerImpl(List<V> initial) {
+  TimelineControllerImpl(List<AnimationTrackGroup> initial) {
     trackGroups.value.addAll(initial);
+    this.currentFrame.addListener(_onCurrentFrameChanged);
+  }
+
+  void _onCurrentFrameChanged() {
+    for (final group in trackGroups.value) {
+      for (final track in group.tracks) {
+        if (track.keyframes.value.isNotEmpty) {
+          var value = track.calculate(currentFrame.value);
+          applyValue(group, track, value.unwrap());
+        }
+      }
+    }
+  }
+
+  void dispose() {
+    currentFrame.dispose();
+    trackGroups.dispose();
+    pixelsPerFrame.dispose();
+    maxFrames.dispose();
   }
 
   @override
@@ -113,7 +139,7 @@ abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
       ValueNotifier<Set<Keyframe<ChannelValueType>>>({});
 
   @override
-  void setVisible(V trackGroup, bool visible) {
+  void setVisible(AnimationTrackGroup trackGroup, bool visible) {
     // TODO: implement setVisible
   }
 
@@ -122,10 +148,11 @@ abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
     this._mode = mode;
   }
 
-  ValueNotifier<Set<V>> active = ValueNotifier<Set<V>>({});
+  ValueNotifier<Set<AnimationTrackGroup>> active =
+      ValueNotifier<Set<AnimationTrackGroup>>({});
 
   @override
-  void setActive(V group, bool active) {
+  void setActive(AnimationTrackGroup group, bool active) {
     if (!active) {
       this.active.value.remove(group);
     } else {
@@ -138,24 +165,25 @@ abstract class TimelineControllerImpl<V extends AnimationTrackGroup>
   }
 
   @override
-  void addGroup(V group) {
+  void addGroup(AnimationTrackGroup group) {
     this.active.value.add(group);
     this.active.notifyListeners();
   }
 
   @override
-  void deleteGroup(V group) {
+  void deleteGroup(AnimationTrackGroup group) {
     this.active.value.remove(group);
     this.active.notifyListeners();
   }
 
   //
   @override
-  ValueNotifier<Set<V>> expanded = ValueNotifier<Set<V>>({});
+  ValueNotifier<Set<AnimationTrackGroup>> expanded =
+      ValueNotifier<Set<AnimationTrackGroup>>({});
 
   //
   @override
-  void setExpanded(V group, bool expanded) {
+  void setExpanded(AnimationTrackGroup group, bool expanded) {
     if (expanded) {
       this.expanded.value.add(group);
     } else {

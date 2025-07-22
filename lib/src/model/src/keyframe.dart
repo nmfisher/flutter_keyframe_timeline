@@ -5,7 +5,6 @@ enum Interpolation { linear, constant }
 
 //
 //
-//
 abstract class Keyframe<V extends ChannelValueType> {
   
   // The frame number for this keyframe.
@@ -21,11 +20,9 @@ abstract class Keyframe<V extends ChannelValueType> {
   // The value of this keyframe.
   ValueListenable<V> get value;
 
-  // Dispose of
+  // Dispose this object and all value notifiers
   Future dispose();
 
-  // Returns a JSON-serializable map for this keyframe.
-  Map<String, dynamic> toJson();
 }
 
 class KeyframeImpl<V extends ChannelValueType> extends Keyframe<V>
@@ -51,51 +48,9 @@ class KeyframeImpl<V extends ChannelValueType> extends Keyframe<V>
     this.frameNumber.value = frameNumber;
   }
 
-  static KeyframeImpl<QuaternionChannelValueType> quat(dynamic json) =>
-      KeyframeImpl.fromJson<QuaternionChannelValueType>(json);
-
-  static KeyframeImpl<Vector3ChannelValueType> vec3(dynamic json) =>
-      KeyframeImpl.fromJson<Vector3ChannelValueType>(json);
-
   @override
   Future setFrameNumber(int frameNumber) async {
     this.frameNumber.value = frameNumber;
-  }
-
-  static KeyframeImpl<V> fromJson<V extends ChannelValueType>(
-    Map<String, dynamic> json,
-  ) {
-    if (!json.containsKey('frame_number') || !json.containsKey('value')) {
-      throw Exception('Missing required fields in JSON');
-    }
-
-    final frameNumber = json['frame_number'] as int;
-    final List<dynamic> valueList = json['value'];
-    final interpolation = json['interpolation'] != null
-        ? Interpolation.values.firstWhere(
-            (e) => e.toString() == json['interpolation'],
-            orElse: () => Interpolation.constant,
-          )
-        : Interpolation.constant;
-
-    final V value = ChannelValueType.fromJson<V>(
-      valueList.map((v) => (v as num).toDouble()).toList(),
-    );
-
-    return KeyframeImpl<V>(
-      frameNumber: frameNumber,
-      value: value,
-      interpolation: interpolation,
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      'frame_number': frameNumber.value,
-      'value': value.value.toJson(),
-      'interpolation': interpolation.value.toString(),
-    };
   }
 
   @override

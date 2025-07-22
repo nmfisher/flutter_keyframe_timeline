@@ -8,10 +8,10 @@ import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/anima
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/value_editor/animation_channel_editor_widget.dart';
 import 'package:mix/mix.dart';
 
-class TrackGroupWidget<V extends AnimationTrackGroup> extends StatelessWidget {
-  final TimelineController<V> controller;
+class TrackGroupWidget extends StatelessWidget {
+  final TimelineController controller;
   final ScrollController scrollController;
-  final V group;
+  final AnimationTrackGroup group;
 
   final int index;
   final double trackNameWidth;

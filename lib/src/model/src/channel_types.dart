@@ -13,45 +13,15 @@ import 'package:vector_math/vector_math_64.dart';
 // and the scale channel will probably share the same ChannelValueType, even though
 // they are distinct channels.).
 ///
-sealed class ChannelValueType<V> {
+abstract class ChannelValueType<V> {
   String get label;
 
   V get value;
 
   List<num> unwrap();
 
-  dynamic toJson();
-
-  static V fromJson<V extends ChannelValueType>(dynamic json) {
-    switch (V) {
-      case const (ScalarChannelValueType):
-        return ScalarChannelValueType((json as List<double>).first) as V;
-      case const (Vector2ChannelValueType):
-        return Vector2ChannelValueType.fromJson(json as List<double>) as V;
-      case const (Vector3ChannelValueType):
-        return Vector3ChannelValueType.fromJson(json as List<double>) as V;
-      case const (QuaternionChannelValueType):
-        return QuaternionChannelValueType.fromJson(json as List<double>) as V;
-    }
-    throw Exception("TODO");
-  }
-
   ChannelValueType<V> interpolate(ChannelValueType<V> next, double ratio);
-
-  static zero<V extends ChannelValueType>() {
-    switch (V) {
-      case const (ScalarChannelValueType):
-        return ScalarChannelValueType(0.0);
-      case const (Vector4ChannelValueType):
-        return Vector4ChannelValueType(Vector4.zero());
-      case const (Vector3ChannelValueType):
-        return Vector3ChannelValueType(Vector3.zero());
-      case const (Vector2ChannelValueType):
-        return Vector2ChannelValueType(Vector2.zero());
-      case const (QuaternionChannelValueType):
-        return QuaternionChannelValueType(Quaternion.identity());
-    }
-  }
+ 
 }
 
 class ScalarChannelValueType extends ChannelValueType<double> {
@@ -71,10 +41,6 @@ class ScalarChannelValueType extends ChannelValueType<double> {
   @override
   String get label => "SCALAR";
 
-  @override
-  dynamic toJson() {
-    return value;
-  }
 
   @override
   List<num> unwrap() {
@@ -94,14 +60,9 @@ class Vector4ChannelValueType extends ChannelValueType<Vector4> {
   Vector4ChannelValueType(this.value);
 
   @override
-  List<double> toJson() {
-    return [value.x, value.y, value.z];
-  }
-
-  @override
-  factory Vector4ChannelValueType.fromJson(List<double> json) {
-    if (json.length != 4) throw ArgumentError("Expected 4 values for Vector4");
-    return Vector4ChannelValueType(Vector4(json[0], json[1], json[2], json[3]));
+  factory Vector4ChannelValueType.fromUnwrapped(List<num> values) {
+    if (values.length != 4) throw ArgumentError("Expected 4 values for Vector4");
+    return Vector4ChannelValueType(Vector4(values[0].toDouble(), values[1].toDouble(), values[2].toDouble(), values[3].toDouble()));
   }
 
   @override
@@ -132,14 +93,9 @@ class Vector3ChannelValueType extends ChannelValueType<Vector3> {
   Vector3ChannelValueType(this.value);
 
   @override
-  List<double> toJson() {
-    return [value.x, value.y, value.z];
-  }
-
-  @override
-  factory Vector3ChannelValueType.fromJson(List<double> json) {
-    if (json.length != 3) throw ArgumentError("Expected 3 values for Vector3");
-    return Vector3ChannelValueType(Vector3(json[0], json[1], json[2]));
+  factory Vector3ChannelValueType.fromUnwrapped(List<num> values) {
+    if (values.length != 3) throw ArgumentError("Expected 3 values for Vector3");
+    return Vector3ChannelValueType(Vector3(values[0].toDouble(), values[1].toDouble(), values[2].toDouble()));
   }
 
   @override
@@ -159,7 +115,7 @@ class Vector3ChannelValueType extends ChannelValueType<Vector3> {
 }
 
 class Vector2ChannelValueType extends ChannelValueType<Vector2> {
-  Vector3 get zero => Vector3.zero();
+  Vector2 get zero => Vector2.zero();
 
   @override
   final String label = "VEC2";
@@ -169,15 +125,11 @@ class Vector2ChannelValueType extends ChannelValueType<Vector2> {
 
   Vector2ChannelValueType(this.value);
 
-  @override
-  List<double> toJson() {
-    return [value.x, value.y];
-  }
 
   @override
-  factory Vector2ChannelValueType.fromJson(List<double> json) {
-    if (json.length != 2) throw ArgumentError("Expected 3 values for Vector3");
-    return Vector2ChannelValueType(Vector2(json[0], json[1]));
+  factory Vector2ChannelValueType.fromUnwrapped(List<num> values) {
+    if (values.length != 2) throw ArgumentError("Expected 3 values for Vector3");
+    return Vector2ChannelValueType(Vector2(values[0].toDouble(), values[1].toDouble()));
   }
 
   @override
@@ -202,22 +154,18 @@ class QuaternionChannelValueType extends ChannelValueType<Quaternion> {
   @override
   final Quaternion value;
 
+  @override
   final String label = "QUAT";
 
   QuaternionChannelValueType(this.value);
 
   @override
-  List<double> toJson() {
-    return [value.x, value.y, value.z, value.w];
-  }
-
-  @override
-  factory QuaternionChannelValueType.fromJson(List<double> json) {
-    if (json.length != 4) {
+  factory QuaternionChannelValueType.fromUnwrapped(List<num> values) {
+    if (values.length != 4) {
       throw ArgumentError("Expected 4 values for Quaternion");
     }
     return QuaternionChannelValueType(
-      Quaternion(json[0], json[1], json[2], json[3]),
+      Quaternion(values[0].toDouble(), values[1].toDouble(), values[2].toDouble(), values[3].toDouble()),
     );
   }
 
@@ -233,6 +181,8 @@ class QuaternionChannelValueType extends ChannelValueType<Quaternion> {
 
   @override
   List<num> unwrap() {
-    return value.storage;
+    return [value.x, value.y, value.z, value.w];
   }
+
+
 }

@@ -1,21 +1,34 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
 
 abstract class AnimationTrackGroup {
+  //
   ValueListenable<bool> get isVisible;
-  void setVisible(bool visible);
-  // ValueListenable<bool> get isExpanded;
-  // void setExpanded(bool expanded);
 
+  //
+  void setVisible(bool visible);
+
+  //
   ValueListenable<String> get displayName;
+
+  //
   List<AnimationTrack> get tracks;
 
+  //
   bool hasKeyframesAtFrame(int frame);
 
+  //
   Iterable<Keyframe> getKeyframesAtFrame(int frame);
 }
 
-abstract class AnimationTrackGroupImpl extends AnimationTrackGroup {
+class AnimationTrackGroupImpl extends AnimationTrackGroup {
+  @override
+  final List<AnimationTrack> tracks;
+
+  AnimationTrackGroupImpl(this.tracks, String name) {
+    this.displayName.value = name;
+  }
   @override
   ValueNotifier<String> displayName = ValueNotifier<String>("");
 
@@ -47,5 +60,4 @@ abstract class AnimationTrackGroupImpl extends AnimationTrackGroup {
 
   @override
   ValueNotifier<bool> isVisible = ValueNotifier<bool>(true);
-
 }

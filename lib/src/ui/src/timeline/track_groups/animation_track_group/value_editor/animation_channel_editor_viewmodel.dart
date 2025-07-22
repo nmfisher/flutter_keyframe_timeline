@@ -109,6 +109,6 @@ class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
 
   @override
   void setCurrentFrameValue(List<double> values) {
-    track.setFromValues(values);
+    controller.applyValue(group, track, values);
   }
 }
