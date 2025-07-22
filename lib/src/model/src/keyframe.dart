@@ -6,7 +6,6 @@ enum Interpolation { linear, constant }
 //
 //
 abstract class Keyframe<V extends ChannelValueType> {
-  
   // The frame number for this keyframe.
   ValueListenable<int> get frameNumber;
 
@@ -23,17 +22,17 @@ abstract class Keyframe<V extends ChannelValueType> {
   // Dispose this object and all value notifiers
   Future dispose();
 
+  V interpolate(V next, double linearRatio);
 }
 
 class KeyframeImpl<V extends ChannelValueType> extends Keyframe<V>
     implements Comparable<Keyframe<V>> {
-  
   @override
   final ValueNotifier<int> frameNumber = ValueNotifier<int>(0);
 
   @override
   final ValueNotifier<Interpolation> interpolation =
-      ValueNotifier<Interpolation>(Interpolation.constant);
+      ValueNotifier<Interpolation>(Interpolation.linear);
 
   @override
   late final ValueNotifier<V> value;
@@ -41,7 +40,7 @@ class KeyframeImpl<V extends ChannelValueType> extends Keyframe<V>
   KeyframeImpl({
     required int frameNumber,
     required V value,
-    Interpolation interpolation = Interpolation.constant,
+    Interpolation interpolation = Interpolation.linear,
   }) : super() {
     this.value = ValueNotifier<V>(value);
     this.interpolation.value = interpolation;
@@ -63,5 +62,13 @@ class KeyframeImpl<V extends ChannelValueType> extends Keyframe<V>
   @override
   int compareTo(Keyframe<V> other) {
     return frameNumber.value - other.frameNumber.value;
+  }
+
+  @override
+  V interpolate(V next, double linearRatio) {
+    if (interpolation.value == Interpolation.constant) {
+      return value.value;
+    }
+    return value.value.interpolate(next, linearRatio) as V;
   }
 }

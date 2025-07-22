@@ -173,6 +173,9 @@ class TimelineControllerImpl extends TimelineController {
   void clearSelectedKeyframes({bool notify = true}) {
     selected.value.clear();
     _selected.clear();
+    if (notify) {
+      selected.notifyListeners();
+    }
   }
 
   @override

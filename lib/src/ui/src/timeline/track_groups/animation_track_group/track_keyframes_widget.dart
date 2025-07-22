@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
@@ -34,9 +35,9 @@ class TrackKeyframesWidget extends StatelessWidget {
               delegate: _KeyframeFlowDelegate(
                 controller: controller,
                 scrollController: scrollController,
-                keyframes: keyframes.values.toList(),
+                keyframes: track.keyframes,
               ),
-              children: keyframes.values.map((kf) {
+              children: track.keyframes.value.values.map((kf) {
                 return ValueListenableBuilder(
                   valueListenable: controller.selected,
                   builder: (_, selected, __) {
@@ -77,18 +78,21 @@ class TrackKeyframesWidget extends StatelessWidget {
 class _KeyframeFlowDelegate extends FlowDelegate {
   final TimelineController controller;
   final ScrollController scrollController;
-  final List<dynamic> keyframes;
+  late final List<Keyframe> keyframes;
 
   _KeyframeFlowDelegate({
     required this.controller,
     required this.scrollController,
-    required this.keyframes,
+    required ValueListenable<Map<int, Keyframe>> keyframes,
   }) : super(
          repaint: Listenable.merge([
            scrollController,
-           ...keyframes.map((kf) => kf.frameNumber),
+           keyframes,
+           ...keyframes.value.values.map((kf) => kf.frameNumber),
          ]),
-       );
+       ) { 
+        this.keyframes = keyframes.value.values.toList();
+       }
 
   @override
   void paintChildren(FlowPaintingContext context) {

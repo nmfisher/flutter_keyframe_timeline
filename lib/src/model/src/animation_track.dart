@@ -155,6 +155,8 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
     Keyframe? start;
     Keyframe? end;
 
+    print(keyedFrames);
+
     for (final keyedFrameNumber in keyedFrames) {
       if (keyedFrameNumber > frameNumber) {
         end = keyframes.value[keyedFrameNumber]!;
@@ -165,7 +167,9 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
       }
     }
 
-    print("$label: start ${start?.value.value} end ${end?.value.value}");
+    print(
+      "$label at $frameNumber: start ${start?.value.value.unwrap()} end ${end?.value.value.unwrap()}",
+    );
 
     if (start == null) {
       return keyframes.value[keyedFrames.first]!.value.value;
@@ -179,7 +183,7 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
         (frameNumber - start.frameNumber.value) /
         (end.frameNumber.value - start.frameNumber.value);
 
-    return start.value.value.interpolate(end.value.value, linearRatio) as V;
+    return start.interpolate(end.value.value, linearRatio) as V;
   }
 
   @override
