@@ -7,6 +7,7 @@ class MiddleMouseScrollView extends StatefulWidget {
   final ScrollPhysics? physics;
   final Axis scrollDirection;
   final HitTestBehavior hitTestBehavior;
+  final void Function(Offset localPosition) onPrimaryMouseDown;
   final Clip clipBehavior;
 
   const MiddleMouseScrollView({
@@ -17,6 +18,7 @@ class MiddleMouseScrollView extends StatefulWidget {
     required this.scrollDirection,
     required this.hitTestBehavior,
     required this.clipBehavior,
+    required this.onPrimaryMouseDown,
   });
 
   @override
@@ -49,7 +51,7 @@ class _MiddleMouseScrollViewState extends State<MiddleMouseScrollView> {
       final delta = widget.scrollDirection == Axis.vertical
           ? event.scrollDelta.dy
           : event.scrollDelta.dx;
-      
+
       _scrollController.position.moveTo(
         _scrollController.position.pixels + delta,
         clamp: true,
@@ -64,14 +66,16 @@ class _MiddleMouseScrollViewState extends State<MiddleMouseScrollView> {
     final scrollDelta = widget.scrollDirection == Axis.vertical
         ? -delta.dy
         : -delta.dx;
-    
+
     _scrollController.position.moveTo(
       _scrollController.position.pixels + scrollDelta,
       clamp: true,
     );
-    
+
     _lastMousePosition = event.position;
   }
+
+  Offset? _primaryMouseStart;
 
   @override
   Widget build(BuildContext context) {
@@ -82,13 +86,24 @@ class _MiddleMouseScrollViewState extends State<MiddleMouseScrollView> {
             _isMiddleMousePressed = true;
             _lastMousePosition = event.position;
           });
+        } else if (event.buttons & kPrimaryButton != 0) {
+          _primaryMouseStart = event.localPosition;
         }
       },
       onPointerUp: (PointerUpEvent event) {
-        setState(() {
-          _isMiddleMousePressed = false;
-          _lastMousePosition = null;
-        });
+        if (!_isMiddleMousePressed) {
+          final travelled =
+              (event.localPosition - _primaryMouseStart!).distance;
+          print("travelled $travelled");
+          if (travelled < 2) {
+            widget.onPrimaryMouseDown.call(event.localPosition);
+          }
+        } else {
+          setState(() {
+            _isMiddleMousePressed = false;
+            _lastMousePosition = null;
+          });
+        }
       },
       onPointerMove: _handlePointerMove,
       onPointerSignal: _handleMiddleMouseScroll,

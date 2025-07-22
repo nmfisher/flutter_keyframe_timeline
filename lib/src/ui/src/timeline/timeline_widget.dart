@@ -80,6 +80,14 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
         clipBehavior: Clip.hardEdge,
         controller: _horizontalScrollController,
         scrollDirection: Axis.horizontal,
+        onPrimaryMouseDown: (Offset localPosition) {
+          var pixelsPerFrame = controller.pixelsPerFrame.value;
+          var offset = _horizontalScrollController.offset;
+          var newFrame =
+              (offset + localPosition.dx) / pixelsPerFrame.toDouble();
+          print("newFrame $newFrame");
+          controller.setCurrentFrame(newFrame.ceil());
+        },
         slivers: [
           SliverToBoxAdapter(
             child: Container(
