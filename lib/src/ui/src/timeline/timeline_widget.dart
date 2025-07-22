@@ -178,26 +178,26 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                               child: MouseRegion(
                                 opaque: false,
                                 child: Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerDown: (_) {
-          // _focusNode.requestFocus();
-          widget.controller.clearSelectedKeyframes();
-        },
-        child: 
-                                TrackGroupsWidget(
-                                  trackNameWidth: trackNameWidth,
-                                  controller: controller,
-                                  horizontalScrollController:
-                                      _horizontalScrollController,
-                                  keyframeIconBuilder:
-                                      widget.keyframeIconBuilder ??
-                                      widget.style?.keyframeIconBuilder ??
-                                      _defaultIconBuilder,
-                                  keyframeToggleIconBuilder:
-                                      widget.style?.keyframeToggleIconBuilder,
+                                  behavior: HitTestBehavior.translucent,
+                                  onPointerDown: (_) {
+                                    _focusNode.requestFocus();
+                                    widget.controller.clearSelectedKeyframes();
+                                  },
+                                  child: TrackGroupsWidget(
+                                    trackNameWidth: trackNameWidth,
+                                    controller: controller,
+                                    horizontalScrollController:
+                                        _horizontalScrollController,
+                                    keyframeIconBuilder:
+                                        widget.keyframeIconBuilder ??
+                                        widget.style?.keyframeIconBuilder ??
+                                        _defaultIconBuilder,
+                                    keyframeToggleIconBuilder:
+                                        widget.style?.keyframeToggleIconBuilder,
+                                  ),
                                 ),
                               ),
-                            )),
+                            ),
                           ],
                         ),
                       ),
