@@ -6,14 +6,12 @@ import 'package:mix/mix.dart';
 class TrackGroupsWidget extends StatelessWidget {
   final TimelineController controller;
   final ScrollController horizontalScrollController;
-  final bool showTrackKeyframes;
   final double trackNameWidth;
 
   const TrackGroupsWidget({
     super.key,
     required this.controller,
     required this.horizontalScrollController,
-    this.showTrackKeyframes = false,
     required this.trackNameWidth,
   });
 
