@@ -17,7 +17,8 @@ class _MouseHoverWidgetState extends State<MouseHoverWidget> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      hitTestBehavior: HitTestBehavior.translucent,
+      opaque: false,
+      hitTestBehavior: HitTestBehavior.opaque,
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),

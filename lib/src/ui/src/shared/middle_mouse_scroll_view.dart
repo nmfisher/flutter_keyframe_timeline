@@ -79,6 +79,7 @@ class _MiddleMouseScrollViewState extends State<MiddleMouseScrollView> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Listener(
       onPointerDown: (PointerDownEvent event) {
         if (event.buttons & kMiddleMouseButton != 0) {
@@ -106,9 +107,9 @@ class _MiddleMouseScrollViewState extends State<MiddleMouseScrollView> {
       },
       onPointerMove: _handlePointerMove,
       onPointerSignal: _handleMiddleMouseScroll,
-      behavior: widget.hitTestBehavior,
+      behavior: HitTestBehavior.translucent,
       child: CustomScrollView(
-        hitTestBehavior: widget.hitTestBehavior,
+        hitTestBehavior: HitTestBehavior.translucent,
         scrollDirection: widget.scrollDirection,
         clipBehavior: widget.clipBehavior,
         controller: _scrollController,

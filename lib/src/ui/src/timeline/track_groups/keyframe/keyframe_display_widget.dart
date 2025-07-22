@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/mouse_hover_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
-
-typedef KeyframeIconBuilder = Widget Function(
-  BuildContext context,
-  bool isSelected,
-  bool isHovered,
-  int frameNumber,
-);
 
 class KeyframeDisplayWidget extends StatefulWidget {
   final int pixelsPerFrame;
@@ -73,7 +67,6 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
 
   @override
   Widget build(BuildContext context) {
-
     return Focus(
       focusNode: _focusNode,
       onKeyEvent: (node, event) {
@@ -83,45 +76,44 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
         }
         return KeyEventResult.ignored;
       },
-      child: MouseHoverWidget(
-        builder: (isHovered) => GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onPanStart: (details) {
-            dragStart = details.localPosition;
-            initialFrame = widget.frameNumber;
-          },
-          onTap: () {
-            widget.onTap?.call();
-          },
-          onSecondaryTapDown: (details) {
-            if (widget.isSelected) {
-              _showContextMenu(context, details.globalPosition);
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onPanStart: (details) {
+          dragStart = details.localPosition;
+          initialFrame = widget.frameNumber;
+        },
+        onTap: () {
+          widget.onTap?.call();
+        },
+        onSecondaryTapDown: (details) {
+          if (widget.isSelected) {
+            _showContextMenu(context, details.globalPosition);
+          }
+        },
+        onPanUpdate: (details) {
+          if (dragStart != null) {
+            final dragDelta = details.localPosition.dx - dragStart!.dx;
+            final frameDelta = (dragDelta / widget.pixelsPerFrame).round();
+            final newFrame = initialFrame + frameDelta;
+            final clampedFrame = newFrame.clamp(0, double.infinity).toInt();
+            widget.onFrameNumberChanged?.call(clampedFrame);
+          }
+        },
+        onPanEnd: (_) {
+          dragStart = null;
+        },
+        child: MouseHoverWidget(
+          builder: (isHovered) {
+            if (isHovered) {
+              print("YES");
             }
+            return widget.keyframeIconBuilder(
+              context,
+              widget.isSelected,
+              isHovered,
+              widget.frameNumber,
+            );
           },
-          onPanUpdate: (details) {
-            if (dragStart != null) {
-              final dragDelta = details.localPosition.dx - dragStart!.dx;
-              final frameDelta = (dragDelta / widget.pixelsPerFrame).round();
-              final newFrame = initialFrame + frameDelta;
-              final clampedFrame = newFrame.clamp(0, double.infinity).toInt();
-              widget.onFrameNumberChanged?.call(clampedFrame);
-            }
-          },
-          onPanEnd: (_) {
-            dragStart = null;
-          },
-          child: Transform.translate(
-            offset: const Offset(-16, 0.0),
-            child: Container(
-              padding: EdgeInsets.all(4),
-              child: widget.keyframeIconBuilder(
-                context,
-                widget.isSelected,
-                isHovered,
-                widget.frameNumber,
-              ),
-            ),
-          ),
         ),
       ),
     );

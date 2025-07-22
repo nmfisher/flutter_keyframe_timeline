@@ -7,8 +7,9 @@ import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/middle_mouse_scroll_view.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/frame_drag_handle.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_background.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_scroller.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_groups_widget.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/keyframe/keyframe_display_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
 
 // Displays a vertical list of all objects of type [V] (each of which is assumed to
@@ -21,12 +22,16 @@ import 'package:mix/mix.dart';
 //
 class TimelineWidget extends StatefulWidget {
   final TimelineController controller;
+  final TimelineStyle? style;
   final KeyframeIconBuilder? keyframeIconBuilder;
+  final FrameDragHandleBuilder? frameDragHandleBuilder;
 
   const TimelineWidget({
     super.key,
     required this.controller,
+    this.style,
     this.keyframeIconBuilder,
+    this.frameDragHandleBuilder,
   });
 
   @override
@@ -48,9 +53,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
       width: 24,
       height: 24,
       decoration: BoxDecoration(
-        color: isSelected
-            ? Colors.amber.withOpacity(0.2)
-            : Colors.black,
+        color: isSelected ? Colors.amber.withOpacity(0.2) : Colors.black,
         shape: BoxShape.circle,
       ),
       child: Center(
@@ -60,9 +63,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
           decoration: BoxDecoration(
             color: Colors.black,
             shape: BoxShape.circle,
-            border: Border.all(
-              width: isHovered || isSelected ? 2 : 1,
-            ),
+            border: Border.all(width: isHovered || isSelected ? 2 : 1),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
@@ -112,41 +113,6 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
 
   final trackNameWidth = 280.0;
   final trackHeight = 50.0;
-  final playheadHeight = 50.0;
-
-  Widget _scrollArea() {
-    return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(context).copyWith(
-        dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse},
-        scrollbars: true,
-      ),
-      child: MiddleMouseScrollView(
-        physics: ClampingScrollPhysics(),
-        hitTestBehavior: HitTestBehavior.translucent,
-        clipBehavior: Clip.hardEdge,
-        controller: _horizontalScrollController,
-        scrollDirection: Axis.horizontal,
-        onPrimaryMouseDown: (Offset localPosition) {
-          var pixelsPerFrame = controller.pixelsPerFrame.value;
-          var offset = _horizontalScrollController.offset;
-          var newFrame =
-              (offset + localPosition.dx) / pixelsPerFrame.toDouble();
-          print("newFrame $newFrame");
-          controller.setCurrentFrame(newFrame.ceil());
-        },
-        slivers: [
-          SliverToBoxAdapter(
-            child: Container(
-              color: Colors.transparent,
-              width:
-                  controller.maxFrames.value.toDouble() *
-                  controller.pixelsPerFrame.value,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   //
   // The z-ordering and scroll implementation can be a bit tricky to follow.
@@ -173,7 +139,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
               fit: StackFit.expand,
               children: [
                 Positioned.fill(
-                  top: playheadHeight,
+                  top: widget.style?.frameDragHandleStyle.height ?? 50.0,
                   child: CustomScrollView(
                     physics: ClampingScrollPhysics(),
                     hitTestBehavior: HitTestBehavior.translucent,
@@ -188,6 +154,17 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                             $box.width(constraints.maxWidth),
                           ),
                           children: [
+                            Positioned(
+                              top: 0,
+                              height: constraints.maxHeight,
+                              right: 0,
+                              left: trackNameWidth,
+                              child: TimelineScroller(
+                                inner: Container(color: Colors.transparent),
+                                controller: controller,
+                                scrollController: _horizontalScrollController,
+                              ),
+                            ),
                             Padding(
                               padding: EdgeInsets.only(top: 30),
                               child: TrackGroupsWidget(
@@ -195,15 +172,13 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                                 controller: controller,
                                 horizontalScrollController:
                                     _horizontalScrollController,
-                                keyframeIconBuilder: widget.keyframeIconBuilder ?? _defaultIconBuilder,
+                                keyframeIconBuilder:
+                                    widget.keyframeIconBuilder ??
+                                    widget.style?.keyframeIconBuilder ??
+                                    _defaultIconBuilder,
+                                keyframeToggleIconBuilder:
+                                    widget.style?.keyframeToggleIconBuilder,
                               ),
-                            ),
-                            Positioned(
-                              top: 0,
-                              height: constraints.maxHeight,
-                              right: 0,
-                              left: trackNameWidth,
-                              child: _scrollArea(),
                             ),
                           ],
                         ),
@@ -217,8 +192,9 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                   left: trackNameWidth,
                   child: FrameDragHandle(
                     scrollController: _horizontalScrollController,
-                    playheadHeight: playheadHeight,
                     controller: controller,
+                    frameDragHandleBuilder: widget.frameDragHandleBuilder,
+                    style: widget.style?.frameDragHandleStyle,
                   ),
                 ),
               ],

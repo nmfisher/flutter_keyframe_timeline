@@ -70,12 +70,29 @@ abstract class TimelineController {
   void setExpanded(AnimationTrackGroup group, bool expanded);
 }
 
-abstract class TimelineControllerImpl extends TimelineController {
+abstract class ValueBridge {
+  //
+  U getCurrentValue<U extends ChannelValueType>(
+    AnimationTrackGroup target,
+    AnimationTrack<U> track,
+  );
+
+  //
+  void applyValue<U extends ChannelValueType>(
+    AnimationTrackGroup group,
+    AnimationTrack<U> track,
+    List<num> values,
+  );
+}
+
+class TimelineControllerImpl extends TimelineController {
   @override
   final ValueNotifier<List<AnimationTrackGroup>> trackGroups =
       ValueNotifier<List<AnimationTrackGroup>>([]);
 
-  TimelineControllerImpl(List<AnimationTrackGroup> initial) {
+  final ValueBridge valueBridge;
+
+  TimelineControllerImpl(List<AnimationTrackGroup> initial, this.valueBridge) {
     trackGroups.value.addAll(initial);
     this.currentFrame.addListener(_onCurrentFrameChanged);
   }
@@ -190,5 +207,22 @@ abstract class TimelineControllerImpl extends TimelineController {
       this.expanded.value.remove(group);
     }
     this.expanded.notifyListeners();
+  }
+
+  @override
+  void applyValue<U extends ChannelValueType>(
+    AnimationTrackGroup group,
+    AnimationTrack<U> track,
+    List<num> values,
+  ) {
+    valueBridge.applyValue(group, track, values);
+  }
+
+  @override
+  U getCurrentValue<U extends ChannelValueType>(
+    AnimationTrackGroup target,
+    AnimationTrack<U> track,
+  ) {
+    return valueBridge.getCurrentValue<U>(target, track);
   }
 }

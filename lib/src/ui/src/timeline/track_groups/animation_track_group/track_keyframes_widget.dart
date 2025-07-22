@@ -74,7 +74,7 @@ class _KeyframeFlowDelegate extends FlowDelegate {
     required this.controller,
     required this.scrollController,
     required this.keyframes,
-  }) : super(
+  }) : super(repaint:scrollController
        );
 
   @override

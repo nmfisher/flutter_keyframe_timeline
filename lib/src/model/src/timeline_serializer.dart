@@ -1,7 +1,7 @@
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-class JsonSerializer {
+class TimelineSerializer {
   static zero<V extends ChannelValueType>() {
     switch (V) {
       case const (ScalarChannelValueType):

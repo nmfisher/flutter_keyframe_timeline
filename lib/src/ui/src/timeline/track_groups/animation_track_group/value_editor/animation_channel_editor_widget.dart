@@ -2,22 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/numeric/numeric_control_row.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
 
 import 'animation_channel_editor_viewmodel.dart';
-
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class AnimationChannelEditorWidget extends StatefulWidget {
   final AnimationTrackGroup group;
   final AnimationTrack track;
   final TimelineController controller;
+  final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
 
   const AnimationChannelEditorWidget({
     super.key,
     required this.group,
     required this.track,
     required this.controller,
+    this.keyframeToggleIconBuilder,
   });
 
   @override
@@ -40,33 +41,65 @@ class _AnimationChannelEditorWidgetState
     viewModel.dispose();
   }
 
+  static Widget _defaultToggleIconBuilder(
+    BuildContext context,
+    bool hasKeyframeAtCurrentFrame,
+    VoidCallback onPressed,
+  ) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: Transform.rotate(
+        angle: 0.785398, // 45 degrees in radians (pi/4) for diamond shape
+        child: Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: hasKeyframeAtCurrentFrame
+                ? Colors.blue
+                : Colors.grey.withValues(alpha: 0.2),
+            border: Border.all(
+              color: hasKeyframeAtCurrentFrame
+                  ? Colors.black
+                  : Colors.grey.withValues(alpha: 0.5),
+              width: 1,
+            ),
+          ),
+        ),
+      ),
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final labels = widget.track.labels;
 
     final icon = ValueListenableBuilder(
       valueListenable: viewModel.hasKeyframeAtCurrentFrame,
-      builder: (_, hasKeyframeAtCurrentFrame, __) => IconButton(
-        key: Key(
-          "${widget.track.hashCode}_editor_has_keyframe_at_current_frame_$hasKeyframeAtCurrentFrame",
-        ),
-        onPressed: () {
+      builder: (_, hasKeyframeAtCurrentFrame, __) {
+        void onPressed() {
           if (!hasKeyframeAtCurrentFrame) {
             viewModel.addKeyframeForCurrentFrame();
           } else {
             viewModel.deleteKeyframeForCurrentFrame();
           }
-        },
-        icon: PhosphorIcon(
-          PhosphorIcons.diamond(),
-          color: hasKeyframeAtCurrentFrame
-              ? Colors.amber
-              : Colors.pink, // $token.color.onSurfaceVariant.resolve(context),
-          size: 12,
-        ),
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-      ),
+        }
+
+        if (widget.keyframeToggleIconBuilder != null) {
+          return widget.keyframeToggleIconBuilder!(
+            context,
+            hasKeyframeAtCurrentFrame,
+            onPressed,
+          );
+        }
+
+        return _defaultToggleIconBuilder(
+          context,
+          hasKeyframeAtCurrentFrame,
+          onPressed,
+        );
+      },
     );
 
     return SizedBox(

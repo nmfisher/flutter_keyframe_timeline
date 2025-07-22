@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_keyframe_timeline/src/model/src/json_serializer.dart';
+import 'package:flutter_keyframe_timeline/src/model/src/timeline_serializer.dart';
 import 'package:logging/logging.dart';
 import 'package:vector_math/vector_math_64.dart';
 import 'channel_types.dart';
@@ -91,7 +91,7 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
   @override
   final String label;
 
-  JsonSerializer? serializer;
+  TimelineSerializer? serializer;
 
   AnimationTrackImpl(
     List<Keyframe<V>> keyframes,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/animation_track.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/animation_track_group.dart';
 import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/keyframe/keyframe_display_widget.dart';
 import 'package:mix/mix.dart';
 

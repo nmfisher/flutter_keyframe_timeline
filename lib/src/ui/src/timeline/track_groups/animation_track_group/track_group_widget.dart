@@ -6,7 +6,7 @@ import 'package:flutter_keyframe_timeline/src/ui/src/shared/expand_icon.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_keyframes_widget.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_visibility_widget.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/value_editor/animation_channel_editor_widget.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/keyframe/keyframe_display_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
 
 class TrackGroupWidget extends StatelessWidget {
@@ -17,6 +17,7 @@ class TrackGroupWidget extends StatelessWidget {
   final int index;
   final double trackNameWidth;
   final KeyframeIconBuilder keyframeIconBuilder;
+  final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
 
   const TrackGroupWidget({
     super.key,
@@ -26,6 +27,7 @@ class TrackGroupWidget extends StatelessWidget {
     required this.index,
     required this.trackNameWidth,
     required this.keyframeIconBuilder,
+    this.keyframeToggleIconBuilder,
   });
 
   Widget _groupName(bool isExpanded) {
@@ -114,15 +116,17 @@ class TrackGroupWidget extends StatelessWidget {
                             group: group,
                             track: track,
                             controller: controller,
+                            keyframeToggleIconBuilder: keyframeToggleIconBuilder,
                           ),
                         ),
-                        Expanded(child:
-                        TrackKeyframesWidget(
-                          controller: controller,
-                          scrollController: scrollController,
-                          track: track,
-                          keyframeIconBuilder: keyframeIconBuilder,
-                        )),
+                        Expanded(
+                          child: TrackKeyframesWidget(
+                            controller: controller,
+                            scrollController: scrollController,
+                            track: track,
+                            keyframeIconBuilder: keyframeIconBuilder,
+                          ),
+                        ),
                       ],
                     ),
                   )
