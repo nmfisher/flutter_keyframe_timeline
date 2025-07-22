@@ -101,8 +101,6 @@ class TimelineTickPainter extends CustomPainter {
 
     final numFrames = endFrame - startFrame;
 
-    print("startFrame $startFrame startFrame $endFrame");
-
     // Draw vertical lines for all minor ticks
     for (int frame = startFrame; frame <= endFrame; frame++) {
       
