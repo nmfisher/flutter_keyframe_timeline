@@ -87,6 +87,9 @@ class _KeyframeFlowDelegate extends FlowDelegate {
   }) : super(
          repaint: Listenable.merge([
            scrollController,
+           controller.currentFrame,
+           controller.maxFrames,
+           controller.pixelsPerFrame,
            keyframes,
            ...keyframes.value.values.map((kf) => kf.frameNumber),
          ]),
