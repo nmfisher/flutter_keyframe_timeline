@@ -231,39 +231,39 @@ class _MyHomePageState extends State<MyHomePage> {
                 return Positioned(
                   left: obj.position.dx,
                   top: obj.position.dy,
-                  child: Transform.rotate(
-                    angle: obj.rotation,
-                    child: Transform.scale(
-                      scaleX: obj.scaleX,
-                      scaleY: obj.scaleY,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedObject = obj;
-                          });
-                          _controller.setActive(obj.trackGroup, true);
-                        },
-                        onPanUpdate: (details) {
-                          if (_selectedObject == obj) {
-                            final isShiftPressed = HardwareKeyboard.instance.isShiftPressed;
-                            
-                            setState(() {
-                              if (isShiftPressed) {
-                                // Scale mode: use vertical drag to scale uniformly
-                                final scaleChange = -details.delta.dy * 0.01; // Negative for intuitive up=bigger
-                                obj.scaleX = (obj.scaleX + scaleChange).clamp(0.1, 5.0);
-                                obj.scaleY = (obj.scaleY + scaleChange).clamp(0.1, 5.0);
-                              } else {
-                                // Move mode: update position
-                                obj.position = Offset(
-                                  obj.position.dx + details.delta.dx,
-                                  obj.position.dy + details.delta.dy,
-                                );
-                              }
-                            });
-                            _objectHolder.onUpdate.call();
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedObject = obj;
+                      });
+                      _controller.setActive(obj.trackGroup, true);
+                    },
+                    onPanUpdate: (details) {
+                      if (_selectedObject == obj) {
+                        final isShiftPressed = HardwareKeyboard.instance.isShiftPressed;
+                        
+                        setState(() {
+                          if (isShiftPressed) {
+                            // Scale mode: use vertical drag to scale uniformly
+                            final scaleChange = -details.delta.dy * 0.01; // Negative for intuitive up=bigger
+                            obj.scaleX = (obj.scaleX + scaleChange).clamp(0.1, 5.0);
+                            obj.scaleY = (obj.scaleY + scaleChange).clamp(0.1, 5.0);
+                          } else {
+                            // Move mode: update position
+                            obj.position = Offset(
+                              obj.position.dx + details.delta.dx,
+                              obj.position.dy + details.delta.dy,
+                            );
                           }
-                        },
+                        });
+                        _objectHolder.onUpdate.call();
+                      }
+                    },
+                    child: Transform.rotate(
+                      angle: obj.rotation,
+                      child: Transform.scale(
+                        scaleX: obj.scaleX,
+                        scaleY: obj.scaleY,
                         child: Container(
                           width: 50, 
                           height: 50, 
