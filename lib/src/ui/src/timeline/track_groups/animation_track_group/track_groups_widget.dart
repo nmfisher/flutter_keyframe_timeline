@@ -39,10 +39,23 @@ class _TrackGroupsWidgetState extends State<TrackGroupsWidget> {
     return Focus(
       focusNode: _focusNode,
       onKeyEvent: (node, event) {
-        if (event.logicalKey == LogicalKeyboardKey.delete) {
-          widget.controller.deleteSelectedKeyframes();
-          return KeyEventResult.handled;
+        if (event is KeyUpEvent) {
+          switch (event.logicalKey) {
+            case LogicalKeyboardKey.delete:
+              widget.controller.deleteSelectedKeyframes();
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.arrowLeft:
+              widget.controller.setCurrentFrame(
+                widget.controller.currentFrame.value - 1,
+              );
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.arrowRight:
+              widget.controller.setCurrentFrame(
+                widget.controller.currentFrame.value + 1,
+              );
+          }
         }
+
         return KeyEventResult.ignored;
       },
       child: GestureDetector(
