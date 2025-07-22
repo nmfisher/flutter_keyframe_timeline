@@ -36,9 +36,6 @@ class TrackKeyframesWidget extends StatelessWidget {
                 keyframes: keyframes.values.toList(),
               ),
               children: keyframes.values.map((kf) {
-                return ValueListenableBuilder(
-                  valueListenable: kf.frameNumber,
-                  builder: (_, frameNumber, __) {
                     return ValueListenableBuilder(
                       valueListenable: controller.selected,
                       builder: (_, selected, __) {
@@ -47,13 +44,15 @@ class TrackKeyframesWidget extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: KeyframeDisplayWidget(
                             pixelsPerFrame: controller.pixelsPerFrame.value,
-                            frameNumber: frameNumber,
+                            frameNumber: kf.frameNumber.value,
                             isSelected: isSelected,
                             keyframeIconBuilder: keyframeIconBuilder,
+                            onFrameNumberChanged: (int value) {
+                              kf.setFrameNumber(value);
+                            },
                           ),
                         );
-                      },
-                    );
+                    
                   },
                 );
               }).toList(),
@@ -74,8 +73,7 @@ class _KeyframeFlowDelegate extends FlowDelegate {
     required this.controller,
     required this.scrollController,
     required this.keyframes,
-  }) : super(repaint:scrollController
-       );
+  }) : super(repaint: Listenable.merge([scrollController, ...keyframes.map((kf) => kf.frameNumber)]));
 
   @override
   void paintChildren(FlowPaintingContext context) {

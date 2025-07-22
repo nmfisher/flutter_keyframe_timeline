@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/mouse_hover_widget.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
@@ -10,7 +11,7 @@ class KeyframeDisplayWidget extends StatefulWidget {
   final bool isSelected;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
-  final ValueChanged<int>? onFrameNumberChanged;
+  final ValueChanged<int> onFrameNumberChanged;
   final KeyframeIconBuilder keyframeIconBuilder;
 
   const KeyframeDisplayWidget({
@@ -21,7 +22,7 @@ class KeyframeDisplayWidget extends StatefulWidget {
     required this.keyframeIconBuilder,
     this.onTap,
     this.onDelete,
-    this.onFrameNumberChanged,
+    required this.onFrameNumberChanged,
   });
 
   @override
@@ -33,6 +34,12 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
   int initialFrame = 0;
 
   late final _focusNode = FocusNode();
+
+  @override
+  void didUpdateWidget(KeyframeDisplayWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print("didUpdateWidget");
+  }
 
   void _showContextMenu(BuildContext context, Offset offset) {
     final RenderBox overlay =
@@ -104,9 +111,6 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
         },
         child: MouseHoverWidget(
           builder: (isHovered) {
-            if (isHovered) {
-              print("YES");
-            }
             return widget.keyframeIconBuilder(
               context,
               widget.isSelected,
