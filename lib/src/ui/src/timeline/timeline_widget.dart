@@ -89,30 +89,16 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
 
   late final _focusNode = FocusNode();
 
-  OverlayEntry? _overlayEntry;
-
   @override
   void dispose() {
     _horizontalScrollController.dispose();
     _focusNode.dispose();
-    HardwareKeyboard.instance.removeHandler(_onKey);
     super.dispose();
   }
 
   _TimelineWidgetState(this.controller);
 
-  bool _onKey(KeyEvent event) {
-    if (event.logicalKey == LogicalKeyboardKey.escape) {
-      _overlayEntry?.remove();
-      _overlayEntry = null;
-      HardwareKeyboard.instance.removeHandler(_onKey);
-      return true;
-    }
-    return false;
-  }
-
   final trackNameWidth = 280.0;
-  final trackHeight = 50.0;
 
   //
   // The z-ordering and scroll implementation can be a bit tricky to follow.
@@ -126,17 +112,37 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
   //   to match the horizontal scroll; this will never scroll vertically.)
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (ctx, constraints) {
-        return TimelineBackground(
-          trackNameWidth: trackNameWidth,
-          controller: controller,
-          scrollController: _horizontalScrollController,
-          tickColor: Colors.black,
-          inner: SizedBox(
-            height: constraints.maxHeight,
-            child: Stack(
-              fit: StackFit.expand,
+    return Focus(
+      focusNode: _focusNode,
+      onKeyEvent: (node, event) {
+        if (event is KeyUpEvent) {
+          switch (event.logicalKey) {
+            case LogicalKeyboardKey.delete:
+              widget.controller.deleteSelectedKeyframes();
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.arrowLeft:
+              widget.controller.setCurrentFrame(
+                widget.controller.currentFrame.value - 1,
+              );
+              return KeyEventResult.handled;
+            case LogicalKeyboardKey.arrowRight:
+              widget.controller.setCurrentFrame(
+                widget.controller.currentFrame.value + 1,
+              );
+          }
+        }
+
+        return KeyEventResult.ignored;
+      },
+      child: LayoutBuilder(
+        builder: (ctx, constraints) {
+          return TimelineBackground(
+            trackNameWidth: trackNameWidth,
+            controller: controller,
+            scrollController: _horizontalScrollController,
+            tickColor: Colors.black,
+            inner: ZBox(
+              style: Style($box.height(constraints.maxHeight)),
               children: [
                 Positioned.fill(
                   top: widget.style?.frameDragHandleStyle.height ?? 50.0,
@@ -159,27 +165,39 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                               height: constraints.maxHeight,
                               right: 0,
                               left: trackNameWidth,
-                              child: TimelineScroller(
-                                inner: Container(color: Colors.transparent),
-                                controller: controller,
-                                scrollController: _horizontalScrollController,
+                              child: MouseRegion(
+                                child: TimelineScroller(
+                                  inner: Container(),
+                                  controller: controller,
+                                  scrollController: _horizontalScrollController,
+                                ),
                               ),
                             ),
                             Padding(
                               padding: EdgeInsets.only(top: 30),
-                              child: TrackGroupsWidget(
-                                trackNameWidth: trackNameWidth,
-                                controller: controller,
-                                horizontalScrollController:
-                                    _horizontalScrollController,
-                                keyframeIconBuilder:
-                                    widget.keyframeIconBuilder ??
-                                    widget.style?.keyframeIconBuilder ??
-                                    _defaultIconBuilder,
-                                keyframeToggleIconBuilder:
-                                    widget.style?.keyframeToggleIconBuilder,
+                              child: MouseRegion(
+                                opaque: false,
+                                child: Listener(
+        behavior: HitTestBehavior.translucent,
+        onPointerDown: (_) {
+          // _focusNode.requestFocus();
+          widget.controller.clearSelectedKeyframes();
+        },
+        child: 
+                                TrackGroupsWidget(
+                                  trackNameWidth: trackNameWidth,
+                                  controller: controller,
+                                  horizontalScrollController:
+                                      _horizontalScrollController,
+                                  keyframeIconBuilder:
+                                      widget.keyframeIconBuilder ??
+                                      widget.style?.keyframeIconBuilder ??
+                                      _defaultIconBuilder,
+                                  keyframeToggleIconBuilder:
+                                      widget.style?.keyframeToggleIconBuilder,
+                                ),
                               ),
-                            ),
+                            )),
                           ],
                         ),
                       ),
@@ -199,9 +217,9 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                 ),
               ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_keyframe_timeline/src/model/src/channel_types.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/keyframe.dart';
 
 abstract class TimelineController {
+
   //
   ValueNotifier<List<AnimationTrackGroup>> get trackGroups;
 

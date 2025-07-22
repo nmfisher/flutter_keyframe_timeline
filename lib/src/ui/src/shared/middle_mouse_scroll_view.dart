@@ -79,42 +79,44 @@ class _MiddleMouseScrollViewState extends State<MiddleMouseScrollView> {
 
   @override
   Widget build(BuildContext context) {
-    
-    return Listener(
-      onPointerDown: (PointerDownEvent event) {
-        if (event.buttons & kMiddleMouseButton != 0) {
-          setState(() {
-            _isMiddleMousePressed = true;
-            _lastMousePosition = event.position;
-          });
-        } else if (event.buttons & kPrimaryButton != 0) {
-          _primaryMouseStart = event.localPosition;
+    return GestureDetector(
+      onTapDown: (d) {
+        _primaryMouseStart = d.localPosition;
+      },
+      onTapUp: (d) {
+        final travelled = (d.localPosition - _primaryMouseStart!).distance;
+        if (travelled < 2) {
+          widget.onPrimaryMouseDown.call(d.localPosition);
         }
       },
-      onPointerUp: (PointerUpEvent event) {
-        if (!_isMiddleMousePressed) {
-          final travelled =
-              (event.localPosition - _primaryMouseStart!).distance;
-          if (travelled < 2) {
-            widget.onPrimaryMouseDown.call(event.localPosition);
+      child: Listener(
+        onPointerDown: (PointerDownEvent event) {
+          if (event.buttons & kMiddleMouseButton != 0) {
+            setState(() {
+              _isMiddleMousePressed = true;
+              _lastMousePosition = event.position;
+            });
           }
-        } else {
-          setState(() {
-            _isMiddleMousePressed = false;
-            _lastMousePosition = null;
-          });
-        }
-      },
-      onPointerMove: _handlePointerMove,
-      onPointerSignal: _handleMiddleMouseScroll,
-      behavior: HitTestBehavior.translucent,
-      child: CustomScrollView(
-        hitTestBehavior: HitTestBehavior.translucent,
-        scrollDirection: widget.scrollDirection,
-        clipBehavior: widget.clipBehavior,
-        controller: _scrollController,
-        physics: widget.physics ?? const NeverScrollableScrollPhysics(),
-        slivers: widget.slivers,
+        },
+        onPointerUp: (PointerUpEvent event) {
+          if (_isMiddleMousePressed) {
+            setState(() {
+              _isMiddleMousePressed = false;
+              _lastMousePosition = null;
+            });
+          }
+        },
+        onPointerMove: _handlePointerMove,
+        onPointerSignal: _handleMiddleMouseScroll,
+        behavior: HitTestBehavior.translucent,
+        child: CustomScrollView(
+          hitTestBehavior: HitTestBehavior.translucent,
+          scrollDirection: widget.scrollDirection,
+          clipBehavior: widget.clipBehavior,
+          controller: _scrollController,
+          physics: widget.physics ?? const NeverScrollableScrollPhysics(),
+          slivers: widget.slivers,
+        ),
       ),
     );
   }

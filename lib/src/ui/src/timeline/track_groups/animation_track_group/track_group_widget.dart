@@ -36,7 +36,6 @@ class TrackGroupWidget extends StatelessWidget {
       builder: (_, active, __) {
         final isActive = active.contains(group);
         return HBox(
-          // style: TimelineStyle.objectName,
           children: [
             Expanded(
               child: Listener(
@@ -62,8 +61,6 @@ class TrackGroupWidget extends StatelessWidget {
                         builder: (_, displayName, __) => StyledText(
                           displayName,
                           style: Style(
-                            // $text.style.ref($token.textStyle.label),
-                            // $text.style.color.ref($token.color.onSurface),
                             $text.color.withOpacity(isActive ? 1.0 : 0.5),
                             $text.overflow.ellipsis(),
                           ),
@@ -94,11 +91,11 @@ class TrackGroupWidget extends StatelessWidget {
         return VBox(
           style: Style(
             $flex.crossAxisAlignment.start(),
-            $box.color.white.withOpacity(0.5),
+            $box.color.transparent(),
             $box.border.only(top: BorderSideDto(color: ColorDto(Colors.black))),
           ),
           children: [
-            _groupName(isExpanded),
+            SizedBox(width: trackNameWidth, child: _groupName(isExpanded)),
 
             if (isExpanded)
               ...group.tracks
@@ -116,7 +113,8 @@ class TrackGroupWidget extends StatelessWidget {
                             group: group,
                             track: track,
                             controller: controller,
-                            keyframeToggleIconBuilder: keyframeToggleIconBuilder,
+                            keyframeToggleIconBuilder:
+                                keyframeToggleIconBuilder,
                           ),
                         ),
                         Expanded(

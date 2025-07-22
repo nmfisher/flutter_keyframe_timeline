@@ -49,16 +49,11 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
     showMenu(
       context: context,
       position: position,
-      // color: darkNeonTheme.colors[$token.color.surface],
       items: [
         PopupMenuItem(
           child: Box(
-            // style: MenuStyle.item,
             child: Text(
               'Delete',
-              // style: TextStyle(
-              //   color: darkNeonTheme.colors[$token.color.onSurface],
-              // ),
             ),
           ),
           onTap: () {
@@ -72,7 +67,7 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        behavior: HitTestBehavior.translucent,
+        behavior: HitTestBehavior.opaque,
         onPanStart: (details) {
           dragStart = details.localPosition;
           initialFrame = widget.frameNumber;
@@ -100,12 +95,12 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
         },
         child: MouseHoverWidget(
           builder: (isHovered) {
-            return widget.keyframeIconBuilder(
+            return AbsorbPointer(child:widget.keyframeIconBuilder(
               context,
               widget.isSelected,
               isHovered,
               widget.frameNumber,
-            );
+            ));
           },
         ),
       

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
-import 'package:flutter_keyframe_timeline/src/model/model.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/numeric/numeric_control_row.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
-import 'package:mix/mix.dart';
-
 import 'animation_channel_editor_viewmodel.dart';
 
 class AnimationChannelEditorWidget extends StatefulWidget {
