@@ -94,7 +94,6 @@ class _MiddleMouseScrollViewState extends State<MiddleMouseScrollView> {
         if (!_isMiddleMousePressed) {
           final travelled =
               (event.localPosition - _primaryMouseStart!).distance;
-          print("travelled $travelled");
           if (travelled < 2) {
             widget.onPrimaryMouseDown.call(event.localPosition);
           }
