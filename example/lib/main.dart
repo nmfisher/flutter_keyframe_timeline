@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:logging/logging.dart';
 
@@ -91,7 +92,7 @@ class RandomObject {
   }
 }
 
-class ObjectHolder implements ValueBridge {
+class ObjectHolder implements TrackController {
   final _rnd = Random();
 
   final _lookup = <AnimationTrackGroup, RandomObject>{};
@@ -175,6 +176,8 @@ class _MyHomePageState extends State<MyHomePage> {
   late final TimelineController _controller;
 
   final _numObjects = 3;
+  
+  RandomObject? _selectedObject;
 
   @override
   void initState() {
@@ -186,6 +189,32 @@ class _MyHomePageState extends State<MyHomePage> {
       _objectHolder.trackGroups,
       _objectHolder,
     );
+    
+    // Listen to active track group changes and sync canvas selection
+    _controller.active.addListener(() {
+      final activeGroups = _controller.active.value;
+      if (activeGroups.isEmpty) {
+        setState(() {
+          _selectedObject = null;
+        });
+      } else {
+        // Find the object corresponding to the first active track group
+        final activeGroup = activeGroups.first;
+        final activeObject = _objectHolder._objects.firstWhere(
+          (obj) => obj.trackGroup == activeGroup,
+          orElse: () => _objectHolder._objects.first,
+        );
+        setState(() {
+          _selectedObject = activeObject;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.active.removeListener(() {});
+    super.dispose();
   }
 
   @override
@@ -196,7 +225,9 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Expanded(
             child: Stack(
-              children: _objectHolder._objects.map((obj) {
+              children: [
+                ..._objectHolder._objects.map((obj) {
+                final isSelected = _selectedObject == obj;
                 return Positioned(
                   left: obj.position.dx,
                   top: obj.position.dy,
@@ -205,11 +236,112 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Transform.scale(
                       scaleX: obj.scaleX,
                       scaleY: obj.scaleY,
-                      child: Container(width: 50, height: 50, color: obj.color),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedObject = obj;
+                          });
+                          _controller.setActive(obj.trackGroup, true);
+                        },
+                        onPanUpdate: (details) {
+                          if (_selectedObject == obj) {
+                            final isShiftPressed = HardwareKeyboard.instance.isShiftPressed;
+                            
+                            setState(() {
+                              if (isShiftPressed) {
+                                // Scale mode: use vertical drag to scale uniformly
+                                final scaleChange = -details.delta.dy * 0.01; // Negative for intuitive up=bigger
+                                obj.scaleX = (obj.scaleX + scaleChange).clamp(0.1, 5.0);
+                                obj.scaleY = (obj.scaleY + scaleChange).clamp(0.1, 5.0);
+                              } else {
+                                // Move mode: update position
+                                obj.position = Offset(
+                                  obj.position.dx + details.delta.dx,
+                                  obj.position.dy + details.delta.dy,
+                                );
+                              }
+                            });
+                            _objectHolder.onUpdate.call();
+                          }
+                        },
+                        child: Container(
+                          width: 50, 
+                          height: 50, 
+                          decoration: BoxDecoration(
+                            color: obj.color,
+                            border: isSelected ? Border.all(
+                              color: Colors.red, 
+                              width: 3,
+                            ) : null,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 );
-              }).toList(),
+              }),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Mouse Controls:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '• Click to select object',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        Text(
+                          '• Drag to move selected object',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        Text(
+                          '• Shift+Drag to scale selected object',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Selection Sync:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '• Selecting in timeline selects object',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        Text(
+                          '• Selecting object selects timeline',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
