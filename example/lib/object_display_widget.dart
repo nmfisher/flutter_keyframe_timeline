@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
-import 'package:flutter_keyframe_timeline_example/main.dart';
 import 'package:flutter_keyframe_timeline_example/object/objects.dart';
 
 class ObjectDisplayWidget extends StatefulWidget {
