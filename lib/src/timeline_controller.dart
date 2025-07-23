@@ -74,7 +74,6 @@ abstract class TimelineController {
 }
 
 abstract class TrackController {
-  
   //
   U getCurrentValue<U extends ChannelValueType>(
     AnimationTrackGroup target,
@@ -87,7 +86,6 @@ abstract class TrackController {
     AnimationTrack<U> track,
     List<num> values,
   );
-
 }
 
 class TimelineControllerImpl extends TimelineController {
@@ -207,13 +205,17 @@ class TimelineControllerImpl extends TimelineController {
 
   @override
   void addGroup(AnimationTrackGroup group) {
-    this.active.value.add(group);
-    this.active.notifyListeners();
+    this.trackGroups.value.add(group);
+    this.trackGroups.notifyListeners();
   }
 
   @override
   void deleteGroup(AnimationTrackGroup group) {
     this.active.value.remove(group);
+    this.selected.value.remove(group);
+    this.trackGroups.value.remove(group);
+    this.trackGroups.notifyListeners();
+    this.selected.notifyListeners();
     this.active.notifyListeners();
   }
 

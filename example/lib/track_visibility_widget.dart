@@ -9,12 +9,14 @@ class TrackGroupVisibilityWidget extends StatelessWidget {
   final RandomObject object;
   final bool isActive;
   final bool isExpanded;
+  final VoidCallback? onRemove;
 
   const TrackGroupVisibilityWidget({
     super.key,
     required this.object,
     required this.isActive,
     required this.isExpanded,
+    this.onRemove,
   });
 
   @override
@@ -22,17 +24,36 @@ class TrackGroupVisibilityWidget extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: object.isVisible,
       builder: (_, isVisible, __) {
-        return PressableBox(
-          onPress: () {
-            object.isVisible.value = !object.isVisible.value;
-          },
-
-            child: StyledIcon(
-              isVisible ? PhosphorIcons.checkSquare() : PhosphorIcons.square(),
-              style: Style($icon.size(16.0), $icon.color(Colors.red.withOpacity(isActive || isExpanded ? 1.0 : 0.5),
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PressableBox(
+              onPress: () {
+                object.isVisible.value = !object.isVisible.value;
+              },
+              child: StyledIcon(
+                isVisible ? PhosphorIcons.checkSquare() : PhosphorIcons.square(),
+                style: Style(
+                  $icon.size(16.0), 
+                  $icon.color(Colors.red.withOpacity(isActive || isExpanded ? 1.0 : 0.5)),
+                ),
+              ),
             ),
-          ),
-        ));
+            if (onRemove != null) ...[
+              const SizedBox(width: 8),
+              PressableBox(
+                onPress: onRemove,
+                child: StyledIcon(
+                  PhosphorIcons.trash(),
+                  style: Style(
+                    $icon.size(16.0),
+                    $icon.color(Colors.red.withOpacity(isActive || isExpanded ? 1.0 : 0.5)),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        );
       },
     );
   }

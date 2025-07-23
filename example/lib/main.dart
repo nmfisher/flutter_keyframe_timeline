@@ -76,15 +76,25 @@ class _MyHomePageState extends State<MyHomePage> {
                 Positioned.fill(
                   child: TimelineWidget(
                     controller: _controller,
-                    trackGroupExtraWidgetBuilder:(BuildContext context,
-                    AnimationTrackGroup group,
-                    bool trackGroupIsActive,
-                    bool trackGroupIsExpanded) {
-                      final object = _objectHolder.get(group);
-                      return TrackGroupVisibilityWidget(object: object!, isActive: trackGroupIsActive, isExpanded: trackGroupIsExpanded);
-                    } ,
+                    trackGroupExtraWidgetBuilder:
+                        (
+                          BuildContext context,
+                          AnimationTrackGroup group,
+                          bool trackGroupIsActive,
+                          bool trackGroupIsExpanded,
+                        ) {
+                          final object = _objectHolder.get(group);
+                          return TrackGroupVisibilityWidget(
+                            object: object!,
+                            isActive: trackGroupIsActive,
+                            isExpanded: trackGroupIsExpanded,
+                            onRemove: () {
+                              _controller.deleteGroup(group);
+                              _objectHolder.removeObject(group);
+                            },
+                          );
+                        },
                     style: TimelineStyle(
-                      
                       keyframeIconBuilder:
                           (context, isSelected, isHovered, frameNumber) {
                             return Transform.translate(

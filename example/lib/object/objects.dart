@@ -78,6 +78,16 @@ class ObjectHolder implements TrackController {
     return _lookup[group];
   }
 
+  void removeObject(AnimationTrackGroup group) {
+    final object = _lookup[group];
+    if (object != null) {
+      objects.remove(object);
+      trackGroups.remove(group);
+      _lookup.remove(group);
+      onUpdate.call();
+    }
+  }
+
   ObjectHolder(int numObjects, this.onUpdate) {
     objects = List.generate(numObjects, (index) {
       final object = RandomObject(
