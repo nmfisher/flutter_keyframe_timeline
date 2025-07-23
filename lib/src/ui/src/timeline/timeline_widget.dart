@@ -22,6 +22,7 @@ class TimelineWidget extends StatefulWidget {
   final TimelineStyle? style;
   final KeyframeIconBuilder? keyframeIconBuilder;
   final FrameDragHandleBuilder? frameDragHandleBuilder;
+  final TrackGroupExtraWidgetBuilder? trackGroupExtraWidgetBuilder;
 
   const TimelineWidget({
     super.key,
@@ -29,6 +30,7 @@ class TimelineWidget extends StatefulWidget {
     this.style,
     this.keyframeIconBuilder,
     this.frameDragHandleBuilder,
+    this.trackGroupExtraWidgetBuilder
   });
 
   @override
@@ -192,6 +194,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                                         _defaultIconBuilder,
                                     keyframeToggleIconBuilder:
                                         widget.style?.keyframeToggleIconBuilder,
+                                    trackGroupExtraWidgetBuilder: widget.trackGroupExtraWidgetBuilder,
                                   ),
                                 ),
                               ),

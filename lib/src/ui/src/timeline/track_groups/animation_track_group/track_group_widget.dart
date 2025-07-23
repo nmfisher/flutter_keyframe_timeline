@@ -4,7 +4,6 @@ import 'package:flutter_keyframe_timeline/src/model/model.dart';
 import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/expand_icon.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_keyframes_widget.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_visibility_widget.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/value_editor/animation_channel_editor_widget.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
@@ -18,6 +17,7 @@ class TrackGroupWidget extends StatelessWidget {
   final double trackNameWidth;
   final KeyframeIconBuilder keyframeIconBuilder;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
+  final TrackGroupExtraWidgetBuilder? additionalWidgetBuilder;
 
   const TrackGroupWidget({
     super.key,
@@ -27,10 +27,12 @@ class TrackGroupWidget extends StatelessWidget {
     required this.index,
     required this.trackNameWidth,
     required this.keyframeIconBuilder,
+    this.additionalWidgetBuilder,
     this.keyframeToggleIconBuilder,
+    
   });
 
-  Widget _groupName(bool isExpanded) {
+  Widget _groupName(bool isExpanded, BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: controller.active,
       builder: (_, active, __) {
@@ -46,8 +48,7 @@ class TrackGroupWidget extends StatelessWidget {
                     controller.setActive(group, true);
                   }
                 },
-                child: 
-                HBox(
+                child: HBox(
                   children: [
                     CustomExpandIcon(
                       isExpanded: isExpanded,
@@ -72,11 +73,8 @@ class TrackGroupWidget extends StatelessWidget {
                 ),
               ),
             ),
-            TrackGroupVisibilityWidget(
-              group: group,
-              isActive: isActive,
-              isExpanded: isExpanded,
-            ),
+            if(additionalWidgetBuilder != null)
+            additionalWidgetBuilder!(context, group, isActive, isExpanded)
           ],
         );
       },
@@ -96,7 +94,7 @@ class TrackGroupWidget extends StatelessWidget {
             $box.border.only(top: BorderSideDto(color: ColorDto(Colors.black))),
           ),
           children: [
-            SizedBox(width: trackNameWidth, child: _groupName(isExpanded)),
+            SizedBox(width: trackNameWidth, child: _groupName(isExpanded, context)),
 
             if (isExpanded)
               ...group.tracks

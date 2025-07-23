@@ -1,7 +1,11 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyframe_timeline_example/object/objects.dart';
+import 'package:flutter_keyframe_timeline_example/object_display_widget.dart';
+import 'package:flutter_keyframe_timeline_example/track_visibility_widget.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:logging/logging.dart';
 
@@ -35,149 +39,12 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class RandomObject {
-  final String name;
-  late Offset position;
-  late double rotation;
-  late double scaleX;
-  late double scaleY;
-  late Color color;
-
-  late final positionTrack = AnimationTrackImpl(
-    <Keyframe<Vector2ChannelValueType>>[],
-    ["x", "y"],
-    "position",
-  );
-  late final rotationTrack = AnimationTrackImpl(
-    <Keyframe<ScalarChannelValueType>>[],
-    ["rads"],
-    "rotation",
-  );
-  late final scaleTrack = AnimationTrackImpl(
-    <Keyframe<Vector2ChannelValueType>>[],
-    ["x", "y"],
-    "scale",
-  );
-  late final colorTrack = AnimationTrackImpl(
-    <Keyframe<Vector4ChannelValueType>>[],
-    ["r", "g", "b", "a"],
-    "color",
-  );
-
-  late final AnimationTrackGroupImpl trackGroup;
-
-  RandomObject({
-    required this.name,
-    required this.position,
-    required this.rotation,
-    required this.scaleX,
-    required this.scaleY,
-    required this.color,
-  }) {
-    trackGroup = AnimationTrackGroupImpl([
-      positionTrack,
-      rotationTrack,
-      scaleTrack,
-      colorTrack,
-    ], name);
-  }
-
-  void applyValue(AnimationTrack track, List<num> values) {
-    if (track == positionTrack) {
-      position = Offset(values[0].toDouble(), values[1].toDouble());
-    } else if (track == scaleTrack) {
-      scaleX = values[0].toDouble();
-      scaleY = values[1].toDouble();
-    }
-  }
-}
-
-class ObjectHolder implements TrackController {
-  final _rnd = Random();
-
-  final _lookup = <AnimationTrackGroup, RandomObject>{};
-
-  late List<RandomObject> _objects;
-  late List<AnimationTrackGroup> trackGroups;
-
-  final void Function() onUpdate;
-
-  ObjectHolder(int numObjects, this.onUpdate) {
-    _objects = List.generate(numObjects, (index) {
-      final object = RandomObject(
-        name: "object${index}",
-        position: Offset(_rnd.nextDouble() * 100, _rnd.nextDouble() * 100),
-        rotation: _rnd.nextDouble() * 2 * pi, // 0 to 2*pi radians
-        scaleX: _rnd.nextDouble() * 1.5 + 0.5, // 0.5 to 2.0
-        scaleY: _rnd.nextDouble() * 1.5 + 0.5, // 0.5 to 2.0
-        color: Color.fromARGB(
-          255,
-          _rnd.nextInt(256),
-          _rnd.nextInt(256),
-          _rnd.nextInt(256),
-        ),
-      );
-      _lookup[object.trackGroup] = object;
-      return object;
-    });
-
-    trackGroups = _objects.map((object) => object.trackGroup).toList();
-  }
-
-  @override
-  U getCurrentValue<U extends ChannelValueType>(
-    AnimationTrackGroup group,
-    AnimationTrack<U> track,
-  ) {
-    final object = _lookup[group]!;
-    if (track == object.colorTrack) {
-      return Vector4ChannelValueType(
-            Vector4(
-              object.color.r,
-              object.color.g,
-              object.color.b,
-              object.color.r,
-            ),
-          )
-          as U;
-    }
-    if (track == object.positionTrack) {
-      return Vector2ChannelValueType(
-            Vector2(object.position.dx, object.position.dy),
-          )
-          as U;
-    }
-    if (track == object.scaleTrack) {
-      return Vector2ChannelValueType(Vector2(object.scaleX, object.scaleY))
-          as U;
-    }
-    if (track == object.rotationTrack) {
-      return ScalarChannelValueType(object.rotation) as U;
-    }
-
-    throw Exception("Failed to find track");
-  }
-
-  @override
-  void applyValue<U extends ChannelValueType>(
-    AnimationTrackGroup group,
-    AnimationTrack<U> track,
-    List<num> values,
-  ) {
-    var object = _lookup[group];
-    object!.applyValue(track, values);
-    onUpdate.call();
-  }
-}
-
 class _MyHomePageState extends State<MyHomePage> {
   late final ObjectHolder _objectHolder;
 
   late final TimelineController _controller;
 
-  final _numObjects = 3;
-  
-  RandomObject? _selectedObject;
+  final _numObjects = 5;
 
   @override
   void initState() {
@@ -189,32 +56,6 @@ class _MyHomePageState extends State<MyHomePage> {
       _objectHolder.trackGroups,
       _objectHolder,
     );
-    
-    // Listen to active track group changes and sync canvas selection
-    _controller.active.addListener(() {
-      final activeGroups = _controller.active.value;
-      if (activeGroups.isEmpty) {
-        setState(() {
-          _selectedObject = null;
-        });
-      } else {
-        // Find the object corresponding to the first active track group
-        final activeGroup = activeGroups.first;
-        final activeObject = _objectHolder._objects.firstWhere(
-          (obj) => obj.trackGroup == activeGroup,
-          orElse: () => _objectHolder._objects.first,
-        );
-        setState(() {
-          _selectedObject = activeObject;
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.active.removeListener(() {});
-    super.dispose();
   }
 
   @override
@@ -224,124 +65,9 @@ class _MyHomePageState extends State<MyHomePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: Stack(
-              children: [
-                ..._objectHolder._objects.map((obj) {
-                final isSelected = _selectedObject == obj;
-                return Positioned(
-                  left: obj.position.dx,
-                  top: obj.position.dy,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedObject = obj;
-                      });
-                      _controller.setActive(obj.trackGroup, true);
-                    },
-                    onPanUpdate: (details) {
-                      if (_selectedObject == obj) {
-                        final isShiftPressed = HardwareKeyboard.instance.isShiftPressed;
-                        
-                        setState(() {
-                          if (isShiftPressed) {
-                            // Scale mode: use vertical drag to scale uniformly
-                            final scaleChange = -details.delta.dy * 0.01; // Negative for intuitive up=bigger
-                            obj.scaleX = (obj.scaleX + scaleChange).clamp(0.1, 5.0);
-                            obj.scaleY = (obj.scaleY + scaleChange).clamp(0.1, 5.0);
-                          } else {
-                            // Move mode: update position
-                            obj.position = Offset(
-                              obj.position.dx + details.delta.dx,
-                              obj.position.dy + details.delta.dy,
-                            );
-                          }
-                        });
-                        _objectHolder.onUpdate.call();
-                      }
-                    },
-                    child: Transform.rotate(
-                      angle: obj.rotation,
-                      child: Transform.scale(
-                        scaleX: obj.scaleX,
-                        scaleY: obj.scaleY,
-                        child: Container(
-                          width: 50, 
-                          height: 50, 
-                          decoration: BoxDecoration(
-                            color: obj.color,
-                            border: isSelected ? Border.all(
-                              color: Colors.red, 
-                              width: 3,
-                            ) : null,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Mouse Controls:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '• Click to select object',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        Text(
-                          '• Drag to move selected object',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        Text(
-                          '• Shift+Drag to scale selected object',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Selection Sync:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          '• Selecting in timeline selects object',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        Text(
-                          '• Selecting object selects timeline',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            child: ObjectDisplayWidget(
+              objectHolder: _objectHolder,
+              timelineController: _controller,
             ),
           ),
           Expanded(
@@ -350,7 +76,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 Positioned.fill(
                   child: TimelineWidget(
                     controller: _controller,
+                    trackGroupExtraWidgetBuilder:(BuildContext context,
+                    AnimationTrackGroup group,
+                    bool trackGroupIsActive,
+                    bool trackGroupIsExpanded) {
+                      final object = _objectHolder.get(group);
+                      return TrackGroupVisibilityWidget(object: object!, isActive: trackGroupIsActive, isExpanded: trackGroupIsExpanded);
+                    } ,
                     style: TimelineStyle(
+                      
                       keyframeIconBuilder:
                           (context, isSelected, isHovered, frameNumber) {
                             return Transform.translate(
@@ -367,7 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                     boxShadow: isSelected || isHovered
                                         ? [
                                             BoxShadow(
-                                              color: Colors.blue.withValues(alpha: 0.6),
+                                              color: Colors.blue.withValues(
+                                                alpha: 0.6,
+                                              ),
                                               spreadRadius: isSelected ? 3 : 2,
                                               blurRadius: isSelected ? 6 : 4,
                                             ),

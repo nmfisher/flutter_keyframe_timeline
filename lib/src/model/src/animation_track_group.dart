@@ -1,13 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
 
 abstract class AnimationTrackGroup {
-  //
-  ValueListenable<bool> get isVisible;
 
-  //
-  void setVisible(bool visible);
 
   //
   ValueListenable<String> get displayName;

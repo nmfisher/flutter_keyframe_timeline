@@ -5,7 +5,6 @@ import 'package:flutter_keyframe_timeline/src/model/src/channel_types.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/keyframe.dart';
 
 abstract class TimelineController {
-
   //
   ValueNotifier<List<AnimationTrackGroup>> get trackGroups;
 
@@ -75,6 +74,7 @@ abstract class TimelineController {
 }
 
 abstract class TrackController {
+  
   //
   U getCurrentValue<U extends ChannelValueType>(
     AnimationTrackGroup target,
@@ -87,6 +87,7 @@ abstract class TrackController {
     AnimationTrack<U> track,
     List<num> values,
   );
+
 }
 
 class TimelineControllerImpl extends TimelineController {
@@ -96,7 +97,10 @@ class TimelineControllerImpl extends TimelineController {
 
   final TrackController trackController;
 
-  TimelineControllerImpl(List<AnimationTrackGroup> initial, this.trackController) {
+  TimelineControllerImpl(
+    List<AnimationTrackGroup> initial,
+    this.trackController,
+  ) {
     trackGroups.value.addAll(initial);
     this.currentFrame.addListener(_onCurrentFrameChanged);
   }
@@ -161,6 +165,7 @@ class TimelineControllerImpl extends TimelineController {
 
   final _selected = <Keyframe, AnimationTrack>{};
 
+  @override
   void select(Keyframe keyframe, AnimationTrack track, {bool append = false}) {
     if (!append) {
       clearSelectedKeyframes(notify: false);
@@ -171,17 +176,13 @@ class TimelineControllerImpl extends TimelineController {
     selected.notifyListeners();
   }
 
+  @override
   void clearSelectedKeyframes({bool notify = true}) {
     selected.value.clear();
     _selected.clear();
     if (notify) {
       selected.notifyListeners();
     }
-  }
-
-  @override
-  void setVisible(AnimationTrackGroup trackGroup, bool visible) {
-    // TODO: implement setVisible
   }
 
   ValueNotifier<Set<AnimationTrackGroup>> active =

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 
 typedef TextBuilder = Widget Function(BuildContext context, String text);
 
@@ -81,4 +82,11 @@ typedef KeyframeToggleIconBuilder = Widget Function(
   BuildContext context,
   bool hasKeyframeAtCurrentFrame,
   VoidCallback onPressed,
+);
+
+typedef TrackGroupExtraWidgetBuilder = Widget Function(
+  BuildContext context,
+  AnimationTrackGroup group,
+  bool trackGroupIsActive,
+  bool trackGroupIsExpanded
 );
