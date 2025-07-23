@@ -66,7 +66,7 @@ class TrackGroupWidget extends StatelessWidget {
                         builder: (_, displayName, __) => StyledText(
                           displayName,
                           style: Style(
-                            $text.color.withOpacity(isActive ? 1.0 : 0.5),
+                            $text.color((trackGroupNameStyle?.textColor ?? Colors.black).withOpacity(isActive ? 1.0 : 0.5)),
                             $text.overflow.ellipsis(),
                           ),
                         ),

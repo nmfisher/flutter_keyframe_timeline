@@ -75,7 +75,7 @@ class TrackGroupNameStyle {
 
   const TrackGroupNameStyle({
     this.textColor = Colors.black,
-    required this.iconData,
+    this.iconData = Icons.expand_more,
     this.iconColor = Colors.black,
     this.borderColor = Colors.black,
   });

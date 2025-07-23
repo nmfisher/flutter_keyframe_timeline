@@ -89,13 +89,9 @@ class TimelineTickPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final minorPaint = Paint()
-      ..color = minorTickColor
-      ..strokeWidth = 1;
+    final minorPaint = Paint()..color = minorTickColor;
 
-    final majorPaint = Paint()
-      ..color = majorTickColor
-      ..strokeWidth = 2;
+    final majorPaint = Paint()..color = majorTickColor;
 
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
@@ -107,9 +103,9 @@ class TimelineTickPainter extends CustomPainter {
 
     // Draw vertical lines for all minor ticks
     for (int frame = startFrame; frame <= endFrame; frame++) {
-      
-      final x = trackNameWidth + ((frame - startFrame) * pixelsPerFrame).toDouble();
-      
+      final x =
+          trackNameWidth + ((frame - startFrame) * pixelsPerFrame).toDouble();
+
       if (frame % minorTickInterval == 0) {
         final paint = frame % majorTickInterval == 0 ? majorPaint : minorPaint;
 
