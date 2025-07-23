@@ -71,6 +71,9 @@ abstract class TimelineController {
 
   //
   void setExpanded(AnimationTrackGroup group, bool expanded);
+
+  // Dispose this instance and all associated ValueNotifiers.
+  void dispose();
 }
 
 abstract class TrackController {
