@@ -1,10 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
 import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/shared/middle_mouse_scroll_view.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/frame_drag_handle.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_background.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_scroller.dart';
@@ -156,7 +153,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                         child: ZBox(
                           style: Style(
                             $box.clipBehavior.none(),
-                            $box.height(constraints.maxHeight),
+                            $box.color.transparent(),
                             $box.width(constraints.maxWidth),
                           ),
                           children: [
@@ -176,6 +173,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                             Padding(
                               padding: EdgeInsets.only(top: 30),
                               child: MouseRegion(
+                                hitTestBehavior: HitTestBehavior.translucent,
                                 opaque: false,
                                 child: Listener(
                                   behavior: HitTestBehavior.translucent,

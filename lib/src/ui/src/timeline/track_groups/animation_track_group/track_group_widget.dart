@@ -46,7 +46,8 @@ class TrackGroupWidget extends StatelessWidget {
                     controller.setActive(group, true);
                   }
                 },
-                child: HBox(
+                child: 
+                HBox(
                   children: [
                     CustomExpandIcon(
                       isExpanded: isExpanded,
