@@ -176,6 +176,19 @@ class _MyHomePageState extends State<MyHomePage> {
                           textAlign: TextAlign.center,
                         ),
                       ),
+                      backgroundStyle: TimelineBackgroundStyle(
+                        majorTickColor: Colors.grey.shade500,
+                        minorTickColor: Colors.grey.shade300,
+                        textColor: Colors.grey.shade700,
+                        majorTickInterval: 10,
+                        minorTickInterval: 1
+                      ),
+                      trackGroupNameStyle: TrackGroupNameStyle(
+                        iconData: Icons.folder,
+                        textColor: Colors.blue.shade800,
+                        iconColor: Colors.blue.shade600,
+                        borderColor: Colors.blue.shade200,
+                      ),
                     ),
                   ),
 

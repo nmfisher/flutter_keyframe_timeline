@@ -23,6 +23,8 @@ class TimelineWidget extends StatefulWidget {
   final KeyframeIconBuilder? keyframeIconBuilder;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
   final TrackGroupExtraWidgetBuilder? trackGroupExtraWidgetBuilder;
+  final TrackGroupNameStyle? trackGroupNameStyle;
+  final TimelineBackgroundStyle backgroundStyle;
 
   const TimelineWidget({
     super.key,
@@ -30,7 +32,9 @@ class TimelineWidget extends StatefulWidget {
     this.frameDragHandleStyle = const FrameDragHandleStyle(),
     this.keyframeIconBuilder,
     this.keyframeToggleIconBuilder,
-    this.trackGroupExtraWidgetBuilder
+    this.trackGroupExtraWidgetBuilder,
+    this.trackGroupNameStyle,
+    this.backgroundStyle = const TimelineBackgroundStyle(),
   });
 
   @override
@@ -138,7 +142,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
             trackNameWidth: trackNameWidth,
             controller: controller,
             scrollController: _horizontalScrollController,
-            tickColor: Colors.black,
+            backgroundStyle: widget.backgroundStyle,
             inner: ZBox(
               style: Style($box.height(constraints.maxHeight)),
               children: [
@@ -194,6 +198,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                                     keyframeToggleIconBuilder:
                                         widget.keyframeToggleIconBuilder,
                                     trackGroupExtraWidgetBuilder: widget.trackGroupExtraWidgetBuilder,
+                                    trackGroupNameStyle: widget.trackGroupNameStyle,
                                   ),
                                 ),
                               ),

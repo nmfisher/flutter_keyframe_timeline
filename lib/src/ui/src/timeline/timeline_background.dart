@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 
 class TimelineBackground extends StatefulWidget {
   final TimelineController controller;
   final ScrollController scrollController;
   final double trackNameWidth;
-  final Color tickColor;
   final Widget inner;
+  final TimelineBackgroundStyle backgroundStyle;
 
   const TimelineBackground({
     super.key,
     required this.controller,
     required this.scrollController,
-    required this.tickColor,
     required this.inner,
     required this.trackNameWidth,
+    required this.backgroundStyle,
   });
 
   @override
@@ -41,15 +42,18 @@ class _TimelineBackgroundState extends State<TimelineBackground> {
         willChange: false,
         painter: TimelineTickPainter(
           maxFrames: widget.controller.maxFrames.value,
-          minorTickInterval: 10,
-          majorTickInterval: 60,
-          tickColor: widget.tickColor,
+          minorTickInterval: widget.backgroundStyle.minorTickInterval,
+          majorTickInterval: widget.backgroundStyle.majorTickInterval,
+          majorTickColor: widget.backgroundStyle.majorTickColor,
+          minorTickColor: widget.backgroundStyle.minorTickColor,
+          textColor: widget.backgroundStyle.textColor,
           trackNameWidth: widget.trackNameWidth,
           scrollOffset: widget.scrollController.hasClients
               ? widget.scrollController.offset
               : 0.0,
           // darkNeonTheme.colors[$token.color.onSurface] ??
           //     Colors.white,
+          textFontSize: widget.backgroundStyle.textFontSize,
           pixelsPerFrame: pixelsPerFrame,
         ),
         child: widget.inner,
@@ -65,31 +69,33 @@ class TimelineTickPainter extends CustomPainter {
   final int pixelsPerFrame;
   final int minorTickInterval;
   final int majorTickInterval;
-  final Color tickColor;
+  final Color majorTickColor;
+  final Color minorTickColor;
+  final Color textColor;
+  final double textFontSize;
 
   TimelineTickPainter({
     required this.maxFrames,
     required this.pixelsPerFrame,
     required this.minorTickInterval,
     required this.majorTickInterval,
-    required this.tickColor,
+    required this.majorTickColor,
+    required this.minorTickColor,
+    required this.textColor,
     required this.trackNameWidth,
-    required this.scrollOffset
+    required this.scrollOffset,
+    required this.textFontSize,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final minorPaint = Paint()
-      ..color = tickColor.withOpacity(0.1)
+      ..color = minorTickColor
       ..strokeWidth = 1;
 
     final majorPaint = Paint()
-      ..color = tickColor.withOpacity(0.3)
+      ..color = majorTickColor
       ..strokeWidth = 2;
-
-    final textPaint = Paint()
-      ..color = tickColor
-      ..strokeWidth = 1;
 
     final textPainter = TextPainter(
       textDirection: TextDirection.ltr,
@@ -98,8 +104,6 @@ class TimelineTickPainter extends CustomPainter {
 
     final startFrame = (scrollOffset / pixelsPerFrame).floor();
     final endFrame = ((scrollOffset + size.width) / pixelsPerFrame).floor();
-
-    final numFrames = endFrame - startFrame;
 
     // Draw vertical lines for all minor ticks
     for (int frame = startFrame; frame <= endFrame; frame++) {
@@ -120,7 +124,7 @@ class TimelineTickPainter extends CustomPainter {
       if (frame % majorTickInterval == 0) {
         textPainter.text = TextSpan(
           text: frame.toString(),
-          style: TextStyle(color: tickColor, fontSize: 10),
+          style: TextStyle(color: textColor, fontSize: textFontSize),
         );
         textPainter.layout();
         textPainter.paint(canvas, Offset(x - textPainter.width / 2, 2));
@@ -133,5 +137,7 @@ class TimelineTickPainter extends CustomPainter {
       maxFrames != oldDelegate.maxFrames ||
       minorTickInterval != oldDelegate.minorTickInterval ||
       majorTickInterval != oldDelegate.majorTickInterval ||
-      tickColor != oldDelegate.tickColor;
+      majorTickColor != oldDelegate.majorTickColor ||
+      minorTickColor != oldDelegate.minorTickColor ||
+      textColor != oldDelegate.textColor;
 }

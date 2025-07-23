@@ -46,30 +46,6 @@ class FrameDragHandleStyle {
   }
 }
 
-// class TimelineStyle {
-  
-//   final KeyframeIconBuilder? keyframeIconBuilder;
-//   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
-
-//   const TimelineStyle({
-//     this.frameDragHandleStyle = ,
-//     this.keyframeIconBuilder,
-//     this.keyframeToggleIconBuilder,
-//   });
-
-//   TimelineStyle copyWith({
-//     FrameDragHandleStyle? frameDragHandleStyle,
-//     KeyframeIconBuilder? keyframeIconBuilder,
-//     KeyframeToggleIconBuilder? keyframeToggleIconBuilder,
-//   }) {
-//     return TimelineStyle(
-//       frameDragHandleStyle: frameDragHandleStyle ?? this.frameDragHandleStyle,
-//       keyframeIconBuilder: keyframeIconBuilder ?? this.keyframeIconBuilder,
-//       keyframeToggleIconBuilder: keyframeToggleIconBuilder ?? this.keyframeToggleIconBuilder,
-//     );
-//   }
-// }
-
 // Re-export the KeyframeIconBuilder typedef for convenience
 typedef KeyframeIconBuilder = Widget Function(
   BuildContext context,
@@ -90,3 +66,67 @@ typedef TrackGroupExtraWidgetBuilder = Widget Function(
   bool trackGroupIsActive,
   bool trackGroupIsExpanded
 );
+
+class TrackGroupNameStyle {
+  final Color textColor;
+  final IconData iconData;
+  final Color iconColor;
+  final Color borderColor;
+
+  const TrackGroupNameStyle({
+    this.textColor = Colors.black,
+    required this.iconData,
+    this.iconColor = Colors.black,
+    this.borderColor = Colors.black,
+  });
+
+  TrackGroupNameStyle copyWith({
+    Color? textColor,
+    IconData? iconData,
+    Color? iconColor,
+    Color? borderColor,
+  }) {
+    return TrackGroupNameStyle(
+      textColor: textColor ?? this.textColor,
+      iconData: iconData ?? this.iconData,
+      iconColor: iconColor ?? this.iconColor,
+      borderColor: borderColor ?? this.borderColor,
+    );
+  }
+}
+
+class TimelineBackgroundStyle {
+  final Color majorTickColor;
+  final Color minorTickColor;
+  final Color textColor;
+  final int minorTickInterval;
+  final int majorTickInterval;
+  final double textFontSize;
+
+  const TimelineBackgroundStyle({
+    this.majorTickColor = Colors.black,
+    this.minorTickColor = Colors.grey,
+    this.textColor = Colors.black,
+    this.minorTickInterval = 10,
+    this.majorTickInterval = 60,
+    this.textFontSize = 10.0,
+  });
+
+  TimelineBackgroundStyle copyWith({
+    Color? majorTickColor,
+    Color? minorTickColor,
+    Color? textColor,
+    int? minorTickInterval,
+    int? majorTickInterval,
+    double? textFontSize,
+  }) {
+    return TimelineBackgroundStyle(
+      majorTickColor: majorTickColor ?? this.majorTickColor,
+      minorTickColor: minorTickColor ?? this.minorTickColor,
+      textColor: textColor ?? this.textColor,
+      minorTickInterval: minorTickInterval ?? this.minorTickInterval,
+      majorTickInterval: majorTickInterval ?? this.majorTickInterval,
+      textFontSize: textFontSize ?? this.textFontSize,
+    );
+  }
+}

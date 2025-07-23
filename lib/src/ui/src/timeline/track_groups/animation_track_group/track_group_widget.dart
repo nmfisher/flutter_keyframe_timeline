@@ -18,6 +18,7 @@ class TrackGroupWidget extends StatelessWidget {
   final KeyframeIconBuilder keyframeIconBuilder;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
   final TrackGroupExtraWidgetBuilder? additionalWidgetBuilder;
+  final TrackGroupNameStyle? trackGroupNameStyle;
 
   const TrackGroupWidget({
     super.key,
@@ -29,6 +30,7 @@ class TrackGroupWidget extends StatelessWidget {
     required this.keyframeIconBuilder,
     this.additionalWidgetBuilder,
     this.keyframeToggleIconBuilder,
+    this.trackGroupNameStyle,
     
   });
 
@@ -56,6 +58,7 @@ class TrackGroupWidget extends StatelessWidget {
                       setExpanded: (expanded) {
                         controller.setExpanded(group, expanded);
                       },
+                      color: trackGroupNameStyle?.iconColor,
                     ),
                     Expanded(
                       child: ValueListenableBuilder(
@@ -91,7 +94,7 @@ class TrackGroupWidget extends StatelessWidget {
           style: Style(
             $flex.crossAxisAlignment.start(),
             $box.color.transparent(),
-            $box.border.only(top: BorderSideDto(color: ColorDto(Colors.black))),
+            $box.border.only(top: BorderSideDto(color: ColorDto(trackGroupNameStyle?.borderColor ?? Colors.black))),
           ),
           children: [
             SizedBox(width: trackNameWidth, child: _groupName(isExpanded, context)),
@@ -101,7 +104,7 @@ class TrackGroupWidget extends StatelessWidget {
                   .map(
                     (track) => HBox(
                       style: Style(
-                        $box.border.bottom(color: Colors.black),
+                        $box.border.bottom(color: trackGroupNameStyle?.borderColor ?? Colors.black),
                         $box.padding.vertical(12),
                         $flex.crossAxisAlignment.start(),
                       ),

@@ -12,13 +12,16 @@ class TrackGroupsWidget extends StatefulWidget {
   final KeyframeIconBuilder keyframeIconBuilder;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
   final TrackGroupExtraWidgetBuilder? trackGroupExtraWidgetBuilder;
+  final TrackGroupNameStyle? trackGroupNameStyle;
   const TrackGroupsWidget({
     super.key,
     required this.controller,
     required this.horizontalScrollController,
     required this.trackNameWidth,
     required this.keyframeIconBuilder,
-    this.keyframeToggleIconBuilder,  this.trackGroupExtraWidgetBuilder,
+    this.keyframeToggleIconBuilder,
+    this.trackGroupExtraWidgetBuilder,
+    this.trackGroupNameStyle,
   });
 
   @override
@@ -47,7 +50,8 @@ class _TrackGroupsWidgetState extends State<TrackGroupsWidget> {
                   scrollController: widget.horizontalScrollController,
                   keyframeIconBuilder: widget.keyframeIconBuilder,
                   keyframeToggleIconBuilder: widget.keyframeToggleIconBuilder,
-                  additionalWidgetBuilder: widget.trackGroupExtraWidgetBuilder
+                  additionalWidgetBuilder: widget.trackGroupExtraWidgetBuilder,
+                  trackGroupNameStyle: widget.trackGroupNameStyle,
                 ),
               ),
             )

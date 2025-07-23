@@ -6,12 +6,14 @@ class CustomExpandIcon extends StatelessWidget {
   final bool isExpanded;
   final bool isActive;
   final void Function(bool expand) setExpanded;
+  final Color? color;
 
   const CustomExpandIcon({
     super.key,
     required this.isExpanded,
     required this.setExpanded,
-    this.isActive = true
+    this.isActive = true,
+    this.color,
   });
 
   @override
@@ -25,7 +27,7 @@ class CustomExpandIcon extends StatelessWidget {
       child: StyledIcon(
         isExpanded ? Icons.expand_more : Icons.chevron_right,
         style: Style(
-          $icon.color.black.withOpacity(isActive || isExpanded ? 1.0 : 0.5),
+          $icon.color((color ?? Colors.black).withOpacity(isActive || isExpanded ? 1.0 : 0.5)),
         ),
       ),
     );
