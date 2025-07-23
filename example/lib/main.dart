@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline_example/object/objects.dart';
 import 'package:flutter_keyframe_timeline_example/object_display_widget.dart';
 import 'package:flutter_keyframe_timeline_example/track_visibility_widget.dart';
+import 'package:flutter_keyframe_timeline_example/timeline_skip_control.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:logging/logging.dart';
 
@@ -95,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                           );
                         },
-                    style: TimelineStyle(
+                    
                       keyframeIconBuilder:
                           (context, isSelected, isHovered, frameNumber) {
                             return Transform.translate(
@@ -177,10 +178,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   ),
-                ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: TimelineZoomControl(timelineController: _controller),
+
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Row(
+                    children: [
+                      TimelineZoomControl(timelineController: _controller),
+                      SizedBox(width: 8),
+                      TimelineSkipControl(timelineController: _controller),
+                    ],
+                  ),
                 ),
               ],
             ),

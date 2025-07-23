@@ -19,22 +19,21 @@ import 'package:mix/mix.dart';
 //
 class TimelineWidget extends StatefulWidget {
   final TimelineController controller;
-  final TimelineStyle? style;
+  final FrameDragHandleStyle frameDragHandleStyle;
   final KeyframeIconBuilder? keyframeIconBuilder;
-  final FrameDragHandleBuilder? frameDragHandleBuilder;
+  final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
   final TrackGroupExtraWidgetBuilder? trackGroupExtraWidgetBuilder;
 
   const TimelineWidget({
     super.key,
     required this.controller,
-    this.style,
+    this.frameDragHandleStyle = const FrameDragHandleStyle(),
     this.keyframeIconBuilder,
-    this.frameDragHandleBuilder,
+    this.keyframeToggleIconBuilder,
     this.trackGroupExtraWidgetBuilder
   });
 
   @override
-  // ignore: no_logic_in_create_state
   State<TimelineWidget> createState() => _TimelineWidgetState(controller);
 }
 
@@ -144,7 +143,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
               style: Style($box.height(constraints.maxHeight)),
               children: [
                 Positioned.fill(
-                  top: widget.style?.frameDragHandleStyle.height ?? 50.0,
+                  top: widget.frameDragHandleStyle.height,
                   child: CustomScrollView(
                     physics: ClampingScrollPhysics(),
                     hitTestBehavior: HitTestBehavior.translucent,
@@ -190,10 +189,10 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                                         _horizontalScrollController,
                                     keyframeIconBuilder:
                                         widget.keyframeIconBuilder ??
-                                        widget.style?.keyframeIconBuilder ??
+                                        widget.keyframeIconBuilder ??
                                         _defaultIconBuilder,
                                     keyframeToggleIconBuilder:
-                                        widget.style?.keyframeToggleIconBuilder,
+                                        widget.keyframeToggleIconBuilder,
                                     trackGroupExtraWidgetBuilder: widget.trackGroupExtraWidgetBuilder,
                                   ),
                                 ),
@@ -212,8 +211,7 @@ class _TimelineWidgetState<V extends AnimationTrackGroup>
                   child: FrameDragHandle(
                     scrollController: _horizontalScrollController,
                     controller: controller,
-                    frameDragHandleBuilder: widget.frameDragHandleBuilder,
-                    style: widget.style?.frameDragHandleStyle,
+                    style: widget.frameDragHandleStyle
                   ),
                 ),
               ],

@@ -12,8 +12,8 @@ class FrameDragHandleStyle {
 
   const FrameDragHandleStyle({
     this.backgroundColor = Colors.purple,
-    this.width = 75,
-    this.height = 75,
+    this.width = 50,
+    this.height = 25,
     this.textBuilder,
     this.borderRadius,
   });
@@ -46,29 +46,29 @@ class FrameDragHandleStyle {
   }
 }
 
-class TimelineStyle {
-  final FrameDragHandleStyle frameDragHandleStyle;
-  final KeyframeIconBuilder? keyframeIconBuilder;
-  final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
+// class TimelineStyle {
+  
+//   final KeyframeIconBuilder? keyframeIconBuilder;
+//   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
 
-  const TimelineStyle({
-    this.frameDragHandleStyle = const FrameDragHandleStyle(),
-    this.keyframeIconBuilder,
-    this.keyframeToggleIconBuilder,
-  });
+//   const TimelineStyle({
+//     this.frameDragHandleStyle = ,
+//     this.keyframeIconBuilder,
+//     this.keyframeToggleIconBuilder,
+//   });
 
-  TimelineStyle copyWith({
-    FrameDragHandleStyle? frameDragHandleStyle,
-    KeyframeIconBuilder? keyframeIconBuilder,
-    KeyframeToggleIconBuilder? keyframeToggleIconBuilder,
-  }) {
-    return TimelineStyle(
-      frameDragHandleStyle: frameDragHandleStyle ?? this.frameDragHandleStyle,
-      keyframeIconBuilder: keyframeIconBuilder ?? this.keyframeIconBuilder,
-      keyframeToggleIconBuilder: keyframeToggleIconBuilder ?? this.keyframeToggleIconBuilder,
-    );
-  }
-}
+//   TimelineStyle copyWith({
+//     FrameDragHandleStyle? frameDragHandleStyle,
+//     KeyframeIconBuilder? keyframeIconBuilder,
+//     KeyframeToggleIconBuilder? keyframeToggleIconBuilder,
+//   }) {
+//     return TimelineStyle(
+//       frameDragHandleStyle: frameDragHandleStyle ?? this.frameDragHandleStyle,
+//       keyframeIconBuilder: keyframeIconBuilder ?? this.keyframeIconBuilder,
+//       keyframeToggleIconBuilder: keyframeToggleIconBuilder ?? this.keyframeToggleIconBuilder,
+//     );
+//   }
+// }
 
 // Re-export the KeyframeIconBuilder typedef for convenience
 typedef KeyframeIconBuilder = Widget Function(

@@ -4,23 +4,16 @@ import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
 
-typedef FrameDragHandleBuilder = Widget Function(
-  BuildContext context,
-  int currentFrame,
-  bool isDragging,
-);
 
 class FrameDragHandle extends StatefulWidget {
   final ScrollController scrollController;
   final TimelineController controller;
-  final FrameDragHandleBuilder? frameDragHandleBuilder;
   final FrameDragHandleStyle? style;
 
   const FrameDragHandle({
     super.key,
     required this.scrollController,
     required this.controller,
-    this.frameDragHandleBuilder,
     this.style,
   });
 
@@ -33,7 +26,7 @@ class FrameDragHandle extends StatefulWidget {
 class _FrameDragHandleState extends State<FrameDragHandle> {
   bool isDragging = false;
 
-  Widget _buildDefaultFrameDragHandle(
+  Widget _buildDragHandle(
     BuildContext context,
     int currentFrame,
     bool isDragging,
@@ -125,11 +118,7 @@ class _FrameDragHandleState extends State<FrameDragHandle> {
                           widget.controller.setCurrentFrame(currentFrame);
                         }
                       },
-                      child: widget.frameDragHandleBuilder?.call(
-                        context,
-                        frameNumber,
-                        isDragging,
-                      ) ?? _buildDefaultFrameDragHandle(
+                      child: _buildDragHandle(
                         context,
                         frameNumber,
                         isDragging,
@@ -137,7 +126,7 @@ class _FrameDragHandleState extends State<FrameDragHandle> {
                     ),
                   ),
                   Expanded(
-                    child: Box(style: Style($box.width(1), $box.color.black())),
+                    child: Box(style: Style($box.width(1), $box.color(style.backgroundColor))),
                   ),
                 ],
               ),
