@@ -33,7 +33,7 @@ class RandomObject {
     "color",
   );
 
-  late final AnimatableObjectImpl trackGroup;
+  late final AnimatableObjectImpl trackObject;
 
   //
   ValueNotifier<bool> isVisible = ValueNotifier<bool>(true);
@@ -46,7 +46,7 @@ class RandomObject {
     required this.scaleY,
     required this.color,
   }) {
-    trackGroup = AnimatableObjectImpl([
+    trackObject = AnimatableObjectImpl([
       positionTrack,
       rotationTrack,
       scaleTrack,
@@ -75,20 +75,20 @@ class ObjectHolder implements TrackController {
   final void Function() onUpdate;
   TimelineController? _timelineController;
 
-  RandomObject? get(AnimatableObject group) {
-    return _lookup[group];
+  RandomObject? get(AnimatableObject object) {
+    return _lookup[object];
   }
 
   void setTimelineController(TimelineController controller) {
     _timelineController = controller;
   }
 
-  void removeObject(AnimatableObject group) {
-    final object = _lookup[group];
+  void removeObject(AnimatableObject animatableObject) {
+    final object = _lookup[animatableObject];
     if (object != null) {
       objects.remove(object);
-      animatableObjects.remove(group);
-      _lookup.remove(group);
+      animatableObjects.remove(object);
+      _lookup.remove(object);
       onUpdate.call();
     }
   }
@@ -110,12 +110,12 @@ class ObjectHolder implements TrackController {
     );
     
     objects.add(object);
-    animatableObjects.add(object.trackGroup);
-    _lookup[object.trackGroup] = object;
+    animatableObjects.add(object.trackObject);
+    _lookup[object.trackObject] = object;
     
-    // Notify timeline controller of new track group
+    // Notify timeline controller of new track object
     if (_timelineController != null) {
-      _timelineController!.addGroup(object.trackGroup);
+      _timelineController!.addObject(object.trackObject);
     }
     
     onUpdate.call();
@@ -136,19 +136,19 @@ class ObjectHolder implements TrackController {
           _rnd.nextInt(256),
         ),
       );
-      _lookup[object.trackGroup] = object;
+      _lookup[object.trackObject] = object;
       return object;
     });
 
-    animatableObjects = objects.map((object) => object.trackGroup).toList();
+    animatableObjects = objects.map((object) => object.trackObject).toList();
   }
 
   @override
   U getCurrentValue<U extends ChannelValueType>(
-    AnimatableObject group,
+    AnimatableObject animatableObject,
     AnimationTrack<U> track,
   ) {
-    final object = _lookup[group]!;
+    final object = _lookup[animatableObject]!;
     if (track == object.colorTrack) {
       return Vector4ChannelValueType(
             Vector4(
@@ -179,11 +179,11 @@ class ObjectHolder implements TrackController {
 
   @override
   void applyValue<U extends ChannelValueType>(
-    AnimatableObject group,
+    AnimatableObject animatableObject,
     AnimationTrack<U> track,
     List<num> values,
   ) {
-    var object = _lookup[group];
+    var object = _lookup[animatableObject];
     object!.applyValue(track, values);
     onUpdate.call();
   }

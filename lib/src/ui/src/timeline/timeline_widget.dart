@@ -5,7 +5,7 @@ import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/frame_drag_handle.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_background.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_scroller.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_groups_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/track_objects_widget.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
 
@@ -22,8 +22,8 @@ class TimelineWidget extends StatefulWidget {
   final FrameDragHandleStyle frameDragHandleStyle;
   final KeyframeIconBuilder? keyframeIconBuilder;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
-  final TrackGroupExtraWidgetBuilder? trackGroupExtraWidgetBuilder;
-  final TrackGroupNameStyle? trackGroupNameStyle;
+  final TrackObjectExtraWidgetBuilder? trackObjectExtraWidgetBuilder;
+  final TrackObjectNameStyle? trackObjectNameStyle;
   final TimelineBackgroundStyle backgroundStyle;
 
   const TimelineWidget({
@@ -32,8 +32,8 @@ class TimelineWidget extends StatefulWidget {
     this.frameDragHandleStyle = const FrameDragHandleStyle(),
     this.keyframeIconBuilder,
     this.keyframeToggleIconBuilder,
-    this.trackGroupExtraWidgetBuilder,
-    this.trackGroupNameStyle,
+    this.trackObjectExtraWidgetBuilder,
+    this.trackObjectNameStyle,
     this.backgroundStyle = const TimelineBackgroundStyle(),
   });
 
@@ -186,7 +186,7 @@ class _TimelineWidgetState<V extends AnimatableObject>
                                     _focusNode.requestFocus();
                                     widget.controller.clearSelectedKeyframes();
                                   },
-                                  child: TrackGroupsWidget(
+                                  child: TrackObjectsWidget(
                                     trackNameWidth: trackNameWidth,
                                     controller: controller,
                                     horizontalScrollController:
@@ -197,8 +197,8 @@ class _TimelineWidgetState<V extends AnimatableObject>
                                         _defaultIconBuilder,
                                     keyframeToggleIconBuilder:
                                         widget.keyframeToggleIconBuilder,
-                                    trackGroupExtraWidgetBuilder: widget.trackGroupExtraWidgetBuilder,
-                                    trackGroupNameStyle: widget.trackGroupNameStyle,
+                                    trackObjectExtraWidgetBuilder: widget.trackObjectExtraWidgetBuilder,
+                                    trackObjectNameStyle: widget.trackObjectNameStyle,
                                   ),
                                 ),
                               ),

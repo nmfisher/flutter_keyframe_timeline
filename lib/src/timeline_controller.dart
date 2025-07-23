@@ -1,21 +1,18 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_keyframe_timeline/src/model/src/animation_track.dart';
-import 'package:flutter_keyframe_timeline/src/model/src/animation_track_group.dart';
-import 'package:flutter_keyframe_timeline/src/model/src/channel_types.dart';
-import 'package:flutter_keyframe_timeline/src/model/src/keyframe.dart';
+import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 
 abstract class TimelineController {
   //
   ValueNotifier<List<AnimatableObject>> get animatableObjects;
 
   //
-  void resetGroups(List<AnimatableObject> groups);
+  void resetObjects(List<AnimatableObject> objects);
 
   //
-  void addGroup(AnimatableObject group);
+  void addObject(AnimatableObject object);
 
   //
-  void deleteGroup(AnimatableObject group);
+  void deleteObject(AnimatableObject object);
 
   //
   ValueListenable<int> get pixelsPerFrame;
@@ -58,7 +55,7 @@ abstract class TimelineController {
 
   //
   void applyValue<U extends ChannelValueType>(
-    AnimatableObject group,
+    AnimatableObject object,
     AnimationTrack<U> track,
     List<num> values,
   );
@@ -67,13 +64,13 @@ abstract class TimelineController {
   ValueListenable<Set<AnimatableObject>> get active;
 
   //
-  void setActive(AnimatableObject group, bool active, {bool append = false});
+  void setActive(AnimatableObject object, bool active, {bool append = false});
 
   //
   ValueListenable<Set<AnimatableObject>> get expanded;
 
   //
-  void setExpanded(AnimatableObject group, bool expanded);
+  void setExpanded(AnimatableObject object, bool expanded);
 
   // Dispose this instance and all associated ValueNotifiers.
   void dispose();
@@ -88,7 +85,7 @@ abstract class TrackController {
 
   //
   void applyValue<U extends ChannelValueType>(
-    AnimatableObject group,
+    AnimatableObject object,
     AnimationTrack<U> track,
     List<num> values,
   );
@@ -110,11 +107,11 @@ class TimelineControllerImpl extends TimelineController {
   }
 
   void _onCurrentFrameChanged() {
-    for (final group in animatableObjects.value) {
-      for (final track in group.tracks) {
+    for (final object in animatableObjects.value) {
+      for (final track in object.tracks) {
         if (track.keyframes.value.isNotEmpty) {
           var value = track.calculate(currentFrame.value);
-          applyValue(group, track, value.unwrap());
+          applyValue(object, track, value.unwrap());
         }
       }
     }
@@ -194,39 +191,39 @@ class TimelineControllerImpl extends TimelineController {
 
   @override
   void setActive(
-    AnimatableObject group,
+    AnimatableObject object,
     bool active, {
     bool append = false,
   }) {
     if (!active) {
-      this.active.value.remove(group);
+      this.active.value.remove(object);
     } else {
       if (!append) {
         this.active.value.clear();
       }
-      this.active.value.add(group);
+      this.active.value.add(object);
     }
     this.active.notifyListeners();
   }
 
   @override
-  void resetGroups(List<AnimatableObject> groups) {
+  void resetObjects(List<AnimatableObject> objects) {
     this.animatableObjects.value.clear();
-    this.animatableObjects.value.addAll(groups);
+    this.animatableObjects.value.addAll(objects);
     this.animatableObjects.notifyListeners();
   }
 
   @override
-  void addGroup(AnimatableObject group) {
-    this.animatableObjects.value.add(group);
+  void addObject(AnimatableObject object) {
+    this.animatableObjects.value.add(object);
     this.animatableObjects.notifyListeners();
   }
 
   @override
-  void deleteGroup(AnimatableObject group) {
-    this.active.value.remove(group);
-    this.selected.value.remove(group);
-    this.animatableObjects.value.remove(group);
+  void deleteObject(AnimatableObject object) {
+    this.active.value.remove(object);
+    this.selected.value.remove(object);
+    this.animatableObjects.value.remove(object);
     this.animatableObjects.notifyListeners();
     this.selected.notifyListeners();
     this.active.notifyListeners();
@@ -239,22 +236,22 @@ class TimelineControllerImpl extends TimelineController {
 
   //
   @override
-  void setExpanded(AnimatableObject group, bool expanded) {
+  void setExpanded(AnimatableObject object, bool expanded) {
     if (expanded) {
-      this.expanded.value.add(group);
+      this.expanded.value.add(object);
     } else {
-      this.expanded.value.remove(group);
+      this.expanded.value.remove(object);
     }
     this.expanded.notifyListeners();
   }
 
   @override
   void applyValue<U extends ChannelValueType>(
-    AnimatableObject group,
+    AnimatableObject object,
     AnimationTrack<U> track,
     List<num> values,
   ) {
-    trackController.applyValue(group, track, values);
+    trackController.applyValue(object, track, values);
   }
 
   @override

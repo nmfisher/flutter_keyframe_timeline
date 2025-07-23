@@ -24,18 +24,18 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
   void initState() {
     super.initState();
 
-    // Listen to active track group changes and sync canvas selection
+    // Listen to active track object changes and sync canvas selection
     widget.timelineController.active.addListener(() {
-      final activeGroups = widget.timelineController.active.value;
-      if (activeGroups.isEmpty) {
+      final activeObjects = widget.timelineController.active.value;
+      if (activeObjects.isEmpty) {
         setState(() {
           _selectedObject = null;
         });
       } else {
-        // Find the object corresponding to the first active track group
-        final activeGroup = activeGroups.first;
+        // Find the object corresponding to the first active track object
+        final animatableObject = activeObjects.first;
         final activeObject = widget.objectHolder.objects.firstWhere(
-          (obj) => obj.trackGroup == activeGroup,
+          (obj) => obj.trackObject == animatableObject,
           orElse: () => widget.objectHolder.objects.first,
         );
         setState(() {
@@ -71,7 +71,7 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
                     setState(() {
                       _selectedObject = obj;
                     });
-                    widget.timelineController.setActive(obj.trackGroup, true);
+                    widget.timelineController.setActive(obj.trackObject, true);
                   },
                   onPanUpdate: (details) {
                     if (_selectedObject == obj) {

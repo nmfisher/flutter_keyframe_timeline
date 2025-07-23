@@ -1,57 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_group_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/track_object_widget.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
 
-class TrackGroupsWidget extends StatefulWidget {
+class TrackObjectsWidget extends StatefulWidget {
   final TimelineController controller;
   final ScrollController horizontalScrollController;
   final double trackNameWidth;
   final KeyframeIconBuilder keyframeIconBuilder;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
-  final TrackGroupExtraWidgetBuilder? trackGroupExtraWidgetBuilder;
-  final TrackGroupNameStyle? trackGroupNameStyle;
-  const TrackGroupsWidget({
+  final TrackObjectExtraWidgetBuilder? trackObjectExtraWidgetBuilder;
+  final TrackObjectNameStyle? trackObjectNameStyle;
+  const TrackObjectsWidget({
     super.key,
     required this.controller,
     required this.horizontalScrollController,
     required this.trackNameWidth,
     required this.keyframeIconBuilder,
     this.keyframeToggleIconBuilder,
-    this.trackGroupExtraWidgetBuilder,
-    this.trackGroupNameStyle,
+    this.trackObjectExtraWidgetBuilder,
+    this.trackObjectNameStyle,
   });
 
   @override
-  State<TrackGroupsWidget> createState() => _TrackGroupsWidgetState();
+  State<TrackObjectsWidget> createState() => _TrackObjectsWidgetState();
 }
 
-class _TrackGroupsWidgetState extends State<TrackGroupsWidget> {
+class _TrackObjectsWidgetState extends State<TrackObjectsWidget> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: widget.controller.animatableObjects,
-      builder: (_, groups, __) => VBox(
+      builder: (_, objects, __) => VBox(
         key: ObjectKey(widget.controller.animatableObjects),
         style: Style($flex.crossAxisAlignment.start()),
-        children: groups
+        children: objects
             .asMap()
             .map(
-              (idx, group) => MapEntry(
+              (idx, object) => MapEntry(
                 idx,
-                TrackGroupWidget(
-                  key: ObjectKey(group),
-                  group: group,
+                TrackObjectWidget(
+                  key: ObjectKey(object),
+                  object: object,
                   index: idx,
                   controller: widget.controller,
                   trackNameWidth: widget.trackNameWidth,
                   scrollController: widget.horizontalScrollController,
                   keyframeIconBuilder: widget.keyframeIconBuilder,
                   keyframeToggleIconBuilder: widget.keyframeToggleIconBuilder,
-                  additionalWidgetBuilder: widget.trackGroupExtraWidgetBuilder,
-                  trackGroupNameStyle: widget.trackGroupNameStyle,
+                  additionalWidgetBuilder: widget.trackObjectExtraWidgetBuilder,
+                  trackObjectNameStyle: widget.trackObjectNameStyle,
                 ),
               ),
             )

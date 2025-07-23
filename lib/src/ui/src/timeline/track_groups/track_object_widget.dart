@@ -1,28 +1,30 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
+import 'package:flutter_keyframe_timeline/src/model/src/animatable_object.dart';
 import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/expand_icon.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/track_keyframes_widget.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/animation_track_group/value_editor/animation_channel_editor_widget.dart';
+
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/track_keyframes_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/value_editor/animation_channel_editor_widget.dart';
 import 'package:mix/mix.dart';
 
-class TrackGroupWidget extends StatelessWidget {
+class TrackObjectWidget extends StatelessWidget {
   final TimelineController controller;
   final ScrollController scrollController;
-  final AnimatableObject group;
+  final AnimatableObject object;
 
   final int index;
   final double trackNameWidth;
   final KeyframeIconBuilder keyframeIconBuilder;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
-  final TrackGroupExtraWidgetBuilder? additionalWidgetBuilder;
-  final TrackGroupNameStyle? trackGroupNameStyle;
+  final TrackObjectExtraWidgetBuilder? additionalWidgetBuilder;
+  final TrackObjectNameStyle? trackObjectNameStyle;
 
-  const TrackGroupWidget({
+  const TrackObjectWidget({
     super.key,
-    required this.group,
+    required this.object,
     required this.controller,
     required this.scrollController,
     required this.index,
@@ -30,15 +32,15 @@ class TrackGroupWidget extends StatelessWidget {
     required this.keyframeIconBuilder,
     this.additionalWidgetBuilder,
     this.keyframeToggleIconBuilder,
-    this.trackGroupNameStyle,
+    this.trackObjectNameStyle,
     
   });
 
-  Widget _groupName(bool isExpanded, BuildContext context) {
+  Widget _objectName(bool isExpanded, BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: controller.active,
       builder: (_, active, __) {
-        final isActive = active.contains(group);
+        final isActive = active.contains(object);
         return HBox(
           children: [
             Expanded(
@@ -47,7 +49,7 @@ class TrackGroupWidget extends StatelessWidget {
                 onPointerDown: (details) {
                   if (details.buttons & kPrimaryMouseButton ==
                       kPrimaryMouseButton) {
-                    controller.setActive(group, true);
+                    controller.setActive(object, true);
                   }
                 },
                 child: HBox(
@@ -56,17 +58,17 @@ class TrackGroupWidget extends StatelessWidget {
                       isExpanded: isExpanded,
                       isActive: isActive,
                       setExpanded: (expanded) {
-                        controller.setExpanded(group, expanded);
+                        controller.setExpanded(object, expanded);
                       },
-                      color: trackGroupNameStyle?.iconColor,
+                      color: trackObjectNameStyle?.iconColor,
                     ),
                     Expanded(
                       child: ValueListenableBuilder(
-                        valueListenable: group.displayName,
+                        valueListenable: object.displayName,
                         builder: (_, displayName, __) => StyledText(
                           displayName,
                           style: Style(
-                            $text.color((trackGroupNameStyle?.textColor ?? Colors.black).withOpacity(isActive ? 1.0 : 0.5)),
+                            $text.color((trackObjectNameStyle?.textColor ?? Colors.black).withOpacity(isActive ? 1.0 : 0.5)),
                             $text.overflow.ellipsis(),
                           ),
                         ),
@@ -77,7 +79,7 @@ class TrackGroupWidget extends StatelessWidget {
               ),
             ),
             if(additionalWidgetBuilder != null)
-            additionalWidgetBuilder!(context, group, isActive, isExpanded)
+            additionalWidgetBuilder!(context, object, isActive, isExpanded)
           ],
         );
       },
@@ -89,22 +91,22 @@ class TrackGroupWidget extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: controller.expanded,
       builder: (_, expanded, __) {
-        final isExpanded = expanded.contains(group);
+        final isExpanded = expanded.contains(object);
         return VBox(
           style: Style(
             $flex.crossAxisAlignment.start(),
             $box.color.transparent(),
-            $box.border.only(top: BorderSideDto(color: ColorDto(trackGroupNameStyle?.borderColor ?? Colors.black))),
+            $box.border.only(top: BorderSideDto(color: ColorDto(trackObjectNameStyle?.borderColor ?? Colors.black))),
           ),
           children: [
-            SizedBox(width: trackNameWidth, child: _groupName(isExpanded, context)),
+            SizedBox(width: trackNameWidth, child: _objectName(isExpanded, context)),
 
             if (isExpanded)
-              ...group.tracks
+              ...object.tracks
                   .map(
                     (track) => HBox(
                       style: Style(
-                        $box.border.bottom(color: trackGroupNameStyle?.borderColor ?? Colors.black),
+                        $box.border.bottom(color: trackObjectNameStyle?.borderColor ?? Colors.black),
                         $box.padding.vertical(12),
                         $flex.crossAxisAlignment.start(),
                       ),
@@ -112,7 +114,7 @@ class TrackGroupWidget extends StatelessWidget {
                         SizedBox(
                           width: trackNameWidth,
                           child: AnimationChannelEditorWidget(
-                            group: group,
+                            object: object,
                             track: track,
                             controller: controller,
                             keyframeToggleIconBuilder:

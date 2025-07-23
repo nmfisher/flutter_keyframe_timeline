@@ -5,13 +5,13 @@ import 'package:mix/mix.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 
-class TrackGroupVisibilityWidget extends StatelessWidget {
+class TrackObjectVisibilityWidget extends StatelessWidget {
   final RandomObject object;
   final bool isActive;
   final bool isExpanded;
   final VoidCallback? onRemove;
 
-  const TrackGroupVisibilityWidget({
+  const TrackObjectVisibilityWidget({
     super.key,
     required this.object,
     required this.isActive,

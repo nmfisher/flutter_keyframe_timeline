@@ -1,5 +1,3 @@
-import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -78,21 +76,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 Positioned.fill(
                   child: TimelineWidget(
                     controller: _controller,
-                    trackGroupExtraWidgetBuilder:
+                    trackObjectExtraWidgetBuilder:
                         (
                           BuildContext context,
-                          AnimatableObject group,
-                          bool trackGroupIsActive,
-                          bool trackGroupIsExpanded,
+                          AnimatableObject animatableObject,
+                          bool trackObjectIsActive,
+                          bool trackObjectIsExpanded,
                         ) {
-                          final object = _objectHolder.get(group);
-                          return TrackGroupVisibilityWidget(
+                          final object = _objectHolder.get(animatableObject);
+                          return TrackObjectVisibilityWidget(
                             object: object!,
-                            isActive: trackGroupIsActive,
-                            isExpanded: trackGroupIsExpanded,
+                            isActive: trackObjectIsActive,
+                            isExpanded: trackObjectIsExpanded,
                             onRemove: () {
-                              _controller.deleteGroup(group);
-                              _objectHolder.removeObject(group);
+                              _controller.deleteObject(animatableObject);
+                              _objectHolder.removeObject(animatableObject);
                             },
                           );
                         },
@@ -183,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         majorTickInterval: 10,
                         minorTickInterval: 1
                       ),
-                      trackGroupNameStyle: TrackGroupNameStyle(
+                      trackObjectNameStyle: TrackObjectNameStyle(
                         iconData: Icons.folder,
                         textColor: Colors.blue.shade800,
                         iconColor: Colors.blue.shade600,

@@ -31,11 +31,11 @@ class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
     false,
   );
 
-  final AnimatableObject group;
+  final AnimatableObject object;
   final AnimationTrack<V> track;
   final TimelineController controller;
 
-  AnimationChannelEditorViewModelImpl(this.group, this.track, this.controller) {
+  AnimationChannelEditorViewModelImpl(this.object, this.track, this.controller) {
     track.keyframes.addListener(_onKeyframesUpdated);
     _onKeyframesUpdated();
 
@@ -98,17 +98,17 @@ class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
   @override
   Future addKeyframeForCurrentFrame() async {
     final currentFrame = controller.currentFrame.value;
-    var value = controller.getCurrentValue<V>(group, track);
+    var value = controller.getCurrentValue<V>(object, track);
     track.addOrUpdateKeyframe(currentFrame, value);
   }
 
   @override
   V getValue(int frame) {
-    return controller.getCurrentValue<V>(group, track);
+    return controller.getCurrentValue<V>(object, track);
   }
 
   @override
   void setCurrentFrameValue(List<double> values) {
-    controller.applyValue(group, track, values);
+    controller.applyValue(object, track, values);
   }
 }

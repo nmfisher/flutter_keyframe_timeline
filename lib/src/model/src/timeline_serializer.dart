@@ -1,4 +1,5 @@
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
+import 'package:flutter_keyframe_timeline/src/model/src/animatable_object.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class TimelineSerializer {
@@ -74,12 +75,12 @@ class TimelineSerializer {
   }
 
   static AnimatableObject fromMap(
-    Map<String, dynamic> group,
+    Map<String, dynamic> object,
   ) {
     
-    var name = group["name"] as String;
+    var name = object["name"] as String;
     
-    var tracks = group["tracks"].map((track) {
+    var tracks = object["tracks"].map((track) {
       var keyframes = track["keyframes"]
           .map(parseKeyframe)
           .cast<Keyframe>()
@@ -94,9 +95,9 @@ class TimelineSerializer {
     return AnimatableObjectImpl(tracks, name);
   }
 
-  static Map<String, dynamic> toMap(AnimatableObject group) {
+  static Map<String, dynamic> toMap(AnimatableObject object) {
     return {
-      'tracks': group.tracks.map((track) {
+      'tracks': object.tracks.map((track) {
         return {
           'label': track.label,
           'labels': track.labels,

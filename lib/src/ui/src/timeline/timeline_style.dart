@@ -60,33 +60,33 @@ typedef KeyframeToggleIconBuilder = Widget Function(
   VoidCallback onPressed,
 );
 
-typedef TrackGroupExtraWidgetBuilder = Widget Function(
+typedef TrackObjectExtraWidgetBuilder = Widget Function(
   BuildContext context,
-  AnimatableObject group,
-  bool trackGroupIsActive,
-  bool trackGroupIsExpanded
+  AnimatableObject object,
+  bool trackObjectIsActive,
+  bool trackObjectIsExpanded
 );
 
-class TrackGroupNameStyle {
+class TrackObjectNameStyle {
   final Color textColor;
   final IconData iconData;
   final Color iconColor;
   final Color borderColor;
 
-  const TrackGroupNameStyle({
+  const TrackObjectNameStyle({
     this.textColor = Colors.black,
     this.iconData = Icons.expand_more,
     this.iconColor = Colors.black,
     this.borderColor = Colors.black,
   });
 
-  TrackGroupNameStyle copyWith({
+  TrackObjectNameStyle copyWith({
     Color? textColor,
     IconData? iconData,
     Color? iconColor,
     Color? borderColor,
   }) {
-    return TrackGroupNameStyle(
+    return TrackObjectNameStyle(
       textColor: textColor ?? this.textColor,
       iconData: iconData ?? this.iconData,
       iconColor: iconColor ?? this.iconColor,

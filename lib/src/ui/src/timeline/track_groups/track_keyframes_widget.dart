@@ -2,7 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/keyframe/keyframe_display_widget.dart';
+
+import 'keyframe/keyframe_display_widget.dart';
 
 class TrackKeyframesWidget extends StatelessWidget {
   final AnimationTrack track;

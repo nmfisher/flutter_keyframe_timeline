@@ -4,14 +4,14 @@ import 'package:flutter_keyframe_timeline/src/ui/src/shared/numeric/numeric_cont
 import 'animation_channel_editor_viewmodel.dart';
 
 class AnimationChannelEditorWidget extends StatefulWidget {
-  final AnimatableObject group;
+  final AnimatableObject object;
   final AnimationTrack track;
   final TimelineController controller;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
 
   const AnimationChannelEditorWidget({
     super.key,
-    required this.group,
+    required this.object,
     required this.track,
     required this.controller,
     this.keyframeToggleIconBuilder,
@@ -26,7 +26,7 @@ class _AnimationChannelEditorWidgetState
     extends State<AnimationChannelEditorWidget> {
   late final AnimationChannelEditorViewModel viewModel =
       AnimationChannelEditorViewModelImpl(
-        widget.group,
+        widget.object,
         widget.track,
         widget.controller,
       );
