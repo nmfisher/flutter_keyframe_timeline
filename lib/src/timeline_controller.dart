@@ -6,13 +6,16 @@ import 'package:flutter_keyframe_timeline/src/model/src/keyframe.dart';
 
 abstract class TimelineController {
   //
-  ValueNotifier<List<AnimationTrackGroup>> get trackGroups;
+  ValueNotifier<List<AnimatableObject>> get animatableObjects;
 
   //
-  void addGroup(AnimationTrackGroup group);
+  void resetGroups(List<AnimatableObject> groups);
 
   //
-  void deleteGroup(AnimationTrackGroup group);
+  void addGroup(AnimatableObject group);
+
+  //
+  void deleteGroup(AnimatableObject group);
 
   //
   ValueListenable<int> get pixelsPerFrame;
@@ -49,28 +52,28 @@ abstract class TimelineController {
 
   //
   U getCurrentValue<U extends ChannelValueType>(
-    AnimationTrackGroup target,
+    AnimatableObject target,
     AnimationTrack<U> track,
   );
 
   //
   void applyValue<U extends ChannelValueType>(
-    AnimationTrackGroup group,
+    AnimatableObject group,
     AnimationTrack<U> track,
     List<num> values,
   );
 
   //
-  ValueListenable<Set<AnimationTrackGroup>> get active;
+  ValueListenable<Set<AnimatableObject>> get active;
 
   //
-  void setActive(AnimationTrackGroup group, bool active, {bool append = false});
+  void setActive(AnimatableObject group, bool active, {bool append = false});
 
   //
-  ValueListenable<Set<AnimationTrackGroup>> get expanded;
+  ValueListenable<Set<AnimatableObject>> get expanded;
 
   //
-  void setExpanded(AnimationTrackGroup group, bool expanded);
+  void setExpanded(AnimatableObject group, bool expanded);
 
   // Dispose this instance and all associated ValueNotifiers.
   void dispose();
@@ -79,13 +82,13 @@ abstract class TimelineController {
 abstract class TrackController {
   //
   U getCurrentValue<U extends ChannelValueType>(
-    AnimationTrackGroup target,
+    AnimatableObject target,
     AnimationTrack<U> track,
   );
 
   //
   void applyValue<U extends ChannelValueType>(
-    AnimationTrackGroup group,
+    AnimatableObject group,
     AnimationTrack<U> track,
     List<num> values,
   );
@@ -93,21 +96,21 @@ abstract class TrackController {
 
 class TimelineControllerImpl extends TimelineController {
   @override
-  final ValueNotifier<List<AnimationTrackGroup>> trackGroups =
-      ValueNotifier<List<AnimationTrackGroup>>([]);
+  final ValueNotifier<List<AnimatableObject>> animatableObjects =
+      ValueNotifier<List<AnimatableObject>>([]);
 
   final TrackController trackController;
 
   TimelineControllerImpl(
-    List<AnimationTrackGroup> initial,
+    List<AnimatableObject> initial,
     this.trackController,
   ) {
-    trackGroups.value.addAll(initial);
+    animatableObjects.value.addAll(initial);
     this.currentFrame.addListener(_onCurrentFrameChanged);
   }
 
   void _onCurrentFrameChanged() {
-    for (final group in trackGroups.value) {
+    for (final group in animatableObjects.value) {
       for (final track in group.tracks) {
         if (track.keyframes.value.isNotEmpty) {
           var value = track.calculate(currentFrame.value);
@@ -119,7 +122,7 @@ class TimelineControllerImpl extends TimelineController {
 
   void dispose() {
     currentFrame.dispose();
-    trackGroups.dispose();
+    animatableObjects.dispose();
     pixelsPerFrame.dispose();
     maxFrames.dispose();
   }
@@ -186,12 +189,12 @@ class TimelineControllerImpl extends TimelineController {
     }
   }
 
-  ValueNotifier<Set<AnimationTrackGroup>> active =
-      ValueNotifier<Set<AnimationTrackGroup>>({});
+  ValueNotifier<Set<AnimatableObject>> active =
+      ValueNotifier<Set<AnimatableObject>>({});
 
   @override
   void setActive(
-    AnimationTrackGroup group,
+    AnimatableObject group,
     bool active, {
     bool append = false,
   }) {
@@ -207,29 +210,36 @@ class TimelineControllerImpl extends TimelineController {
   }
 
   @override
-  void addGroup(AnimationTrackGroup group) {
-    this.trackGroups.value.add(group);
-    this.trackGroups.notifyListeners();
+  void resetGroups(List<AnimatableObject> groups) {
+    this.animatableObjects.value.clear();
+    this.animatableObjects.value.addAll(groups);
+    this.animatableObjects.notifyListeners();
   }
 
   @override
-  void deleteGroup(AnimationTrackGroup group) {
+  void addGroup(AnimatableObject group) {
+    this.animatableObjects.value.add(group);
+    this.animatableObjects.notifyListeners();
+  }
+
+  @override
+  void deleteGroup(AnimatableObject group) {
     this.active.value.remove(group);
     this.selected.value.remove(group);
-    this.trackGroups.value.remove(group);
-    this.trackGroups.notifyListeners();
+    this.animatableObjects.value.remove(group);
+    this.animatableObjects.notifyListeners();
     this.selected.notifyListeners();
     this.active.notifyListeners();
   }
 
   //
   @override
-  ValueNotifier<Set<AnimationTrackGroup>> expanded =
-      ValueNotifier<Set<AnimationTrackGroup>>({});
+  ValueNotifier<Set<AnimatableObject>> expanded =
+      ValueNotifier<Set<AnimatableObject>>({});
 
   //
   @override
-  void setExpanded(AnimationTrackGroup group, bool expanded) {
+  void setExpanded(AnimatableObject group, bool expanded) {
     if (expanded) {
       this.expanded.value.add(group);
     } else {
@@ -240,7 +250,7 @@ class TimelineControllerImpl extends TimelineController {
 
   @override
   void applyValue<U extends ChannelValueType>(
-    AnimationTrackGroup group,
+    AnimatableObject group,
     AnimationTrack<U> track,
     List<num> values,
   ) {
@@ -249,7 +259,7 @@ class TimelineControllerImpl extends TimelineController {
 
   @override
   U getCurrentValue<U extends ChannelValueType>(
-    AnimationTrackGroup target,
+    AnimatableObject target,
     AnimationTrack<U> track,
   ) {
     return trackController.getCurrentValue<U>(target, track);

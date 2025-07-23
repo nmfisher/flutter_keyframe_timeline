@@ -11,7 +11,7 @@ import 'package:mix/mix.dart';
 class TrackGroupWidget extends StatelessWidget {
   final TimelineController controller;
   final ScrollController scrollController;
-  final AnimationTrackGroup group;
+  final AnimatableObject group;
 
   final int index;
   final double trackNameWidth;

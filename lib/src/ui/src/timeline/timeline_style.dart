@@ -62,7 +62,7 @@ typedef KeyframeToggleIconBuilder = Widget Function(
 
 typedef TrackGroupExtraWidgetBuilder = Widget Function(
   BuildContext context,
-  AnimationTrackGroup group,
+  AnimatableObject group,
   bool trackGroupIsActive,
   bool trackGroupIsExpanded
 );

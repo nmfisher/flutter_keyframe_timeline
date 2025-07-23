@@ -73,7 +73,7 @@ class TimelineSerializer {
     throw Exception("Unrecognized type $V");
   }
 
-  static AnimationTrackGroup fromMap(
+  static AnimatableObject fromMap(
     Map<String, dynamic> group,
   ) {
     
@@ -91,10 +91,10 @@ class TimelineSerializer {
         track["label"],
       );
     }).toList();
-    return AnimationTrackGroupImpl(tracks, name);
+    return AnimatableObjectImpl(tracks, name);
   }
 
-  static Map<String, dynamic> toMap(AnimationTrackGroup group) {
+  static Map<String, dynamic> toMap(AnimatableObject group) {
     return {
       'tracks': group.tracks.map((track) {
         return {

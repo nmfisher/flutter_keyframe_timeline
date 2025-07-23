@@ -31,7 +31,7 @@ class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
     false,
   );
 
-  final AnimationTrackGroup group;
+  final AnimatableObject group;
   final AnimationTrack<V> track;
   final TimelineController controller;
 

@@ -32,9 +32,9 @@ class _TrackGroupsWidgetState extends State<TrackGroupsWidget> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: widget.controller.trackGroups,
+      valueListenable: widget.controller.animatableObjects,
       builder: (_, groups, __) => VBox(
-        key: ObjectKey(widget.controller.trackGroups),
+        key: ObjectKey(widget.controller.animatableObjects),
         style: Style($flex.crossAxisAlignment.start()),
         children: groups
             .asMap()

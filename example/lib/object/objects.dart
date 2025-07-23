@@ -33,7 +33,7 @@ class RandomObject {
     "color",
   );
 
-  late final AnimationTrackGroupImpl trackGroup;
+  late final AnimatableObjectImpl trackGroup;
 
   //
   ValueNotifier<bool> isVisible = ValueNotifier<bool>(true);
@@ -46,7 +46,7 @@ class RandomObject {
     required this.scaleY,
     required this.color,
   }) {
-    trackGroup = AnimationTrackGroupImpl([
+    trackGroup = AnimatableObjectImpl([
       positionTrack,
       rotationTrack,
       scaleTrack,
@@ -67,15 +67,15 @@ class RandomObject {
 class ObjectHolder implements TrackController {
   final _rnd = Random();
 
-  final _lookup = <AnimationTrackGroup, RandomObject>{};
+  final _lookup = <AnimatableObject, RandomObject>{};
 
   late List<RandomObject> objects;
-  late List<AnimationTrackGroup> trackGroups;
+  late List<AnimatableObject> animatableObjects;
 
   final void Function() onUpdate;
   TimelineController? _timelineController;
 
-  RandomObject? get(AnimationTrackGroup group) {
+  RandomObject? get(AnimatableObject group) {
     return _lookup[group];
   }
 
@@ -83,11 +83,11 @@ class ObjectHolder implements TrackController {
     _timelineController = controller;
   }
 
-  void removeObject(AnimationTrackGroup group) {
+  void removeObject(AnimatableObject group) {
     final object = _lookup[group];
     if (object != null) {
       objects.remove(object);
-      trackGroups.remove(group);
+      animatableObjects.remove(group);
       _lookup.remove(group);
       onUpdate.call();
     }
@@ -110,7 +110,7 @@ class ObjectHolder implements TrackController {
     );
     
     objects.add(object);
-    trackGroups.add(object.trackGroup);
+    animatableObjects.add(object.trackGroup);
     _lookup[object.trackGroup] = object;
     
     // Notify timeline controller of new track group
@@ -140,12 +140,12 @@ class ObjectHolder implements TrackController {
       return object;
     });
 
-    trackGroups = objects.map((object) => object.trackGroup).toList();
+    animatableObjects = objects.map((object) => object.trackGroup).toList();
   }
 
   @override
   U getCurrentValue<U extends ChannelValueType>(
-    AnimationTrackGroup group,
+    AnimatableObject group,
     AnimationTrack<U> track,
   ) {
     final object = _lookup[group]!;
@@ -179,7 +179,7 @@ class ObjectHolder implements TrackController {
 
   @override
   void applyValue<U extends ChannelValueType>(
-    AnimationTrackGroup group,
+    AnimatableObject group,
     AnimationTrack<U> track,
     List<num> values,
   ) {

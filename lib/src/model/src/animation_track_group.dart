@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
 
-abstract class AnimationTrackGroup {
-
+abstract class AnimatableObject {
 
   //
   ValueListenable<String> get displayName;
@@ -17,11 +16,11 @@ abstract class AnimationTrackGroup {
   Iterable<Keyframe> getKeyframesAtFrame(int frame);
 }
 
-class AnimationTrackGroupImpl extends AnimationTrackGroup {
+class AnimatableObjectImpl extends AnimatableObject {
   @override
   final List<AnimationTrack> tracks;
 
-  AnimationTrackGroupImpl(this.tracks, String name) {
+  AnimatableObjectImpl(this.tracks, String name) {
     this.displayName.value = name;
   }
   @override

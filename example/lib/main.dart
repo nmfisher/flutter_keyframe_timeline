@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     });
     _controller = TimelineControllerImpl(
-      _objectHolder.trackGroups,
+      _objectHolder.animatableObjects,
       _objectHolder,
     );
     _objectHolder.setTimelineController(_controller);
@@ -81,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     trackGroupExtraWidgetBuilder:
                         (
                           BuildContext context,
-                          AnimationTrackGroup group,
+                          AnimatableObject group,
                           bool trackGroupIsActive,
                           bool trackGroupIsExpanded,
                         ) {

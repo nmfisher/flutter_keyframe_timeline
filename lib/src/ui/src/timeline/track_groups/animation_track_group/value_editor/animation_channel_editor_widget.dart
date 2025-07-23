@@ -4,7 +4,7 @@ import 'package:flutter_keyframe_timeline/src/ui/src/shared/numeric/numeric_cont
 import 'animation_channel_editor_viewmodel.dart';
 
 class AnimationChannelEditorWidget extends StatefulWidget {
-  final AnimationTrackGroup group;
+  final AnimatableObject group;
   final AnimationTrack track;
   final TimelineController controller;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;

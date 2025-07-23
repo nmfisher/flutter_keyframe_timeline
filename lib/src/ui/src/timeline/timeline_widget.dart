@@ -41,7 +41,7 @@ class TimelineWidget extends StatefulWidget {
   State<TimelineWidget> createState() => _TimelineWidgetState(controller);
 }
 
-class _TimelineWidgetState<V extends AnimationTrackGroup>
+class _TimelineWidgetState<V extends AnimatableObject>
     extends State<TimelineWidget> {
   final TimelineController controller;
 
