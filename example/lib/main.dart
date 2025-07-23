@@ -56,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _objectHolder.trackGroups,
       _objectHolder,
     );
+    _objectHolder.setTimelineController(_controller);
   }
 
   @override

@@ -176,6 +176,21 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
                   '• Selecting object selects timeline',
                   style: TextStyle(fontSize: 12),
                 ),
+                SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    widget.objectHolder.addNewObject();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                  child: Text(
+                    'Add New Object',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
               ],
             ),
           ),

@@ -73,9 +73,14 @@ class ObjectHolder implements TrackController {
   late List<AnimationTrackGroup> trackGroups;
 
   final void Function() onUpdate;
+  TimelineController? _timelineController;
 
   RandomObject? get(AnimationTrackGroup group) {
     return _lookup[group];
+  }
+
+  void setTimelineController(TimelineController controller) {
+    _timelineController = controller;
   }
 
   void removeObject(AnimationTrackGroup group) {
@@ -86,6 +91,34 @@ class ObjectHolder implements TrackController {
       _lookup.remove(group);
       onUpdate.call();
     }
+  }
+
+  void addNewObject() {
+    final index = objects.length;
+    final object = RandomObject(
+      name: "object$index",
+      position: Offset(_rnd.nextDouble() * 100, _rnd.nextDouble() * 100),
+      rotation: _rnd.nextDouble() * 2 * pi,
+      scaleX: _rnd.nextDouble() * 1.5 + 0.5,
+      scaleY: _rnd.nextDouble() * 1.5 + 0.5,
+      color: Color.fromARGB(
+        255,
+        _rnd.nextInt(256),
+        _rnd.nextInt(256),
+        _rnd.nextInt(256),
+      ),
+    );
+    
+    objects.add(object);
+    trackGroups.add(object.trackGroup);
+    _lookup[object.trackGroup] = object;
+    
+    // Notify timeline controller of new track group
+    if (_timelineController != null) {
+      _timelineController!.addGroup(object.trackGroup);
+    }
+    
+    onUpdate.call();
   }
 
   ObjectHolder(int numObjects, this.onUpdate) {
