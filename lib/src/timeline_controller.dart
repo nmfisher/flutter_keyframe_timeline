@@ -6,9 +6,6 @@ abstract class TimelineController {
   ValueNotifier<List<AnimatableObject>> get animatableObjects;
 
   //
-  void resetObjects(List<AnimatableObject> objects);
-
-  //
   void addObject(AnimatableObject object);
 
   //
@@ -98,10 +95,7 @@ class TimelineControllerImpl extends TimelineController {
 
   final TrackController trackController;
 
-  TimelineControllerImpl(
-    List<AnimatableObject> initial,
-    this.trackController,
-  ) {
+  TimelineControllerImpl(List<AnimatableObject> initial, this.trackController) {
     animatableObjects.value.addAll(initial);
     this.currentFrame.addListener(_onCurrentFrameChanged);
   }
@@ -190,11 +184,7 @@ class TimelineControllerImpl extends TimelineController {
       ValueNotifier<Set<AnimatableObject>>({});
 
   @override
-  void setActive(
-    AnimatableObject object,
-    bool active, {
-    bool append = false,
-  }) {
+  void setActive(AnimatableObject object, bool active, {bool append = false}) {
     if (!active) {
       this.active.value.remove(object);
     } else {
@@ -204,13 +194,6 @@ class TimelineControllerImpl extends TimelineController {
       this.active.value.add(object);
     }
     this.active.notifyListeners();
-  }
-
-  @override
-  void resetObjects(List<AnimatableObject> objects) {
-    this.animatableObjects.value.clear();
-    this.animatableObjects.value.addAll(objects);
-    this.animatableObjects.notifyListeners();
   }
 
   @override
