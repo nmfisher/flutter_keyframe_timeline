@@ -1,7 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/shared/channel_value_editor_widget.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
+import 'package:mix/mix.dart';
 import 'animation_track_value_editor_viewmodel.dart';
 
 class AnimationTrackValueEditorWidget extends StatefulWidget {
@@ -36,10 +37,122 @@ class _AnimationTrackValueEditorWidgetState
         widget.controller,
       );
 
+  // Channel value editor state
+  late final List<TextEditingController> controllers;
+  late List<double> currentValues;
+
+  @override
+  void initState() {
+    super.initState();
+    controllers = List.generate(
+      widget.track.labels.length,
+      (_) => TextEditingController(),
+    );
+    currentValues = List.generate(widget.track.labels.length, (_) => 0.0);
+  }
+
   @override
   void dispose() {
     super.dispose();
     viewModel.dispose();
+    for (var controller in controllers) {
+      controller.dispose();
+    }
+  }
+
+  void _updateControllers(List<num> values) {
+    for (var i = 0; i < controllers.length; i++) {
+      final newText = values[i].toStringAsFixed(2);
+      if (controllers[i].text != newText) {
+        controllers[i].text = newText;
+      }
+    }
+  }
+
+  void _onChannelChanged(int channelIndex, double newValue) {
+    final newValues = List<double>.from(currentValues);
+    newValues[channelIndex] = newValue;
+    currentValues = newValues;
+    viewModel.setCurrentFrameValue(newValues);
+  }
+
+  Widget _buildNumberField(
+    String label,
+    TextEditingController controller,
+    int index,
+  ) {
+    final textField = TextField(
+      controller: controller,
+      style: TextStyle(
+        color: widget.channelValueEditorStyle?.textColor ?? Colors.black,
+        fontSize: widget.channelValueEditorStyle?.fontSize ?? 11,
+      ),
+      decoration:
+          widget.channelValueEditorStyle?.inputDecoration ??
+          InputDecoration(
+            border: widget.channelValueEditorStyle?.borderColor != null
+                ? OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: widget.channelValueEditorStyle!.borderColor!,
+                    ),
+                  )
+                : null,
+            enabledBorder:
+                widget.channelValueEditorStyle?.enabledBorderColor != null
+                ? OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color:
+                          widget.channelValueEditorStyle!.enabledBorderColor!,
+                    ),
+                  )
+                : null,
+            focusedBorder:
+                widget.channelValueEditorStyle?.focusedBorderColor != null
+                ? OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color:
+                          widget.channelValueEditorStyle!.focusedBorderColor!,
+                    ),
+                  )
+                : null,
+            errorBorder:
+                widget.channelValueEditorStyle?.errorBorderColor != null
+                ? OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: widget.channelValueEditorStyle!.errorBorderColor!,
+                    ),
+                  )
+                : null,
+            fillColor: widget.channelValueEditorStyle?.backgroundColor,
+            filled: widget.channelValueEditorStyle?.backgroundColor != null,
+            isDense: true,
+            contentPadding: const EdgeInsets.all(8),
+          ),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      onSubmitted: (text) {
+        final value = double.parse(text);
+        _onChannelChanged(index, value);
+      },
+      onChanged: (text) {
+        // final value = double.tryParse(text);
+        // if (value != null) {
+        //   final clampedValue = value.clamp(-100.0, 100.0);
+        //   _onChannelChanged(index, clampedValue);
+        // }
+      },
+    );
+
+    return SizedBox(
+      width: widget.channelValueEditorStyle?.width ?? 52,
+      child:
+          widget.channelValueEditorContainerBuilder?.call(
+            context,
+            textField,
+            label,
+            index,
+          ) ??
+          textField,
+    );
   }
 
   static Widget _defaultToggleIconBuilder(
@@ -110,15 +223,22 @@ class _AnimationTrackValueEditorWidgetState
         builder: (_, int currentFrame, __) {
           var value = viewModel.getValue(currentFrame);
           var unwrapped = value.unwrap();
-          return ChannelValueEditorWidget(
-            label: widget.track.label,
-            channelLabels: labels,
-            values: unwrapped,
-            onValuesChanged: (values) => viewModel.setCurrentFrameValue(values),
-            icon: icon,
-            step: 0.01,
-            channelValueEditorStyle: widget.channelValueEditorStyle,
-            channelValueEditorContainerBuilder: widget.channelValueEditorContainerBuilder,
+
+          // Update current values and controllers
+          if (!listEquals(currentValues, unwrapped)) {
+            currentValues = List.from(unwrapped);
+            _updateControllers(unwrapped);
+          }
+
+          return HBox(
+            children: [
+              icon,
+              ...List.generate(
+                labels.length,
+                (index) =>
+                    _buildNumberField(labels[index], controllers[index], index),
+              ),
+            ],
           );
         },
       ),
