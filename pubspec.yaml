@@ -1,10 +1,10 @@
 name: flutter_keyframe_timeline
 description: "A Flutter package for creating keyframe-based timelines for 2D/3D animations, video editing, etc."
-version: 0.0.1
+version: 0.0.1-pre
 homepage: https://github.com/nmfisher/flutter_keyframe_timeline
 
 environment:
-  sdk: ^3.9.0-333.2.beta
+  sdk: ^3.3.0
   flutter: ">=1.17.0"
 
 dependencies:
