@@ -1,5 +1,5 @@
 name: flutter_keyframe_timeline
-description: "A new Flutter package project."
+description: "A Flutter package for creating keyframe-based timelines for 2D/3D animations, video editing, etc."
 version: 0.0.1
 homepage:
 
