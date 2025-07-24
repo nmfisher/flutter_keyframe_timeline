@@ -9,8 +9,8 @@ class AnimationTrackValueEditorWidget extends StatefulWidget {
   final AnimationTrack track;
   final TimelineController controller;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
-  final NumericControlStyle? numericControlStyle;
-  final ChannelTextfieldWidgetBuilder? channelTextfieldWidgetBuilder;
+  final ChannelValueEditorStyle? channelValueEditorStyle;
+  final ChannelValueTextFieldWidgetBuilder? channelTextfieldWidgetBuilder;
 
   const AnimationTrackValueEditorWidget({
     super.key,
@@ -18,7 +18,7 @@ class AnimationTrackValueEditorWidget extends StatefulWidget {
     required this.track,
     required this.controller,
     this.keyframeToggleIconBuilder,
-    this.numericControlStyle,
+    this.channelValueEditorStyle,
     this.channelTextfieldWidgetBuilder,
   });
 
@@ -117,7 +117,7 @@ class _AnimationTrackValueEditorWidgetState
             onValuesChanged: (values) => viewModel.setCurrentFrameValue(values),
             icon: icon,
             step: 0.01,
-            numericControlStyle: widget.numericControlStyle,
+            channelValueEditorStyle: widget.channelValueEditorStyle,
             channelTextfieldWidgetBuilder: widget.channelTextfieldWidgetBuilder,
           );
         },

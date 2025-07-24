@@ -25,8 +25,8 @@ class TimelineWidget extends StatefulWidget {
   final TrackObjectExtraWidgetBuilder? trackObjectExtraWidgetBuilder;
   final TrackObjectNameStyle? trackObjectNameStyle;
   final TimelineBackgroundStyle backgroundStyle;
-  final NumericControlStyle? numericControlStyle;
-  final ChannelTextfieldWidgetBuilder? channelTextfieldWidgetBuilder;
+  final ChannelValueEditorStyle? channelValueEditorStyle;
+  final ChannelValueTextFieldWidgetBuilder? channelTextfieldWidgetBuilder;
 
   const TimelineWidget({
     super.key,
@@ -37,7 +37,7 @@ class TimelineWidget extends StatefulWidget {
     this.trackObjectExtraWidgetBuilder,
     this.trackObjectNameStyle,
     this.backgroundStyle = const TimelineBackgroundStyle(),
-    this.numericControlStyle,
+    this.channelValueEditorStyle,
     this.channelTextfieldWidgetBuilder,
   });
 
@@ -203,7 +203,7 @@ class _TimelineWidgetState<V extends AnimatableObject>
                                         widget.keyframeToggleIconBuilder,
                                     trackObjectExtraWidgetBuilder: widget.trackObjectExtraWidgetBuilder,
                                     trackObjectNameStyle: widget.trackObjectNameStyle,
-                                    numericControlStyle: widget.numericControlStyle,
+                                    channelValueEditorStyle: widget.channelValueEditorStyle,
                                     channelTextfieldWidgetBuilder: widget.channelTextfieldWidgetBuilder,
                                   ),
                                 ),

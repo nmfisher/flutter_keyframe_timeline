@@ -17,8 +17,8 @@ class ChannelValueEditorWidget extends StatefulWidget {
   final void Function(List<double>) onValuesChanged;
 
   final Widget icon;
-  final NumericControlStyle? numericControlStyle;
-  final ChannelTextfieldWidgetBuilder? channelTextfieldWidgetBuilder;
+  final ChannelValueEditorStyle? channelValueEditorStyle;
+  final ChannelValueTextFieldWidgetBuilder? channelTextfieldWidgetBuilder;
 
   const ChannelValueEditorWidget({
     super.key,
@@ -32,7 +32,7 @@ class ChannelValueEditorWidget extends StatefulWidget {
     this.max = 100.0,
     this.min = -100.0,
     this.showLabel = false,
-    this.numericControlStyle,
+    this.channelValueEditorStyle,
     this.channelTextfieldWidgetBuilder,
   });
 
@@ -104,18 +104,18 @@ class _ChannelValueEditorWidgetState extends State<ChannelValueEditorWidget> {
     final textField = TextField(
       controller: controller,
       style: TextStyle(
-        color: widget.numericControlStyle?.textColor ?? Colors.black,
-        fontSize: widget.numericControlStyle?.fontSize ?? 11,
+        color: widget.channelValueEditorStyle?.textColor ?? Colors.black,
+        fontSize: widget.channelValueEditorStyle?.fontSize ?? 11,
       ),
-      decoration: widget.numericControlStyle?.inputDecoration ?? 
+      decoration: widget.channelValueEditorStyle?.inputDecoration ?? 
         InputDecoration(
-          border: widget.numericControlStyle?.borderColor != null
+          border: widget.channelValueEditorStyle?.borderColor != null
               ? OutlineInputBorder(
-                  borderSide: BorderSide(color: widget.numericControlStyle!.borderColor!),
+                  borderSide: BorderSide(color: widget.channelValueEditorStyle!.borderColor!),
                 )
               : null,
-          fillColor: widget.numericControlStyle?.backgroundColor,
-          filled: widget.numericControlStyle?.backgroundColor != null,
+          fillColor: widget.channelValueEditorStyle?.backgroundColor,
+          filled: widget.channelValueEditorStyle?.backgroundColor != null,
           isDense: true,
           contentPadding: const EdgeInsets.all(8),
         ),

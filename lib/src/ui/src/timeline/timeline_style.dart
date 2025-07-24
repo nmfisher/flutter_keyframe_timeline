@@ -67,7 +67,7 @@ typedef TrackObjectExtraWidgetBuilder = Widget Function(
   bool trackObjectIsExpanded
 );
 
-typedef ChannelTextfieldWidgetBuilder = Widget Function(
+typedef ChannelValueTextFieldWidgetBuilder = Widget Function(
   BuildContext context,
   Widget textField,
   String dimensionLabel,
@@ -138,7 +138,7 @@ class TimelineBackgroundStyle {
   }
 }
 
-class NumericControlStyle {
+class ChannelValueEditorStyle {
   final Color textColor;
   final double fontSize;
   final Color? backgroundColor;
@@ -146,7 +146,7 @@ class NumericControlStyle {
   final Color? labelTextColor;
   final InputDecoration? inputDecoration;
 
-  const NumericControlStyle({
+  const ChannelValueEditorStyle({
     this.textColor = Colors.black,
     this.fontSize = 11.0,
     this.backgroundColor,
@@ -155,7 +155,7 @@ class NumericControlStyle {
     this.inputDecoration,
   });
 
-  NumericControlStyle copyWith({
+  ChannelValueEditorStyle copyWith({
     Color? textColor,
     double? fontSize,
     Color? backgroundColor,
@@ -163,7 +163,7 @@ class NumericControlStyle {
     Color? labelTextColor,
     InputDecoration? inputDecoration,
   }) {
-    return NumericControlStyle(
+    return ChannelValueEditorStyle(
       textColor: textColor ?? this.textColor,
       fontSize: fontSize ?? this.fontSize,
       backgroundColor: backgroundColor ?? this.backgroundColor,
