@@ -111,6 +111,7 @@ class TimelineControllerImpl extends TimelineController {
     }
   }
 
+  @override
   void dispose() {
     currentFrame.dispose();
     animatableObjects.dispose();
@@ -180,6 +181,7 @@ class TimelineControllerImpl extends TimelineController {
     }
   }
 
+  @override
   ValueNotifier<Set<AnimatableObject>> active =
       ValueNotifier<Set<AnimatableObject>>({});
 

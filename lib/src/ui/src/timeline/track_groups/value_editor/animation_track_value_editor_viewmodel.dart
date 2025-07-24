@@ -57,7 +57,7 @@ class AnimationTrackValueEditorViewModelImpl<V extends ChannelValueType>
   }
 
   void _onKeyframesUpdated() {
-    final newValue = track.keyframes.value.values.toSet();
+    final newValue = track.keyframes.value.toSet();
     final removed = keyframes.difference(newValue);
     final added = newValue.difference(keyframes);
     for (final kf in removed) {

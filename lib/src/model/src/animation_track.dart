@@ -1,9 +1,6 @@
-import 'dart:collection';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/src/model/src/timeline_serializer.dart';
 import 'package:logging/logging.dart';
-import 'package:vector_math/vector_math_64.dart';
 import 'channel_types.dart';
 import 'keyframe.dart';
 
@@ -39,7 +36,7 @@ abstract class AnimationTrack<V extends ChannelValueType> {
   //
   // A map of frame numbers to keyframes.
   //
-  ValueListenable<Map<int, Keyframe<V>>> get keyframes;
+  ValueListenable<List<Keyframe<V>>> get keyframes;
 
   //
   // Calculates the value of this channel at [frameNumber].
@@ -75,10 +72,8 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
   static final _logger = Logger("AnimationTrackImpl");
 
   @override
-  final ValueNotifier<Map<int, Keyframe<V>>> keyframes =
-      ValueNotifier<SplayTreeMap<int, Keyframe<V>>>(
-        SplayTreeMap((key1, key2) => key1.compareTo(key2)),
-      );
+  final ValueNotifier<List<Keyframe<V>>> keyframes =
+      ValueNotifier<List<Keyframe<V>>>([]);
 
   @override
   final List<String> labels;
@@ -95,21 +90,29 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
     this.serializer,
   }) {
     for (final kf in keyframes) {
-      this.keyframes.value[kf.frameNumber.value] = kf;
+      this.keyframes.value.add(kf);
+      kf.frameNumber.addListener(_onKeyframeFrameUpdated);
     }
+  }
+
+  void _onKeyframeFrameUpdated() {
+    this.keyframes.notifyListeners();
   }
 
   @override
   Future<Keyframe<V>> addOrUpdateKeyframe(int frameNumber, V value) async {
     final keyframe = KeyframeImpl<V>(frameNumber: frameNumber, value: value);
+    
 
     await addKeyframe(keyframe);
     return keyframe;
   }
 
   Future addKeyframe(Keyframe<V> keyframe) async {
-    await keyframes.value[keyframe.frameNumber.value]?.dispose();
-    keyframes.value[keyframe.frameNumber.value] = keyframe;
+    keyframe.frameNumber.addListener(_onKeyframeFrameUpdated);
+    await removeKeyframeAt(keyframe.frameNumber.value);
+    keyframes.value.add(keyframe);
+
     keyframes.notifyListeners();
     _logger.info(
       "Added keyframe at ${keyframe.frameNumber.value} with values ${keyframe.value.value.unwrap()} ",
@@ -118,19 +121,25 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
 
   @override
   Future removeKeyframeAt(int frameNumber) async {
-    keyframes.value[frameNumber]?.dispose();
-    keyframes.value.remove(frameNumber);
+    final existing = keyframeAt(frameNumber);
+    if (existing == null) {
+      return;
+    }
+    await existing?.dispose();
+    keyframes.value.remove(existing);
     keyframes.notifyListeners();
   }
 
   @override
   Keyframe<V>? keyframeAt(int frame) {
-    return keyframes.value[frame];
+    return keyframes.value
+            .firstWhereOrNull((kf) => kf.frameNumber.value == frame)
+        as Keyframe<V>?;
   }
 
   @override
   Future dispose() async {
-    for (final keyframe in keyframes.value.values) {
+    for (final keyframe in keyframes.value) {
       keyframe.dispose();
     }
     keyframes.value.clear();
@@ -146,26 +155,27 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
     Keyframe? start;
     Keyframe? end;
 
-    for (final keyedFrameNumber in keyframes.value.keys) {
-      if (keyedFrameNumber > frameNumber) {
-        end = keyframes.value[keyedFrameNumber]!;
+    keyframes.value.sort();
+
+    for (final kf in keyframes.value) {
+      if (kf.frameNumber.value > frameNumber) {
+        end = kf;
         break;
       }
-      if (keyedFrameNumber <= frameNumber) {
-        start = keyframes.value[keyedFrameNumber]!;
+      if (kf.frameNumber.value <= frameNumber) {
+        start = kf;
       }
     }
 
     if (start == null) {
-      return keyframes.value[keyframes.value.keys.first]!.value.value;
+      return keyframes.value.first.value.value;
     }
 
     if (end == null) {
-      return keyframes.value[keyframes.value.keys.last]!.value.value;
+      return keyframes.value.last.value.value;
     }
 
-    var linearRatio =
-        (frameNumber - start.frameNumber.value) /
+    var linearRatio = (frameNumber - start.frameNumber.value) /
         (end.frameNumber.value - start.frameNumber.value);
 
     return start.interpolate(end.value.value, linearRatio) as V;
@@ -173,7 +183,7 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
 
   @override
   bool hasKeyframeAt(int frame) {
-    return keyframes.value[frame] != null;
+    return keyframeAt(frame) != null;
   }
 }
 

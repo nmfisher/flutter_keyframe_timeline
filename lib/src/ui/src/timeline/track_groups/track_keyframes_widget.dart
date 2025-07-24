@@ -38,7 +38,7 @@ class TrackKeyframesWidget extends StatelessWidget {
                 scrollController: scrollController,
                 keyframes: track.keyframes,
               ),
-              children: track.keyframes.value.values.map((kf) {
+              children: track.keyframes.value.map((kf) {
                 return ValueListenableBuilder(
                   valueListenable: controller.selected,
                   builder: (_, selected, __) {
@@ -84,7 +84,7 @@ class _KeyframeFlowDelegate extends FlowDelegate {
   _KeyframeFlowDelegate({
     required this.controller,
     required this.scrollController,
-    required ValueListenable<Map<int, Keyframe>> keyframes,
+    required ValueListenable<List<Keyframe>> keyframes,
   }) : super(
          repaint: Listenable.merge([
            scrollController,
@@ -92,10 +92,10 @@ class _KeyframeFlowDelegate extends FlowDelegate {
            controller.maxFrames,
            controller.pixelsPerFrame,
            keyframes,
-           ...keyframes.value.values.map((kf) => kf.frameNumber),
+           ...keyframes.value.map((kf) => kf.frameNumber),
          ]),
        ) { 
-        this.keyframes = keyframes.value.values.toList();
+        this.keyframes = keyframes.value.toList();
        }
 
   @override

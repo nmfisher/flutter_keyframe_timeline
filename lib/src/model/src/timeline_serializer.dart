@@ -101,7 +101,7 @@ class TimelineSerializer {
         return {
           'label': track.label,
           'labels': track.labels,
-          'keyframes': track.keyframes.value.values.map((keyframe) {
+          'keyframes': track.keyframes.value.map((keyframe) {
             return {
               'frame_number': keyframe.frameNumber.value,
               'value': keyframe.value.value.unwrap(),
