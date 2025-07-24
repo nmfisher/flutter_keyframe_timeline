@@ -2,6 +2,10 @@
 
 A Flutter package for creating keyframe-based timelines for 2D/3D animations, video editing, etc.
 
+
+https://github.com/user-attachments/assets/c60b9931-04d0-44b4-acbe-f76d25afc214
+
+
 ### Core Concepts
 
 An object (e.g. a video, or a polygon on a 2D canvas) may have various properties that can be animated over time (position, rotation, scale, etc). Each property can be assigned to an `AnimationTrack`  containing zero or more `Keyframes`. Each `Keyframe` represents the value for that track at a specified frame, and an interpolation method. An `AnimatableObject` is a collection of `AnimationTrack` that belong to an object. A channel refers to a single animatable values in  a track (e.g. a "translation" track has channels "x" and "y"). The generic parameter `ChannelValueType` indicates the type of this value. 
