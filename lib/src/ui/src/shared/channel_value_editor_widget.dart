@@ -7,7 +7,7 @@ import 'package:mix/mix.dart';
 class ChannelValueEditorWidget extends StatefulWidget {
   final String label;
   final bool showLabel;
-  final List<String> dimensionLabels;
+  final List<String> channelLabels;
 
   final double step;
   final double max;
@@ -23,7 +23,7 @@ class ChannelValueEditorWidget extends StatefulWidget {
   const ChannelValueEditorWidget({
     super.key,
     required this.label,
-    required this.dimensionLabels,
+    required this.channelLabels,
     required this.values,
     required this.onValuesChanged,
     required this.icon,
@@ -50,7 +50,7 @@ class _ChannelValueEditorWidgetState extends State<ChannelValueEditorWidget> {
   void initState() {
     super.initState();
     controllers = List.generate(
-      widget.dimensionLabels.length,
+      widget.channelLabels.length,
       (_) => TextEditingController(),
     );
     currentValues = List.from(widget.values);
@@ -154,7 +154,7 @@ class _ChannelValueEditorWidgetState extends State<ChannelValueEditorWidget> {
     );
 
     return SizedBox(
-      width: widget.channelValueEditorStyle?.width ?? 52,
+      width: 52,
       child:widget.channelValueEditorContainerBuilder?.call(
         context,
         textField,
@@ -170,9 +170,9 @@ class _ChannelValueEditorWidgetState extends State<ChannelValueEditorWidget> {
       children: [
         widget.icon,
         ...List.generate(
-          widget.dimensionLabels.length,
+          widget.channelLabels.length,
           (index) => _buildNumberField(
-            widget.dimensionLabels[index],
+            widget.channelLabels[index],
             controllers[index],
             index,
           ),

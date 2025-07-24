@@ -112,7 +112,7 @@ class _AnimationTrackValueEditorWidgetState
           var unwrapped = value.unwrap();
           return ChannelValueEditorWidget(
             label: widget.track.label,
-            dimensionLabels: labels,
+            channelLabels: labels,
             values: unwrapped,
             onValuesChanged: (values) => viewModel.setCurrentFrameValue(values),
             icon: icon,
