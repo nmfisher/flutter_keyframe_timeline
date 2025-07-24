@@ -134,11 +134,7 @@ class _AnimationTrackValueEditorWidgetState
         _onChannelChanged(index, value);
       },
       onChanged: (text) {
-        // final value = double.tryParse(text);
-        // if (value != null) {
-        //   final clampedValue = value.clamp(-100.0, 100.0);
-        //   _onChannelChanged(index, clampedValue);
-        // }
+        
       },
     );
 
@@ -148,6 +144,7 @@ class _AnimationTrackValueEditorWidgetState
           widget.channelValueEditorContainerBuilder?.call(
             context,
             textField,
+            controller,
             label,
             index,
           ) ??

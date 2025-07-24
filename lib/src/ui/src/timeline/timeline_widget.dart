@@ -43,11 +43,14 @@ class TimelineWidget extends StatefulWidget {
   /// This allows you to customize the layout and wrapper behavior around each
   /// TextField used for editing channel values. The builder receives:
   /// - The styled TextField widget (already configured with channelValueEditorStyle)
+  /// - The TextEditingController for manipulating the text value externally
   /// - The dimension label (e.g., "X", "Y", "Z")
   /// - The dimension index (0, 1, 2, etc.)
   /// 
   /// Use this to add labels, containers, spacing, or other UI elements around
-  /// the text fields. If null, text fields are wrapped in a simple SizedBox.
+  /// the text fields. The controller allows external manipulation of the text
+  /// value (e.g., via mouse drag interactions). If null, text fields are 
+  /// wrapped in a simple SizedBox.
   /// 
   /// Note: This only controls the wrapper/layout - the TextField styling is
   /// handled separately by channelValueEditorStyle.

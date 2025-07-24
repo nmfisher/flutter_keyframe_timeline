@@ -70,6 +70,7 @@ typedef TrackObjectExtraWidgetBuilder = Widget Function(
 typedef ChannelValueTextFieldWidgetBuilder = Widget Function(
   BuildContext context,
   Widget textField,
+  TextEditingController controller,
   String dimensionLabel,
   int dimensionIndex,
 );

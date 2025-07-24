@@ -198,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         focusedBorderColor: Colors.green.shade600,
                         errorBorderColor: Colors.red.shade400,
                       ),
-                      channelValueEditorContainerBuilder: (context, textField, dimensionLabel, dimensionIndex) {
+                      channelValueEditorContainerBuilder: (context, textField, controller, dimensionLabel, dimensionIndex) {
                         return Container(
                           width: 60,
                           padding: const EdgeInsets.all(2),
