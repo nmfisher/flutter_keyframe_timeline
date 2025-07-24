@@ -3,7 +3,7 @@ import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-abstract class AnimationChannelEditorViewModel<V extends ChannelValueType> {
+abstract class AnimationTrackValueEditorViewModel<V extends ChannelValueType> {
   ValueListenable<bool> get hasKeyframeAtCurrentFrame;
 
   ///
@@ -22,8 +22,8 @@ abstract class AnimationChannelEditorViewModel<V extends ChannelValueType> {
   Future dispose();
 }
 
-class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
-    extends AnimationChannelEditorViewModel<V> {
+class AnimationTrackValueEditorViewModelImpl<V extends ChannelValueType>
+    extends AnimationTrackValueEditorViewModel<V> {
   final Set<Keyframe> keyframes = {};
 
   @override
@@ -35,7 +35,7 @@ class AnimationChannelEditorViewModelImpl<V extends ChannelValueType>
   final AnimationTrack<V> track;
   final TimelineController controller;
 
-  AnimationChannelEditorViewModelImpl(this.object, this.track, this.controller) {
+  AnimationTrackValueEditorViewModelImpl(this.object, this.track, this.controller) {
     track.keyframes.addListener(_onKeyframesUpdated);
     _onKeyframesUpdated();
 

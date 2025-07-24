@@ -7,7 +7,7 @@ import 'package:flutter_keyframe_timeline/src/ui/src/shared/expand_icon.dart';
 
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/track_keyframes_widget.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/value_editor/animation_channel_editor_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/value_editor/animation_track_value_editor_widget.dart';
 import 'package:mix/mix.dart';
 
 class TrackObjectWidget extends StatelessWidget {
@@ -21,6 +21,8 @@ class TrackObjectWidget extends StatelessWidget {
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
   final TrackObjectExtraWidgetBuilder? additionalWidgetBuilder;
   final TrackObjectNameStyle? trackObjectNameStyle;
+  final NumericControlStyle? numericControlStyle;
+  final ChannelTextfieldWidgetBuilder? channelTextfieldWidgetBuilder;
 
   const TrackObjectWidget({
     super.key,
@@ -33,7 +35,8 @@ class TrackObjectWidget extends StatelessWidget {
     this.additionalWidgetBuilder,
     this.keyframeToggleIconBuilder,
     this.trackObjectNameStyle,
-    
+    this.numericControlStyle,
+    this.channelTextfieldWidgetBuilder,
   });
 
   Widget _objectName(bool isExpanded, BuildContext context) {
@@ -113,12 +116,14 @@ class TrackObjectWidget extends StatelessWidget {
                       children: [
                         SizedBox(
                           width: trackNameWidth,
-                          child: AnimationChannelEditorWidget(
+                          child: AnimationTrackValueEditorWidget(
                             object: object,
                             track: track,
                             controller: controller,
                             keyframeToggleIconBuilder:
                                 keyframeToggleIconBuilder,
+                            numericControlStyle: numericControlStyle,
+                            channelTextfieldWidgetBuilder: channelTextfieldWidgetBuilder,
                           ),
                         ),
                         Expanded(

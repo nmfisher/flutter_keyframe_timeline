@@ -67,6 +67,13 @@ typedef TrackObjectExtraWidgetBuilder = Widget Function(
   bool trackObjectIsExpanded
 );
 
+typedef ChannelTextfieldWidgetBuilder = Widget Function(
+  BuildContext context,
+  Widget textField,
+  String dimensionLabel,
+  int dimensionIndex,
+);
+
 class TrackObjectNameStyle {
   final Color textColor;
   final IconData iconData;
@@ -127,6 +134,42 @@ class TimelineBackgroundStyle {
       minorTickInterval: minorTickInterval ?? this.minorTickInterval,
       majorTickInterval: majorTickInterval ?? this.majorTickInterval,
       textFontSize: textFontSize ?? this.textFontSize,
+    );
+  }
+}
+
+class NumericControlStyle {
+  final Color textColor;
+  final double fontSize;
+  final Color? backgroundColor;
+  final Color? borderColor;
+  final Color? labelTextColor;
+  final InputDecoration? inputDecoration;
+
+  const NumericControlStyle({
+    this.textColor = Colors.black,
+    this.fontSize = 11.0,
+    this.backgroundColor,
+    this.borderColor,
+    this.labelTextColor,
+    this.inputDecoration,
+  });
+
+  NumericControlStyle copyWith({
+    Color? textColor,
+    double? fontSize,
+    Color? backgroundColor,
+    Color? borderColor,
+    Color? labelTextColor,
+    InputDecoration? inputDecoration,
+  }) {
+    return NumericControlStyle(
+      textColor: textColor ?? this.textColor,
+      fontSize: fontSize ?? this.fontSize,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderColor: borderColor ?? this.borderColor,
+      labelTextColor: labelTextColor ?? this.labelTextColor,
+      inputDecoration: inputDecoration ?? this.inputDecoration,
     );
   }
 }

@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/shared/numeric/numeric_control_row.dart';
-import 'animation_channel_editor_viewmodel.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/shared/channel_value_editor_widget.dart';
+import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
+import 'animation_track_value_editor_viewmodel.dart';
 
-class AnimationChannelEditorWidget extends StatefulWidget {
+class AnimationTrackValueEditorWidget extends StatefulWidget {
   final AnimatableObject object;
   final AnimationTrack track;
   final TimelineController controller;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
+  final NumericControlStyle? numericControlStyle;
+  final ChannelTextfieldWidgetBuilder? channelTextfieldWidgetBuilder;
 
-  const AnimationChannelEditorWidget({
+  const AnimationTrackValueEditorWidget({
     super.key,
     required this.object,
     required this.track,
     required this.controller,
     this.keyframeToggleIconBuilder,
+    this.numericControlStyle,
+    this.channelTextfieldWidgetBuilder,
   });
 
   @override
-  State<AnimationChannelEditorWidget> createState() =>
-      _AnimationChannelEditorWidgetState();
+  State<AnimationTrackValueEditorWidget> createState() =>
+      _AnimationTrackValueEditorWidgetState();
 }
 
-class _AnimationChannelEditorWidgetState
-    extends State<AnimationChannelEditorWidget> {
-  late final AnimationChannelEditorViewModel viewModel =
-      AnimationChannelEditorViewModelImpl(
+class _AnimationTrackValueEditorWidgetState
+    extends State<AnimationTrackValueEditorWidget> {
+  late final AnimationTrackValueEditorViewModel viewModel =
+      AnimationTrackValueEditorViewModelImpl(
         widget.object,
         widget.track,
         widget.controller,
@@ -105,13 +110,15 @@ class _AnimationChannelEditorWidgetState
         builder: (_, int currentFrame, __) {
           var value = viewModel.getValue(currentFrame);
           var unwrapped = value.unwrap();
-          return NumericControlRow(
+          return ChannelValueEditorWidget(
             label: widget.track.label,
             dimensionLabels: labels,
             values: unwrapped,
             onValuesChanged: (values) => viewModel.setCurrentFrameValue(values),
             icon: icon,
             step: 0.01,
+            numericControlStyle: widget.numericControlStyle,
+            channelTextfieldWidgetBuilder: widget.channelTextfieldWidgetBuilder,
           );
         },
       ),

@@ -187,6 +187,53 @@ class _MyHomePageState extends State<MyHomePage> {
                         iconColor: Colors.blue.shade600,
                         borderColor: Colors.blue.shade200,
                       ),
+                      numericControlStyle: NumericControlStyle(
+                        textColor: Colors.green.shade700,
+                        fontSize: 12.0,
+                        inputDecoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.green.shade400, width: 2),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.green.shade300, width: 1),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.green.shade600, width: 2),
+                          ),
+                          fillColor: Colors.green.shade50,
+                          filled: true,
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          hintText: '0.0',
+                          hintStyle: TextStyle(color: Colors.green.shade400),
+                        ),
+                      ),
+                      channelTextfieldWidgetBuilder: (context, textField, dimensionLabel, dimensionIndex) {
+                        return Container(
+                          width: 60,
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.blue.shade300),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                dimensionLabel,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.blue.shade600,
+                                ),
+                              ),
+                              textField,
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
 
