@@ -47,11 +47,5 @@ class AnimatableObjectImpl extends AnimatableObject {
     return false;
   }
 
-  @override
-  void setVisible(bool visible) {
-    this.isVisible.value = visible;
-  }
 
-  @override
-  ValueNotifier<bool> isVisible = ValueNotifier<bool>(true);
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:mix/mix.dart';
 import 'animation_track_value_editor_viewmodel.dart';
 
