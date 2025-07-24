@@ -25,8 +25,33 @@ class TimelineWidget extends StatefulWidget {
   final TrackObjectExtraWidgetBuilder? trackObjectExtraWidgetBuilder;
   final TrackObjectNameStyle? trackObjectNameStyle;
   final TimelineBackgroundStyle backgroundStyle;
+  
+  /// Styling for the text fields used to edit the numeric values for 
+  /// each channel in an AnimationTrack.
+  /// 
+  /// This controls the visual appearance of the TextField widgets used for editing
+  /// animation channel values (like position X, Y, Z coordinates). You can customize:
+  /// - Text color and font size
+  /// - Background and border colors  
+  /// - Complete InputDecoration for full control over appearance
+  /// 
+  /// This only affects the TextField styling, not the layout or wrapper behavior.
   final ChannelValueEditorStyle? channelValueEditorStyle;
-  final ChannelValueTextFieldWidgetBuilder? channelTextfieldWidgetBuilder;
+  
+  /// Builder for wrapping channel value editor text fields.
+  /// 
+  /// This allows you to customize the layout and wrapper behavior around each
+  /// TextField used for editing channel values. The builder receives:
+  /// - The styled TextField widget (already configured with channelValueEditorStyle)
+  /// - The dimension label (e.g., "X", "Y", "Z")
+  /// - The dimension index (0, 1, 2, etc.)
+  /// 
+  /// Use this to add labels, containers, spacing, or other UI elements around
+  /// the text fields. If null, text fields are wrapped in a simple SizedBox.
+  /// 
+  /// Note: This only controls the wrapper/layout - the TextField styling is
+  /// handled separately by channelValueEditorStyle.
+  final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
 
   const TimelineWidget({
     super.key,
@@ -38,7 +63,7 @@ class TimelineWidget extends StatefulWidget {
     this.trackObjectNameStyle,
     this.backgroundStyle = const TimelineBackgroundStyle(),
     this.channelValueEditorStyle,
-    this.channelTextfieldWidgetBuilder,
+    this.channelValueEditorContainerBuilder,
   });
 
   @override
@@ -204,7 +229,7 @@ class _TimelineWidgetState<V extends AnimatableObject>
                                     trackObjectExtraWidgetBuilder: widget.trackObjectExtraWidgetBuilder,
                                     trackObjectNameStyle: widget.trackObjectNameStyle,
                                     channelValueEditorStyle: widget.channelValueEditorStyle,
-                                    channelTextfieldWidgetBuilder: widget.channelTextfieldWidgetBuilder,
+                                    channelValueEditorContainerBuilder: widget.channelValueEditorContainerBuilder,
                                   ),
                                 ),
                               ),

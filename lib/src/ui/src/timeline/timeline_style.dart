@@ -141,16 +141,24 @@ class TimelineBackgroundStyle {
 class ChannelValueEditorStyle {
   final Color textColor;
   final double fontSize;
+  final double width;
   final Color? backgroundColor;
   final Color? borderColor;
+  final Color? focusedBorderColor;
+  final Color? enabledBorderColor;
+  final Color? errorBorderColor;
   final Color? labelTextColor;
   final InputDecoration? inputDecoration;
 
   const ChannelValueEditorStyle({
     this.textColor = Colors.black,
     this.fontSize = 11.0,
+    this.width = 52.0,
     this.backgroundColor,
     this.borderColor,
+    this.focusedBorderColor,
+    this.enabledBorderColor,
+    this.errorBorderColor,
     this.labelTextColor,
     this.inputDecoration,
   });
@@ -158,16 +166,24 @@ class ChannelValueEditorStyle {
   ChannelValueEditorStyle copyWith({
     Color? textColor,
     double? fontSize,
+    double? width,
     Color? backgroundColor,
     Color? borderColor,
+    Color? focusedBorderColor,
+    Color? enabledBorderColor,
+    Color? errorBorderColor,
     Color? labelTextColor,
     InputDecoration? inputDecoration,
   }) {
     return ChannelValueEditorStyle(
       textColor: textColor ?? this.textColor,
       fontSize: fontSize ?? this.fontSize,
+      width: width ?? this.width,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       borderColor: borderColor ?? this.borderColor,
+      focusedBorderColor: focusedBorderColor ?? this.focusedBorderColor,
+      enabledBorderColor: enabledBorderColor ?? this.enabledBorderColor,
+      errorBorderColor: errorBorderColor ?? this.errorBorderColor,
       labelTextColor: labelTextColor ?? this.labelTextColor,
       inputDecoration: inputDecoration ?? this.inputDecoration,
     );

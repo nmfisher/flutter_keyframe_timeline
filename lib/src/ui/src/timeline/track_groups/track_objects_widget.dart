@@ -13,7 +13,7 @@ class TrackObjectsWidget extends StatefulWidget {
   final TrackObjectExtraWidgetBuilder? trackObjectExtraWidgetBuilder;
   final TrackObjectNameStyle? trackObjectNameStyle;
   final ChannelValueEditorStyle? channelValueEditorStyle;
-  final ChannelValueTextFieldWidgetBuilder? channelTextfieldWidgetBuilder;
+  final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
   const TrackObjectsWidget({
     super.key,
     required this.controller,
@@ -24,7 +24,7 @@ class TrackObjectsWidget extends StatefulWidget {
     this.trackObjectExtraWidgetBuilder,
     this.trackObjectNameStyle,
     this.channelValueEditorStyle,
-    this.channelTextfieldWidgetBuilder,
+    this.channelValueEditorContainerBuilder,
   });
 
   @override
@@ -56,7 +56,7 @@ class _TrackObjectsWidgetState extends State<TrackObjectsWidget> {
                   additionalWidgetBuilder: widget.trackObjectExtraWidgetBuilder,
                   trackObjectNameStyle: widget.trackObjectNameStyle,
                   channelValueEditorStyle: widget.channelValueEditorStyle,
-                  channelTextfieldWidgetBuilder: widget.channelTextfieldWidgetBuilder,
+                  channelValueEditorContainerBuilder: widget.channelValueEditorContainerBuilder,
                 ),
               ),
             )

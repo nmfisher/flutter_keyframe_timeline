@@ -10,7 +10,7 @@ class AnimationTrackValueEditorWidget extends StatefulWidget {
   final TimelineController controller;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
   final ChannelValueEditorStyle? channelValueEditorStyle;
-  final ChannelValueTextFieldWidgetBuilder? channelTextfieldWidgetBuilder;
+  final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
 
   const AnimationTrackValueEditorWidget({
     super.key,
@@ -19,7 +19,7 @@ class AnimationTrackValueEditorWidget extends StatefulWidget {
     required this.controller,
     this.keyframeToggleIconBuilder,
     this.channelValueEditorStyle,
-    this.channelTextfieldWidgetBuilder,
+    this.channelValueEditorContainerBuilder,
   });
 
   @override
@@ -118,7 +118,7 @@ class _AnimationTrackValueEditorWidgetState
             icon: icon,
             step: 0.01,
             channelValueEditorStyle: widget.channelValueEditorStyle,
-            channelTextfieldWidgetBuilder: widget.channelTextfieldWidgetBuilder,
+            channelValueEditorContainerBuilder: widget.channelValueEditorContainerBuilder,
           );
         },
       ),

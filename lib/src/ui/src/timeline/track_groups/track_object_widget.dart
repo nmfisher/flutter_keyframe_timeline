@@ -22,7 +22,7 @@ class TrackObjectWidget extends StatelessWidget {
   final TrackObjectExtraWidgetBuilder? additionalWidgetBuilder;
   final TrackObjectNameStyle? trackObjectNameStyle;
   final ChannelValueEditorStyle? channelValueEditorStyle;
-  final ChannelValueTextFieldWidgetBuilder? channelTextfieldWidgetBuilder;
+  final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
 
   const TrackObjectWidget({
     super.key,
@@ -36,7 +36,7 @@ class TrackObjectWidget extends StatelessWidget {
     this.keyframeToggleIconBuilder,
     this.trackObjectNameStyle,
     this.channelValueEditorStyle,
-    this.channelTextfieldWidgetBuilder,
+    this.channelValueEditorContainerBuilder,
   });
 
   Widget _objectName(bool isExpanded, BuildContext context) {
@@ -123,7 +123,7 @@ class TrackObjectWidget extends StatelessWidget {
                             keyframeToggleIconBuilder:
                                 keyframeToggleIconBuilder,
                             channelValueEditorStyle: channelValueEditorStyle,
-                            channelTextfieldWidgetBuilder: channelTextfieldWidgetBuilder,
+                            channelValueEditorContainerBuilder: channelValueEditorContainerBuilder,
                           ),
                         ),
                         Expanded(

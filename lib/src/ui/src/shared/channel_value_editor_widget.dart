@@ -18,7 +18,7 @@ class ChannelValueEditorWidget extends StatefulWidget {
 
   final Widget icon;
   final ChannelValueEditorStyle? channelValueEditorStyle;
-  final ChannelValueTextFieldWidgetBuilder? channelTextfieldWidgetBuilder;
+  final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
 
   const ChannelValueEditorWidget({
     super.key,
@@ -33,7 +33,7 @@ class ChannelValueEditorWidget extends StatefulWidget {
     this.min = -100.0,
     this.showLabel = false,
     this.channelValueEditorStyle,
-    this.channelTextfieldWidgetBuilder,
+    this.channelValueEditorContainerBuilder,
   });
 
   @override
@@ -114,6 +114,21 @@ class _ChannelValueEditorWidgetState extends State<ChannelValueEditorWidget> {
                   borderSide: BorderSide(color: widget.channelValueEditorStyle!.borderColor!),
                 )
               : null,
+          enabledBorder: widget.channelValueEditorStyle?.enabledBorderColor != null
+              ? OutlineInputBorder(
+                  borderSide: BorderSide(color: widget.channelValueEditorStyle!.enabledBorderColor!),
+                )
+              : null,
+          focusedBorder: widget.channelValueEditorStyle?.focusedBorderColor != null
+              ? OutlineInputBorder(
+                  borderSide: BorderSide(color: widget.channelValueEditorStyle!.focusedBorderColor!),
+                )
+              : null,
+          errorBorder: widget.channelValueEditorStyle?.errorBorderColor != null
+              ? OutlineInputBorder(
+                  borderSide: BorderSide(color: widget.channelValueEditorStyle!.errorBorderColor!),
+                )
+              : null,
           fillColor: widget.channelValueEditorStyle?.backgroundColor,
           filled: widget.channelValueEditorStyle?.backgroundColor != null,
           isDense: true,
@@ -138,18 +153,14 @@ class _ChannelValueEditorWidgetState extends State<ChannelValueEditorWidget> {
       },
     );
 
-    if (widget.channelTextfieldWidgetBuilder != null) {
-      return widget.channelTextfieldWidgetBuilder!(
+    return SizedBox(
+      width: widget.channelValueEditorStyle?.width ?? 52,
+      child:widget.channelValueEditorContainerBuilder?.call(
         context,
         textField,
         label,
         index,
-      );
-    }
-
-    return SizedBox(
-      width: 52,
-      child: textField,
+      ) ?? textField,
     );
   }
 
