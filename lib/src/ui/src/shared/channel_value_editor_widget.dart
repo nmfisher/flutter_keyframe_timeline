@@ -86,10 +86,10 @@ class _ChannelValueEditorWidgetState extends State<ChannelValueEditorWidget> {
   }
 
 
-  void _onDimensionChanged(int dimensionIndex, double newValue) {
+  void _onDimensionChanged(int channelIndex, double newValue) {
     if (isUpdatingControllers) return;
     final newValues = List<double>.from(currentValues);
-    newValues[dimensionIndex] = newValue;
+    newValues[channelIndex] = newValue;
     currentValues = newValues;
 
     _updateControllers(newValues);
