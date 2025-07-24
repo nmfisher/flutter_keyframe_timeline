@@ -2,9 +2,7 @@
 
 A Flutter package for creating keyframe-based timelines for 2D/3D animations, video editing, etc.
 
-
-https://github.com/user-attachments/assets/c60b9931-04d0-44b4-acbe-f76d25afc214
-
+![timeline](https://github.com/user-attachments/assets/4c3a33de-4693-4485-a7f3-cd5a27e4bb7e)
 
 ### Core Concepts
 
