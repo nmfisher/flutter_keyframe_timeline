@@ -92,12 +92,14 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
                             0.1,
                             5.0,
                           );
+                          
                         } else {
                           // Move mode: update position
                           obj.position = Offset(
                             obj.position.dx + details.delta.dx,
                             obj.position.dy + details.delta.dy,
                           );
+                        
                         }
                       });
                       widget.objectHolder.onUpdate.call();

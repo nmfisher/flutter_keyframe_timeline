@@ -35,7 +35,7 @@ class ScalarChannelValueType extends ChannelValueType<double> {
     ChannelValueType<double> next,
     double ratio,
   ) {
-    return ScalarChannelValueType(0.0);
+    return ScalarChannelValueType(value + (next.value - value) * ratio);
   }
 
   @override

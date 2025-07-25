@@ -61,11 +61,10 @@ typedef KeyframeToggleIconBuilder = Widget Function(
 );
 
 typedef TrackObjectExtraWidgetBuilder = Widget Function(
-  BuildContext context,
-  AnimatableObject object,
-  bool trackObjectIsActive,
-  bool trackObjectIsExpanded
-);
+    BuildContext context,
+    AnimatableObject object,
+    bool trackObjectIsActive,
+    bool trackObjectIsExpanded);
 
 typedef ChannelValueTextFieldWidgetBuilder = Widget Function(
   BuildContext context,
@@ -140,33 +139,35 @@ class TimelineBackgroundStyle {
 }
 
 class ChannelValueEditorStyle {
-  final Color textColor;
-  final double fontSize;
+  final Color textFieldFontColor;
+  final double textFieldFontSize;
   final double width;
   final Color? backgroundColor;
   final Color? borderColor;
   final Color? focusedBorderColor;
   final Color? enabledBorderColor;
   final Color? errorBorderColor;
-  final Color? labelTextColor;
+  final Color labelTextColor;
+  final double labelFontSize;
   final InputDecoration? inputDecoration;
 
   const ChannelValueEditorStyle({
-    this.textColor = Colors.black,
-    this.fontSize = 11.0,
+    this.textFieldFontColor = Colors.black,
+    this.textFieldFontSize = 11.0,
     this.width = 52.0,
     this.backgroundColor,
     this.borderColor,
     this.focusedBorderColor,
     this.enabledBorderColor,
     this.errorBorderColor,
-    this.labelTextColor,
+    this.labelTextColor = Colors.black,
+    this.labelFontSize = 11.0,
     this.inputDecoration,
   });
 
   ChannelValueEditorStyle copyWith({
-    Color? textColor,
-    double? fontSize,
+    Color? textFieldFontColor,
+    double? textFieldFontSize,
     double? width,
     Color? backgroundColor,
     Color? borderColor,
@@ -177,8 +178,8 @@ class ChannelValueEditorStyle {
     InputDecoration? inputDecoration,
   }) {
     return ChannelValueEditorStyle(
-      textColor: textColor ?? this.textColor,
-      fontSize: fontSize ?? this.fontSize,
+      textFieldFontColor: textFieldFontColor ?? this.textFieldFontColor,
+      textFieldFontSize: textFieldFontSize ?? this.textFieldFontSize,
       width: width ?? this.width,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       borderColor: borderColor ?? this.borderColor,

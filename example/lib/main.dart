@@ -188,8 +188,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         borderColor: Colors.blue.shade200,
                       ),
                       channelValueEditorStyle: ChannelValueEditorStyle(
-                        textColor: Colors.green.shade700,
-                        fontSize: 12.0,
+                        textFieldFontColor: Colors.green.shade700,
+                        textFieldFontSize: 12.0,
+                        labelFontSize: 10.0,
                         width: 65.0,
                         backgroundColor: Colors.green.shade50,
                         borderColor: Colors.green.shade400,

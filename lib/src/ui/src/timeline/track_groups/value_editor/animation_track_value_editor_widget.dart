@@ -9,7 +9,7 @@ class AnimationTrackValueEditorWidget extends StatefulWidget {
   final AnimationTrack track;
   final TimelineController controller;
   final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
-  final ChannelValueEditorStyle? channelValueEditorStyle;
+  final ChannelValueEditorStyle channelValueEditorStyle;
   final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
 
   const AnimationTrackValueEditorWidget({
@@ -18,7 +18,7 @@ class AnimationTrackValueEditorWidget extends StatefulWidget {
     required this.track,
     required this.controller,
     this.keyframeToggleIconBuilder,
-    this.channelValueEditorStyle,
+    this.channelValueEditorStyle = const ChannelValueEditorStyle(),
     this.channelValueEditorContainerBuilder,
   });
 
@@ -31,10 +31,10 @@ class _AnimationTrackValueEditorWidgetState
     extends State<AnimationTrackValueEditorWidget> {
   late final AnimationTrackValueEditorViewModel viewModel =
       AnimationTrackValueEditorViewModelImpl(
-        widget.object,
-        widget.track,
-        widget.controller,
-      );
+    widget.object,
+    widget.track,
+    widget.controller,
+  );
 
   // Channel value editor state
   late final List<TextEditingController> controllers;
@@ -48,6 +48,7 @@ class _AnimationTrackValueEditorWidgetState
       (_) => TextEditingController(),
     );
     currentValues = List.generate(widget.track.labels.length, (_) => 0.0);
+    _updateControllers(currentValues);
   }
 
   @override
@@ -83,47 +84,46 @@ class _AnimationTrackValueEditorWidgetState
     final textField = TextField(
       controller: controller,
       style: TextStyle(
-        color: widget.channelValueEditorStyle?.textColor ?? Colors.black,
-        fontSize: widget.channelValueEditorStyle?.fontSize ?? 11,
+        color: widget.channelValueEditorStyle.textFieldFontColor,
+        fontSize: widget.channelValueEditorStyle.textFieldFontSize ,
       ),
-      decoration:
-          widget.channelValueEditorStyle?.inputDecoration ??
+      decoration: widget.channelValueEditorStyle.inputDecoration ??
           InputDecoration(
-            border: widget.channelValueEditorStyle?.borderColor != null
+            border: widget.channelValueEditorStyle.borderColor != null
                 ? OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: widget.channelValueEditorStyle!.borderColor!,
+                      color: widget.channelValueEditorStyle.borderColor!,
                     ),
                   )
                 : null,
-            enabledBorder:
-                widget.channelValueEditorStyle?.enabledBorderColor != null
-                ? OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color:
-                          widget.channelValueEditorStyle!.enabledBorderColor!,
-                    ),
-                  )
-                : null,
-            focusedBorder:
-                widget.channelValueEditorStyle?.focusedBorderColor != null
+            enabledBorder: widget.channelValueEditorStyle.enabledBorderColor !=
+                    null
                 ? OutlineInputBorder(
                     borderSide: BorderSide(
                       color:
-                          widget.channelValueEditorStyle!.focusedBorderColor!,
+                          widget.channelValueEditorStyle.enabledBorderColor!,
                     ),
                   )
                 : null,
-            errorBorder:
-                widget.channelValueEditorStyle?.errorBorderColor != null
+            focusedBorder: widget.channelValueEditorStyle.focusedBorderColor !=
+                    null
                 ? OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: widget.channelValueEditorStyle!.errorBorderColor!,
+                      color:
+                          widget.channelValueEditorStyle.focusedBorderColor!,
                     ),
                   )
                 : null,
-            fillColor: widget.channelValueEditorStyle?.backgroundColor,
-            filled: widget.channelValueEditorStyle?.backgroundColor != null,
+            errorBorder: widget.channelValueEditorStyle.errorBorderColor !=
+                    null
+                ? OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: widget.channelValueEditorStyle.errorBorderColor!,
+                    ),
+                  )
+                : null,
+            fillColor: widget.channelValueEditorStyle.backgroundColor,
+            filled: widget.channelValueEditorStyle.backgroundColor != null,
             isDense: true,
             contentPadding: const EdgeInsets.all(8),
           ),
@@ -132,15 +132,12 @@ class _AnimationTrackValueEditorWidgetState
         final value = double.parse(text);
         _onChannelChanged(index, value);
       },
-      onChanged: (text) {
-        
-      },
+      onChanged: (text) {},
     );
 
     return SizedBox(
-      width: widget.channelValueEditorStyle?.width ?? 52,
-      child:
-          widget.channelValueEditorContainerBuilder?.call(
+      width: widget.channelValueEditorStyle.width ?? 52,
+      child: widget.channelValueEditorContainerBuilder?.call(
             context,
             textField,
             controller,
@@ -212,32 +209,38 @@ class _AnimationTrackValueEditorWidgetState
       },
     );
 
-    return SizedBox(
-      height: 48,
-      child: ValueListenableBuilder(
-        valueListenable: widget.controller.currentFrame,
-        builder: (_, int currentFrame, __) {
-          var value = viewModel.getValue(currentFrame);
-          var unwrapped = value.unwrap();
+    return VBox(
+      style: Style($flex.crossAxisAlignment.start()),
+      children: [
+        StyledText(widget.track.label, style: Style(
+          $text.color(widget.channelValueEditorStyle.labelTextColor),
+          $text.fontSize(widget.channelValueEditorStyle.labelFontSize)),
+          ),
+        ValueListenableBuilder(
+          valueListenable: widget.controller.currentFrame,
+          builder: (_, int currentFrame, __) {
+            var value = viewModel.getValue(currentFrame);
+            var unwrapped = value.unwrap();
 
-          // Update current values and controllers
-          if (!listEquals(currentValues, unwrapped)) {
-            currentValues = List.from(unwrapped);
-            _updateControllers(unwrapped);
-          }
+            // Update current values and controllers
+            if (!listEquals(currentValues, unwrapped)) {
+              currentValues = List.from(unwrapped);
+              _updateControllers(unwrapped);
+            }
 
-          return HBox(
-            children: [
-              icon,
-              ...List.generate(
-                labels.length,
-                (index) =>
-                    _buildNumberField(labels[index], controllers[index], index),
-              ),
-            ],
-          );
-        },
-      ),
+            return HBox(
+              children: [
+                icon,
+                ...List.generate(
+                  labels.length,
+                  (index) => _buildNumberField(
+                      labels[index], controllers[index], index),
+                ),
+              ],
+            );
+          },
+        )
+      ],
     );
   }
 }

@@ -81,17 +81,18 @@ class TimelineSerializer {
     var name = object["name"] as String;
     
     var tracks = object["tracks"].map((track) {
-      var keyframes = track["keyframes"]
+      var rawKeyframes = track["keyframes"] as List;
+      var keyframes = rawKeyframes.cast<Map<String,dynamic>>()
           .map(parseKeyframe)
           .cast<Keyframe>()
           .toList();
 
       return AnimationTrackImpl(
         keyframes,
-        track["labels"] as List<String>,
+        track["labels"].cast<String>(),
         track["label"],
       );
-    }).toList();
+    }).cast<AnimationTrack>().toList();
     return AnimatableObjectImpl(tracks, name);
   }
 

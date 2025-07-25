@@ -60,6 +60,15 @@ class RandomObject {
     } else if (track == scaleTrack) {
       scaleX = values[0].toDouble();
       scaleY = values[1].toDouble();
+    } else if (track == rotationTrack) {
+      rotation = values[0].toDouble();
+    } else if (track == colorTrack) {
+      color = Color.fromARGB(
+        (values[3] * 255).round().clamp(0, 255), // alpha
+        (values[0] * 255).round().clamp(0, 255), // red
+        (values[1] * 255).round().clamp(0, 255), // green
+        (values[2] * 255).round().clamp(0, 255), // blue
+      );
     }
   }
 }
@@ -155,7 +164,7 @@ class ObjectHolder implements TrackController {
               object.color.r,
               object.color.g,
               object.color.b,
-              object.color.r,
+              object.color.a,
             ),
           )
           as U;

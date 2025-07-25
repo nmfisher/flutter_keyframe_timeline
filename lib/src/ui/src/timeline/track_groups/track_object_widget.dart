@@ -122,7 +122,7 @@ class TrackObjectWidget extends StatelessWidget {
                             controller: controller,
                             keyframeToggleIconBuilder:
                                 keyframeToggleIconBuilder,
-                            channelValueEditorStyle: channelValueEditorStyle,
+                            channelValueEditorStyle: channelValueEditorStyle ?? const ChannelValueEditorStyle(),
                             channelValueEditorContainerBuilder: channelValueEditorContainerBuilder,
                           ),
                         ),
