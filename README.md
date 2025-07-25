@@ -52,7 +52,8 @@ TimelineController createTimelineController(List<MyModel> models) {
     final positionTrack = AnimationTrackImpl<Vector3ChannelValueType>(
         keyframes:[],
         labels:["x", "y", "z"],
-        label:"position"
+        label:"position",
+        defaultValues: [0,0,0]
     );
 
     positionTrack.setValue()

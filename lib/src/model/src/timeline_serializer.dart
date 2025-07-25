@@ -30,7 +30,7 @@ class TimelineSerializer {
     );
   }
 
-  static AnimationTrack<V> parseTrack<V extends ChannelValue>(Map<String, dynamic> track, ChannelValueFactory factory) {
+  static AnimationTrack<V> parseTrack<V extends ChannelValue>(Map<String, dynamic> track, ChannelValueFactory factory, List<num> defaultValues) {
 
     var rawKeyframes = track["keyframes"] as List;
 
@@ -41,7 +41,9 @@ class TimelineSerializer {
       keyframes.add(kf);
     }
 
-    return AnimationTrackImpl(
+
+    return AnimationTrackImpl<V>(
+      defaultValues:defaultValues,
       keyframes: keyframes,
       labels: track["labels"].cast<String>(),
       label: track["label"],
@@ -57,11 +59,11 @@ class TimelineSerializer {
           
 
           return switch (track['value_type']) {
-            'VEC4' => parseTrack<Vector4ChannelValue>(track, factory),
-            'VEC3' => parseTrack<Vector3ChannelValue>(track, factory),
-            'VEC2' => parseTrack<Vector2ChannelValue>(track, factory),
-            'QUAT' => parseTrack<QuaternionChannelValue>(track, factory),
-            'SCALAR' => parseTrack<ScalarChannelValue>(track, factory),
+            'VEC4' => parseTrack<Vector4ChannelValue>(track, factory, [0, 0, 0, 0]),
+            'VEC3' => parseTrack<Vector3ChannelValue>(track, factory, [0, 0, 0]),
+            'VEC2' => parseTrack<Vector2ChannelValue>(track, factory, [0, 0]),
+            'QUAT' => parseTrack<QuaternionChannelValue>(track, factory,[0, 0, 0, 1]),
+            'SCALAR' => parseTrack<ScalarChannelValue>(track, factory, [0]),
             _ =>
               throw Exception("Unrecognized value type ${track['value_type']}")
           };

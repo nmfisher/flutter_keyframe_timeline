@@ -230,7 +230,7 @@ class QuaternionChannelValue extends ChannelValue<Quaternion> {
     double ratio,
   ) {
     return QuaternionChannelValue(
-      value.scaled(1 - ratio) + next.value.scaled(ratio),
+      (value.scaled(1 - ratio) + next.value.scaled(ratio)).normalized()
     );
   }
 

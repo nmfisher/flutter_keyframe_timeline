@@ -73,7 +73,7 @@ abstract class AnimationTrack<V extends ChannelValue> {
   AnimationTrack<U> cast<U extends ChannelValue>();
 
   //
-  ValueListenable<V?> get value;
+  ValueListenable<V> get value;
 
   //
   void setValue(V value);
@@ -97,12 +97,15 @@ class AnimationTrackImpl<V extends ChannelValue> extends AnimationTrack<V> {
 
   final ChannelValueFactory factory;
 
+  final List<num> defaultValues;
+
   AnimationTrackImpl(
       {this.factory = const DefaultChannelValueFactory(),
       required List<Keyframe<V>> keyframes,
       required this.labels,
-      required this.label}) {
-    final v = factory.create<V>(null);
+      required this.label,
+      required this.defaultValues}) {
+    final v = factory.create<V>(defaultValues);
     this.value = ValueNotifier<V>(v);
     for (final kf in keyframes) {
       this.keyframes.value.add(kf);
@@ -115,7 +118,8 @@ class AnimationTrackImpl<V extends ChannelValue> extends AnimationTrack<V> {
     return AnimationTrackImpl<U>(
         keyframes: keyframes.value.cast<Keyframe<U>>(),
         labels: labels,
-        label: label);
+        label: label,
+        defaultValues: defaultValues);
   }
 
   void _onKeyframeFrameUpdated() {
@@ -171,7 +175,7 @@ class AnimationTrackImpl<V extends ChannelValue> extends AnimationTrack<V> {
   @override
   V calculate(int frameNumber, {V? initial}) {
     if (keyframes.value.isEmpty) {
-      return initial ?? factory.create<V>(null) as V;
+      return initial ?? value.value;
     }
 
     Keyframe? start;

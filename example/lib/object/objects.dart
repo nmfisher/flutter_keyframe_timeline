@@ -23,21 +23,25 @@ class RandomObject {
     keyframes: <Keyframe<Vector2ChannelValue>>[],
     labels: ["x", "y"],
     label: "position",
+    defaultValues: [0.0, 0.0, 0.0]
   );
   late final rotationTrack = AnimationTrackImpl(
     keyframes: <Keyframe<ScalarChannelValue>>[],
     labels: ["rads"],
     label: "rotation",
+    defaultValues: [0.0]
   );
   late final scaleTrack = AnimationTrackImpl(
     keyframes: <Keyframe<Vector2ChannelValue>>[],
     labels: ["x", "y"],
     label: "scale",
+    defaultValues: [1.0, 1.0, 1.0]
   );
   late final colorTrack = AnimationTrackImpl(
     keyframes: <Keyframe<Vector4ChannelValue>>[],
     labels: ["r", "g", "b", "a"],
     label: "color",
+    defaultValues: [1.0, 1.0, 1.0, 1.0]
   );
 
   late final AnimatableObjectImpl animatableObject;
@@ -85,9 +89,34 @@ class RandomObject {
     }
   }
 
-  void _onRotationChanged() {}
-  void _onScaleChanged() {}
-  void _onColorChanged() {}
+  void _onRotationChanged() {
+    var values = rotationTrack.value.value!.unwrap();
+    if (values[0] != rotation) {
+      setRotation(values[0].toDouble(), notify: false);
+      onUpdate();
+    }
+  }
+  void _onScaleChanged() {
+    var values = scaleTrack.value.value!.unwrap();
+    if (values[0] != scaleX || values[1] != scaleY) {
+      setScaleX(values[0].toDouble(), notify: false);
+      setScaleY(values[1].toDouble(), notify: false);
+      onUpdate();
+    }
+  }
+  void _onColorChanged() {
+    var values = colorTrack.value.value!.unwrap();
+    final newColor = Color.fromARGB(
+      (values[3] * 255).round().clamp(0, 255), // alpha
+      (values[0] * 255).round().clamp(0, 255), // red
+      (values[1] * 255).round().clamp(0, 255), // green
+      (values[2] * 255).round().clamp(0, 255), // blue
+    );
+    if (newColor != color) {
+      setColor(newColor, notify: false);
+      onUpdate();
+    }
+  }
 
   // Setter methods
   void setPosition(Offset newPosition, {bool notify = true}) {
@@ -99,27 +128,34 @@ class RandomObject {
     }
   }
 
-  void setRotation(double newRotation) {
+  void setRotation(double newRotation, {bool notify = true}) {
     _rotation = newRotation;
-
-    rotationTrack.setValue(ScalarChannelValue(rotation));
+    if (notify) {
+      rotationTrack.setValue(ScalarChannelValue(rotation));
+    }
   }
 
-  void setScaleX(double newScaleX) {
+  void setScaleX(double newScaleX, {bool notify = true}) {
     _scaleX = newScaleX;
-    scaleTrack.setValue(Vector2ChannelValue(Vector2(_scaleX, _scaleY)));
+    if (notify) {
+      scaleTrack.setValue(Vector2ChannelValue(Vector2(_scaleX, _scaleY)));
+    }
   }
 
-  void setScaleY(double newScaleY) {
+  void setScaleY(double newScaleY, {bool notify = true}) {
     _scaleY = newScaleY;
-    scaleTrack.setValue(Vector2ChannelValue(Vector2(_scaleX, _scaleY)));
+    if (notify) {
+      scaleTrack.setValue(Vector2ChannelValue(Vector2(_scaleX, _scaleY)));
+    }
   }
 
-  void setColor(Color newColor) {
+  void setColor(Color newColor, {bool notify = true}) {
     _color = newColor;
-    colorTrack.setValue(
-      Vector4ChannelValue(Vector4(_color.r, _color.g, _color.b, _color.a)),
-    );
+    if (notify) {
+      colorTrack.setValue(
+        Vector4ChannelValue(Vector4(_color.r, _color.g, _color.b, _color.a)),
+      );
+    }
   }
 
   void setActualValue(AnimationTrack track, List<num> values) {
