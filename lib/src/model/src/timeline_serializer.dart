@@ -1,5 +1,5 @@
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
-import 'package:flutter_keyframe_timeline/src/model/src/animatable_object.dart';
+
 import 'package:vector_math/vector_math_64.dart';
 
 class TimelineSerializer {

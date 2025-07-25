@@ -77,6 +77,12 @@ abstract class TimelineController {
 }
 
 abstract class TrackController {
+  
+  // Get the current value for [track] in [target]. This retrieves the actual
+  // value, not the value computed from any keyframes. For example, 
+  // calling this method for the position track when [target] is actually
+  // located at (0,1,2) will return (0,1,2), even if the location as calcualted 
+  // from the keyframes would otherwise be different.
   //
   U getCurrentValue<U extends ChannelValueType>(
     AnimatableObject target,

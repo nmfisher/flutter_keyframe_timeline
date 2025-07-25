@@ -1,24 +1,26 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
-import 'package:flutter_keyframe_timeline/src/model/model.dart';
-import 'package:vector_math/vector_math_64.dart';
 
 abstract class AnimationTrackValueEditorViewModel<V extends ChannelValueType> {
+  
+  // Returns true if this track has a keyframe at the current frame, 
+  // false otherwise.
   ValueListenable<bool> get hasKeyframeAtCurrentFrame;
 
-  ///
+  // Add an keyframe for this track at the current frame, with the current
+  // actual value for the track.
   Future addKeyframeForCurrentFrame();
 
   ///
   Future deleteKeyframeForCurrentFrame();
 
   //
-  void setCurrentFrameValue(List<double> values);
+  void setActualValue(List<double> values);
 
   //
-  V getValue(int frame);
+  V getActualValue(int frame);
 
-  //
+  // Dispose this instance and destroy all ValueNotifiers and listeners.
   Future dispose();
 }
 
@@ -103,12 +105,12 @@ class AnimationTrackValueEditorViewModelImpl<V extends ChannelValueType>
   }
 
   @override
-  V getValue(int frame) {
+  V getActualValue(int frame) {
     return controller.getCurrentValue<V>(object, track);
   }
 
   @override
-  void setCurrentFrameValue(List<double> values) {
+  void setActualValue(List<double> values) {
     controller.applyValue(object, track, values);
   }
 }

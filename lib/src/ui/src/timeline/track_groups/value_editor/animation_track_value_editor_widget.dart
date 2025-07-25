@@ -73,7 +73,7 @@ class _AnimationTrackValueEditorWidgetState
     final newValues = List<double>.from(currentValues);
     newValues[channelIndex] = newValue;
     currentValues = newValues;
-    viewModel.setCurrentFrameValue(newValues);
+    viewModel.setActualValue(newValues);
   }
 
   Widget _buildNumberField(
@@ -216,7 +216,7 @@ class _AnimationTrackValueEditorWidgetState
         ValueListenableBuilder(
           valueListenable: widget.controller.currentFrame,
           builder: (_, int currentFrame, __) {
-            var value = viewModel.getValue(currentFrame);
+            var value = viewModel.getActualValue(currentFrame);
             var unwrapped = value.unwrap();
 
             // Update current values and controllers
