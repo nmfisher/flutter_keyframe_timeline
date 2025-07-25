@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_keyframe_timeline/src/model/src/timeline_serializer.dart';
 import 'package:logging/logging.dart';
 import 'channel_types.dart';
 import 'keyframe.dart';
@@ -9,7 +8,10 @@ import 'keyframe.dart';
 // The generic parameter [V] corresponds to the type of the values attached to
 // the keyframes/channel (Vector3, Quaternion, etc).
 //
-abstract class AnimationTrack<V extends ChannelValueType> {
+abstract class AnimationTrack<V extends ChannelValue> {
+  //
+  Type getType() => V;
+
   //
   // Adds a keyframe at [frameNumber] with the value [value].
   // If a keyframe already exists at [frameNumber], its value
@@ -67,11 +69,18 @@ abstract class AnimationTrack<V extends ChannelValueType> {
   //
   Future dispose();
 
-  AnimationTrack<U> cast<U extends ChannelValueType>();
+  //
+  AnimationTrack<U> cast<U extends ChannelValue>();
+
+  //
+  ValueListenable<V?> get value;
+
+  //
+  void setValue(V value);
 }
 
-class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
-  static final _logger = Logger("AnimationTrackImpl");
+class AnimationTrackImpl<V extends ChannelValue> extends AnimationTrack<V> {
+  late final _logger = Logger(this.runtimeType.toString());
 
   @override
   final ValueNotifier<List<Keyframe<V>>> keyframes =
@@ -83,22 +92,30 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
   @override
   final String label;
 
-  TimelineSerializer? serializer;
+  @override
+  late final ValueNotifier<V> value;
+
+  final ChannelValueFactory factory;
 
   AnimationTrackImpl(
-    List<Keyframe<V>> keyframes,
-    this.labels,
-    this.label, {
-    this.serializer,
-  }) {
+      {this.factory = const DefaultChannelValueFactory(),
+      required List<Keyframe<V>> keyframes,
+      required this.labels,
+      required this.label}) {
+    final v = factory.create<V>(null);
+    this.value = ValueNotifier<V>(v);
     for (final kf in keyframes) {
       this.keyframes.value.add(kf);
       kf.frameNumber.addListener(_onKeyframeFrameUpdated);
     }
   }
 
-  AnimationTrack<U> cast<U extends ChannelValueType>() {
-    return AnimationTrackImpl<U>(keyframes.value.cast<Keyframe<U>>(), labels, label);
+  @override
+  AnimationTrack<U> cast<U extends ChannelValue>() {
+    return AnimationTrackImpl<U>(
+        keyframes: keyframes.value.cast<Keyframe<U>>(),
+        labels: labels,
+        label: label);
   }
 
   void _onKeyframeFrameUpdated() {
@@ -154,7 +171,7 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
   @override
   V calculate(int frameNumber, {V? initial}) {
     if (keyframes.value.isEmpty) {
-      return initial ?? this.serializer!.defaultZero();
+      return initial ?? factory.create<V>(null) as V;
     }
 
     Keyframe? start;
@@ -189,6 +206,11 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
   @override
   bool hasKeyframeAt(int frame) {
     return keyframeAt(frame) != null;
+  }
+
+  @override
+  void setValue(V value) {
+    this.value.value = value;
   }
 }
 

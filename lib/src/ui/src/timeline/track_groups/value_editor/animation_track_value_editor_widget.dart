@@ -38,7 +38,6 @@ class _AnimationTrackValueEditorWidgetState
 
   // Channel value editor state
   late final List<TextEditingController> controllers;
-  late List<double> currentValues;
 
   @override
   void initState() {
@@ -47,8 +46,6 @@ class _AnimationTrackValueEditorWidgetState
       widget.track.labels.length,
       (_) => TextEditingController(),
     );
-    currentValues = List.generate(widget.track.labels.length, (_) => 0.0);
-    _updateControllers(currentValues);
   }
 
   @override
@@ -70,10 +67,7 @@ class _AnimationTrackValueEditorWidgetState
   }
 
   void _onChannelChanged(int channelIndex, double newValue) {
-    final newValues = List<double>.from(currentValues);
-    newValues[channelIndex] = newValue;
-    currentValues = newValues;
-    viewModel.setActualValue(newValues);
+    viewModel.setActualValue(channelIndex, newValue);
   }
 
   Widget _buildNumberField(
@@ -85,7 +79,7 @@ class _AnimationTrackValueEditorWidgetState
       controller: controller,
       style: TextStyle(
         color: widget.channelValueEditorStyle.textFieldFontColor,
-        fontSize: widget.channelValueEditorStyle.textFieldFontSize ,
+        fontSize: widget.channelValueEditorStyle.textFieldFontSize,
       ),
       decoration: widget.channelValueEditorStyle.inputDecoration ??
           InputDecoration(
@@ -100,8 +94,7 @@ class _AnimationTrackValueEditorWidgetState
                     null
                 ? OutlineInputBorder(
                     borderSide: BorderSide(
-                      color:
-                          widget.channelValueEditorStyle.enabledBorderColor!,
+                      color: widget.channelValueEditorStyle.enabledBorderColor!,
                     ),
                   )
                 : null,
@@ -109,13 +102,11 @@ class _AnimationTrackValueEditorWidgetState
                     null
                 ? OutlineInputBorder(
                     borderSide: BorderSide(
-                      color:
-                          widget.channelValueEditorStyle.focusedBorderColor!,
+                      color: widget.channelValueEditorStyle.focusedBorderColor!,
                     ),
                   )
                 : null,
-            errorBorder: widget.channelValueEditorStyle.errorBorderColor !=
-                    null
+            errorBorder: widget.channelValueEditorStyle.errorBorderColor != null
                 ? OutlineInputBorder(
                     borderSide: BorderSide(
                       color: widget.channelValueEditorStyle.errorBorderColor!,
@@ -214,16 +205,9 @@ class _AnimationTrackValueEditorWidgetState
       children: [
         widget.channelValueEditorStyle.labelBuilder(widget.track.label),
         ValueListenableBuilder(
-          valueListenable: widget.controller.currentFrame,
-          builder: (_, int currentFrame, __) {
-            var value = viewModel.getActualValue(currentFrame);
-            var unwrapped = value.unwrap();
-
-            // Update current values and controllers
-            if (!listEquals(currentValues, unwrapped)) {
-              currentValues = List.from(unwrapped);
-              _updateControllers(unwrapped);
-            }
+          valueListenable: viewModel.values,
+          builder: (_, List<num> values, __) {
+            _updateControllers(values);
 
             return HBox(
               children: [

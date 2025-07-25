@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
 
 abstract class AnimatableObject {
-
   //
   ValueListenable<String> get displayName;
 
@@ -20,7 +19,7 @@ class AnimatableObjectImpl extends AnimatableObject {
   @override
   final List<AnimationTrack> tracks;
 
-  AnimatableObjectImpl(this.tracks, String name) {
+  AnimatableObjectImpl({required this.tracks, required String name}) {
     this.displayName.value = name;
   }
   @override
@@ -46,6 +45,4 @@ class AnimatableObjectImpl extends AnimatableObject {
     }
     return false;
   }
-
-
 }

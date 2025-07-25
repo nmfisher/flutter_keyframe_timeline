@@ -5,7 +5,7 @@ enum Interpolation { linear, constant }
 
 //
 //
-abstract class Keyframe<V extends ChannelValueType> {
+abstract class Keyframe<V extends ChannelValue> {
   // The frame number for this keyframe.
   ValueListenable<int> get frameNumber;
 
@@ -25,7 +25,7 @@ abstract class Keyframe<V extends ChannelValueType> {
   V interpolate(V next, double linearRatio);
 }
 
-class KeyframeImpl<V extends ChannelValueType> extends Keyframe<V>
+class KeyframeImpl<V extends ChannelValue> extends Keyframe<V>
     implements Comparable<Keyframe<V>> {
   @override
   final ValueNotifier<int> frameNumber = ValueNotifier<int>(0);

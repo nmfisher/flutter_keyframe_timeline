@@ -51,11 +51,13 @@ class _MyHomePageState extends State<MyHomePage> {
     _objectHolder = ObjectHolder(_numObjects, () {
       setState(() {});
     });
-    _controller = TimelineControllerImpl(
+    _controller = TimelineController.create(
       _objectHolder.animatableObjects,
-      _objectHolder,
     );
     _objectHolder.setTimelineController(_controller);
+    final map = TimelineSerializer.toMap(_objectHolder.animatableObjects.first);
+    final foo = TimelineSerializer.fromMap(map);
+    print(foo);
   }
 
   @override

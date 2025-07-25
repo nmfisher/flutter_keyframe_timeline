@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 
-abstract class AnimationTrackValueEditorViewModel<V extends ChannelValueType> {
-  
-  // Returns true if this track has a keyframe at the current frame, 
+abstract class AnimationTrackValueEditorViewModel<V extends ChannelValue> {
+  // Returns true if this track has a keyframe at the current frame,
   // false otherwise.
   ValueListenable<bool> get hasKeyframeAtCurrentFrame;
 
@@ -15,16 +14,16 @@ abstract class AnimationTrackValueEditorViewModel<V extends ChannelValueType> {
   Future deleteKeyframeForCurrentFrame();
 
   //
-  void setActualValue(List<double> values);
+  ValueListenable<List<num>> get values;
 
   //
-  V getActualValue(int frame);
+  void setActualValue(int channelIndex, double value);
 
   // Dispose this instance and destroy all ValueNotifiers and listeners.
   Future dispose();
 }
 
-class AnimationTrackValueEditorViewModelImpl<V extends ChannelValueType>
+class AnimationTrackValueEditorViewModelImpl<V extends ChannelValue>
     extends AnimationTrackValueEditorViewModel<V> {
   final Set<Keyframe> keyframes = {};
 
@@ -33,19 +32,28 @@ class AnimationTrackValueEditorViewModelImpl<V extends ChannelValueType>
     false,
   );
 
+  final ValueNotifier<List<num>> values = ValueNotifier<List<num>>([]);
+
   final AnimatableObject object;
   final AnimationTrack<V> track;
   final TimelineController controller;
 
-  AnimationTrackValueEditorViewModelImpl(this.object, this.track, this.controller) {
+  AnimationTrackValueEditorViewModelImpl(
+      this.object, this.track, this.controller) {
     track.keyframes.addListener(_onKeyframesUpdated);
     _onKeyframesUpdated();
-
+    track.value.addListener(_onActualValueChanged);
     controller.currentFrame.addListener(_onFrameChange);
+    _onActualValueChanged();
+  }
+
+  void _onActualValueChanged() {
+    values.value = track.value.value!.unwrap();
   }
 
   void _onFrameChange() {
     _updateHasKeyframeAtCurrentFrame();
+    _onActualValueChanged();
   }
 
   void _updateHasKeyframeAtCurrentFrame() {
@@ -75,6 +83,8 @@ class AnimationTrackValueEditorViewModelImpl<V extends ChannelValueType>
 
   @override
   Future dispose() async {
+    track.value.removeListener(_onActualValueChanged);
+
     controller.currentFrame.removeListener(_onFrameChange);
 
     for (final kf in this.keyframes) {
@@ -100,17 +110,12 @@ class AnimationTrackValueEditorViewModelImpl<V extends ChannelValueType>
   @override
   Future addKeyframeForCurrentFrame() async {
     final currentFrame = controller.currentFrame.value;
-    var value = controller.getCurrentValue<V>(object, track);
-    track.addOrUpdateKeyframe(currentFrame, value);
+    track.addOrUpdateKeyframe(currentFrame, track.value.value!);
   }
 
   @override
-  V getActualValue(int frame) {
-    return controller.getCurrentValue<V>(object, track);
-  }
-
-  @override
-  void setActualValue(List<double> values) {
-    controller.applyValue(object, track, values);
+  void setActualValue(int channelIndex, double value) {
+    final newValue = track.value.value!.copyWith(channelIndex, value);
+    track.setValue(newValue as V);
   }
 }

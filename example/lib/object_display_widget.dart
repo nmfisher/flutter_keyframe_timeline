@@ -35,7 +35,7 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
         // Find the object corresponding to the first active track object
         final animatableObject = activeObjects.first;
         final activeObject = widget.objectHolder.objects.firstWhere(
-          (obj) => obj.trackObject == animatableObject,
+          (obj) => obj.animatableObject == animatableObject,
           orElse: () => widget.objectHolder.objects.first,
         );
         setState(() {
@@ -71,7 +71,7 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
                     setState(() {
                       _selectedObject = obj;
                     });
-                    widget.timelineController.setActive(obj.trackObject, true);
+                    widget.timelineController.setActive(obj.animatableObject, true);
                   },
                   onPanUpdate: (details) {
                     if (_selectedObject == obj) {
@@ -84,21 +84,21 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
                           final scaleChange =
                               -details.delta.dy *
                               0.01; // Negative for intuitive up=bigger
-                          obj.scaleX = (obj.scaleX + scaleChange).clamp(
+                          obj.setScaleX((obj.scaleX + scaleChange).clamp(
                             0.1,
                             5.0,
-                          );
-                          obj.scaleY = (obj.scaleY + scaleChange).clamp(
+                          ));
+                          obj.setScaleY((obj.scaleY + scaleChange).clamp(
                             0.1,
                             5.0,
-                          );
+                          ));
                           
                         } else {
-                          // Move mode: update position
-                          obj.position = Offset(
+                          // Move   : update position
+                          obj.setPosition(Offset(
                             obj.position.dx + details.delta.dx,
                             obj.position.dy + details.delta.dy,
-                          );
+                          ));
                         
                         }
                       });

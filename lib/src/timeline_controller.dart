@@ -44,18 +44,18 @@ abstract class TimelineController {
   //
   void deleteSelectedKeyframes();
 
-  //
-  U getCurrentValue<U extends ChannelValueType>(
-    AnimatableObject target,
-    AnimationTrack<U> track,
-  );
+  // //
+  // U getCurrentValue<U extends ChannelValue>(
+  //   AnimatableObject target,
+  //   AnimationTrack<U> track,
+  // );
 
-  //
-  void applyValue<U extends ChannelValueType>(
-    AnimatableObject object,
-    AnimationTrack<U> track,
-    List<num> values,
-  );
+  // //
+  // void setActualValue<U extends ChannelValue>(
+  //   AnimatableObject object,
+  //   AnimationTrack<U> track,
+  //   List<num> values,
+  // );
 
   //
   ValueListenable<Set<AnimatableObject>> get active;
@@ -74,37 +74,44 @@ abstract class TimelineController {
 
   // Dispose this instance and all associated ValueNotifiers.
   void dispose();
+
+  factory TimelineController.create(
+      List<AnimatableObject> initial) {
+    return TimelineControllerImpl._(initial);
+  }
 }
 
-abstract class TrackController {
-  
-  // Get the current value for [track] in [target]. This retrieves the actual
-  // value, not the value computed from any keyframes. For example, 
-  // calling this method for the position track when [target] is actually
-  // located at (0,1,2) will return (0,1,2), even if the location as calcualted 
-  // from the keyframes would otherwise be different.
-  //
-  U getCurrentValue<U extends ChannelValueType>(
-    AnimatableObject target,
-    AnimationTrack<U> track,
-  );
+// abstract class TrackValueController {
+//   // Get the current value for [track] in [target]. This retrieves the actual
+//   // value, not the value computed from any keyframes. For example,
+//   // calling this method for the position track when [target] is actually
+//   // located at (0,1,2) will return (0,1,2), even if the location as calcualted
+//   // from the keyframes would otherwise be different.
+//   //
+//   U getCurrentValue<U extends ChannelValue>(
+//     AnimatableObject target,
+//     AnimationTrack<U> track,
+//   );
 
-  //
-  void applyValue<U extends ChannelValueType>(
-    AnimatableObject object,
-    AnimationTrack<U> track,
-    List<num> values,
-  );
-}
+//   // Get the current value for [track] in [target]. This retrieves the actual
+//   // value, not the value computed from any keyframes. For example,
+//   // calling this method for the position track when [target] is actually
+//   // located at (0,1,2) will return (0,1,2), even if the location as calcualted
+//   // from the keyframes would otherwise be different.
+//   //
+//   void setActualValue<U extends ChannelValue>(
+//     AnimatableObject object,
+//     AnimationTrack<U> track,
+//     List<num> values,
+//   );
+// }
 
-class TimelineControllerImpl extends TimelineController {
+class TimelineControllerImpl implements TimelineController {
   @override
   final ValueNotifier<List<AnimatableObject>> animatableObjects =
       ValueNotifier<List<AnimatableObject>>([]);
 
-  final TrackController trackController;
-
-  TimelineControllerImpl(List<AnimatableObject> initial, this.trackController) {
+  TimelineControllerImpl._(List<AnimatableObject> initial) {
     animatableObjects.value.addAll(initial);
     this.currentFrame.addListener(_onCurrentFrameChanged);
   }
@@ -114,7 +121,7 @@ class TimelineControllerImpl extends TimelineController {
       for (final track in object.tracks) {
         if (track.keyframes.value.isNotEmpty) {
           var value = track.calculate(currentFrame.value);
-          applyValue(object, track, value.unwrap());
+          track.setValue(value);
         }
       }
     }
@@ -165,8 +172,8 @@ class TimelineControllerImpl extends TimelineController {
   }
 
   @override
-  ValueNotifier<Set<Keyframe<ChannelValueType>>> selected =
-      ValueNotifier<Set<Keyframe<ChannelValueType>>>({});
+  ValueNotifier<Set<Keyframe<ChannelValue>>> selected =
+      ValueNotifier<Set<Keyframe<ChannelValue>>>({});
 
   final _selected = <Keyframe, AnimationTrack>{};
 
@@ -246,22 +253,6 @@ class TimelineControllerImpl extends TimelineController {
     this.expanded.notifyListeners();
   }
 
-  @override
-  void applyValue<U extends ChannelValueType>(
-    AnimatableObject object,
-    AnimationTrack<U> track,
-    List<num> values,
-  ) {
-    trackController.applyValue(object, track, values);
-  }
-
-  @override
-  U getCurrentValue<U extends ChannelValueType>(
-    AnimatableObject target,
-    AnimationTrack<U> track,
-  ) {
-    return trackController.getCurrentValue<U>(target, track);
-  }
 
   //
   @override

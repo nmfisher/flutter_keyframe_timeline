@@ -6,64 +6,132 @@ import 'package:logging/logging.dart';
 
 class RandomObject {
   final String name;
-  late Offset position;
-  late double rotation;
-  late double scaleX;
-  late double scaleY;
-  late Color color;
+  late Offset _position;
+  late double _rotation;
+  late double _scaleX;
+  late double _scaleY;
+  late Color _color;
+
+  // Getters
+  Offset get position => _position;
+  double get rotation => _rotation;
+  double get scaleX => _scaleX;
+  double get scaleY => _scaleY;
+  Color get color => _color;
 
   late final positionTrack = AnimationTrackImpl(
-    <Keyframe<Vector2ChannelValueType>>[],
-    ["x", "y"],
-    "position",
+    keyframes: <Keyframe<Vector2ChannelValue>>[],
+    labels: ["x", "y"],
+    label: "position",
   );
   late final rotationTrack = AnimationTrackImpl(
-    <Keyframe<ScalarChannelValueType>>[],
-    ["rads"],
-    "rotation",
+    keyframes: <Keyframe<ScalarChannelValue>>[],
+    labels: ["rads"],
+    label: "rotation",
   );
   late final scaleTrack = AnimationTrackImpl(
-    <Keyframe<Vector2ChannelValueType>>[],
-    ["x", "y"],
-    "scale",
+    keyframes: <Keyframe<Vector2ChannelValue>>[],
+    labels: ["x", "y"],
+    label: "scale",
   );
   late final colorTrack = AnimationTrackImpl(
-    <Keyframe<Vector4ChannelValueType>>[],
-    ["r", "g", "b", "a"],
-    "color",
+    keyframes: <Keyframe<Vector4ChannelValue>>[],
+    labels: ["r", "g", "b", "a"],
+    label: "color",
   );
 
-  late final AnimatableObjectImpl trackObject;
+  late final AnimatableObjectImpl animatableObject;
 
   //
   ValueNotifier<bool> isVisible = ValueNotifier<bool>(true);
+  final VoidCallback onUpdate;
 
   RandomObject({
+    required this.onUpdate,
     required this.name,
-    required this.position,
-    required this.rotation,
-    required this.scaleX,
-    required this.scaleY,
-    required this.color,
-  }) {
-    trackObject = AnimatableObjectImpl([
-      positionTrack,
-      rotationTrack,
-      scaleTrack,
-      colorTrack,
-    ], name);
+    required Offset position,
+    required double rotation,
+    required double scaleX,
+    required double scaleY,
+    required Color color,
+  }) : _position = position,
+       _rotation = rotation,
+       _scaleX = scaleX,
+       _scaleY = scaleY,
+       _color = color {
+    animatableObject = AnimatableObjectImpl(
+      tracks: [positionTrack, rotationTrack, scaleTrack, colorTrack],
+      name: name,
+    );
+
+    setPosition(position);
+    setRotation(rotation);
+    setScaleX(scaleX);
+    setScaleY(scaleY);
+    setColor(color);
+    positionTrack.value.addListener(_onPositionChanged);
+    rotationTrack.value.addListener(_onRotationChanged);
+    scaleTrack.value.addListener(_onScaleChanged);
+    colorTrack.value.addListener(_onColorChanged);
+  }
+  void _onPositionChanged() {
+    var values = positionTrack.value.value!.unwrap();
+    if (values[0] != position.dx || values[1] != position.dy) {
+      setPosition(
+        Offset(values[0].toDouble(), values[1].toDouble()),
+        notify: false,
+      );
+      onUpdate();
+    }
   }
 
-  void applyValue(AnimationTrack track, List<num> values) {
+  void _onRotationChanged() {}
+  void _onScaleChanged() {}
+  void _onColorChanged() {}
+
+  // Setter methods
+  void setPosition(Offset newPosition, {bool notify = true}) {
+    _position = newPosition;
+    if (notify) {
+      positionTrack.setValue(
+        Vector2ChannelValue(Vector2(position.dx, position.dy)),
+      );
+    }
+  }
+
+  void setRotation(double newRotation) {
+    _rotation = newRotation;
+
+    rotationTrack.setValue(ScalarChannelValue(rotation));
+  }
+
+  void setScaleX(double newScaleX) {
+    _scaleX = newScaleX;
+    scaleTrack.setValue(Vector2ChannelValue(Vector2(_scaleX, _scaleY)));
+  }
+
+  void setScaleY(double newScaleY) {
+    _scaleY = newScaleY;
+    scaleTrack.setValue(Vector2ChannelValue(Vector2(_scaleX, _scaleY)));
+  }
+
+  void setColor(Color newColor) {
+    _color = newColor;
+    colorTrack.setValue(
+      Vector4ChannelValue(Vector4(_color.r, _color.g, _color.b, _color.a)),
+    );
+  }
+
+  void setActualValue(AnimationTrack track, List<num> values) {
     if (track == positionTrack) {
-      position = Offset(values[0].toDouble(), values[1].toDouble());
+      _position = Offset(values[0].toDouble(), values[1].toDouble());
     } else if (track == scaleTrack) {
-      scaleX = values[0].toDouble();
-      scaleY = values[1].toDouble();
+      _scaleX = values[0].toDouble();
+      _scaleY = values[1].toDouble();
     } else if (track == rotationTrack) {
-      rotation = values[0].toDouble();
+      _rotation = values[0].toDouble();
     } else if (track == colorTrack) {
-      color = Color.fromARGB(
+      _color = Color.fromARGB(
         (values[3] * 255).round().clamp(0, 255), // alpha
         (values[0] * 255).round().clamp(0, 255), // red
         (values[1] * 255).round().clamp(0, 255), // green
@@ -73,7 +141,7 @@ class RandomObject {
   }
 }
 
-class ObjectHolder implements TrackController {
+class ObjectHolder  {
   final _rnd = Random();
 
   final _lookup = <AnimatableObject, RandomObject>{};
@@ -105,6 +173,7 @@ class ObjectHolder implements TrackController {
   void addNewObject() {
     final index = objects.length;
     final object = RandomObject(
+      onUpdate: onUpdate,
       name: "object$index",
       position: Offset(_rnd.nextDouble() * 100, _rnd.nextDouble() * 100),
       rotation: _rnd.nextDouble() * 2 * pi,
@@ -117,22 +186,23 @@ class ObjectHolder implements TrackController {
         _rnd.nextInt(256),
       ),
     );
-    
+
     objects.add(object);
-    animatableObjects.add(object.trackObject);
-    _lookup[object.trackObject] = object;
-    
+    animatableObjects.add(object.animatableObject);
+    _lookup[object.animatableObject] = object;
+
     // Notify timeline controller of new track object
     if (_timelineController != null) {
-      _timelineController!.addObject(object.trackObject);
+      _timelineController!.addObject(object.animatableObject);
     }
-    
+
     onUpdate.call();
   }
 
   ObjectHolder(int numObjects, this.onUpdate) {
     objects = List.generate(numObjects, (index) {
       final object = RandomObject(
+        onUpdate: onUpdate,
         name: "object${index}",
         position: Offset(_rnd.nextDouble() * 100, _rnd.nextDouble() * 100),
         rotation: _rnd.nextDouble() * 2 * pi, // 0 to 2*pi radians
@@ -145,55 +215,57 @@ class ObjectHolder implements TrackController {
           _rnd.nextInt(256),
         ),
       );
-      _lookup[object.trackObject] = object;
+      _lookup[object.animatableObject] = object;
       return object;
     });
 
-    animatableObjects = objects.map((object) => object.trackObject).toList();
+    animatableObjects = objects
+        .map((object) => object.animatableObject)
+        .toList();
   }
 
-  @override
-  U getCurrentValue<U extends ChannelValueType>(
-    AnimatableObject animatableObject,
-    AnimationTrack<U> track,
-  ) {
-    final object = _lookup[animatableObject]!;
-    if (track == object.colorTrack) {
-      return Vector4ChannelValueType(
-            Vector4(
-              object.color.r,
-              object.color.g,
-              object.color.b,
-              object.color.a,
-            ),
-          )
-          as U;
-    }
-    if (track == object.positionTrack) {
-      return Vector2ChannelValueType(
-            Vector2(object.position.dx, object.position.dy),
-          )
-          as U;
-    }
-    if (track == object.scaleTrack) {
-      return Vector2ChannelValueType(Vector2(object.scaleX, object.scaleY))
-          as U;
-    }
-    if (track == object.rotationTrack) {
-      return ScalarChannelValueType(object.rotation) as U;
-    }
+  // @override
+  // U getCurrentValue<U extends ChannelValue>(
+  //   AnimatableObject animatableObject,
+  //   AnimationTrack<U> track,
+  // ) {
+  //   final object = _lookup[animatableObject]!;
+  //   if (track == object.colorTrack) {
+  //     return Vector4ChannelValue(
+  //           Vector4(
+  //             object._color.r,
+  //             object._color.g,
+  //             object._color.b,
+  //             object._color.a,
+  //           ),
+  //         )
+  //         as U;
+  //   }
+  //   if (track == object.positionTrack) {
+  //     return Vector2ChannelValue(
+  //           Vector2(object._position.dx, object._position.dy),
+  //         )
+  //         as U;
+  //   }
+  //   if (track == object.scaleTrack) {
+  //     return Vector2ChannelValue(Vector2(object._scaleX, object._scaleY))
+  //         as U;
+  //   }
+  //   if (track == object.rotationTrack) {
+  //     return ScalarChannelValue(object._rotation) as U;
+  //   }
 
-    throw Exception("Failed to find track");
-  }
+  //   throw Exception("Failed to find track");
+  // }
 
-  @override
-  void applyValue<U extends ChannelValueType>(
-    AnimatableObject animatableObject,
-    AnimationTrack<U> track,
-    List<num> values,
-  ) {
-    var object = _lookup[animatableObject];
-    object!.applyValue(track, values);
-    onUpdate.call();
-  }
+  // @override
+  // void setActualValue<U extends ChannelValue>(
+  //   AnimatableObject animatableObject,
+  //   AnimationTrack<U> track,
+  //   List<num> values,
+  // ) {
+  //   var object = _lookup[animatableObject];
+  //   object!.setActualValue(track, values);
+  //   onUpdate.call();
+  // }
 }

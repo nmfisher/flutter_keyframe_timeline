@@ -3,22 +3,8 @@ import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class TimelineSerializer {
-  static zero<V extends ChannelValueType>() {
-    switch (V) {
-      case const (ScalarChannelValueType):
-        return ScalarChannelValueType(0.0);
-      case const (Vector4ChannelValueType):
-        return Vector4ChannelValueType(Vector4.zero());
-      case const (Vector3ChannelValueType):
-        return Vector3ChannelValueType(Vector3.zero());
-      case const (Vector2ChannelValueType):
-        return Vector2ChannelValueType(Vector2.zero());
-      case const (QuaternionChannelValueType):
-        return QuaternionChannelValueType(Quaternion.identity());
-    }
-  }
-
-  static Keyframe parseKeyframe(Map<String, dynamic> json) {
+  static Keyframe<V> parseKeyframe<V extends ChannelValue>(
+      Map<String, dynamic> json, ChannelValueFactory factory) {
     if (!json.containsKey('frame_number') ||
         !json.containsKey('value') ||
         !json.containsKey('value_type')) {
@@ -26,10 +12,8 @@ class TimelineSerializer {
     }
 
     final frameNumber = json['frame_number'] as int;
-    final List<num> values = json['value']
-        .map((v) => (v as num))
-        .cast<num>()
-        .toList();
+    final List<num> values =
+        json['value'].map((v) => (v as num)).cast<num>().toList();
     final interpolation = json['interpolation'] != null
         ? Interpolation.values.firstWhere(
             (e) => e.toString() == json['interpolation'],
@@ -37,19 +21,7 @@ class TimelineSerializer {
           )
         : Interpolation.constant;
 
-    late ChannelValueType value;
-    switch (json['value_type']) {
-      case 'VEC4':
-        value = Vector4ChannelValueType.fromUnwrapped(values);
-      case 'VEC3':
-        value = Vector3ChannelValueType.fromUnwrapped(values);
-      case 'VEC2':
-        value = Vector2ChannelValueType.fromUnwrapped(values);
-      case 'SCALAR':
-        value = ScalarChannelValueType(values[0] as double);
-      case 'QUAT':
-        value = QuaternionChannelValueType.fromUnwrapped(values);
-    }
+    late V value = factory.create(values) as V;
 
     return KeyframeImpl(
       frameNumber: frameNumber,
@@ -58,55 +30,89 @@ class TimelineSerializer {
     );
   }
 
-  V defaultZero<V extends ChannelValueType>() {
-    switch (V) {
-      case const (ScalarChannelValueType):
-        return ScalarChannelValueType(0.0) as V;
-      case const (Vector4ChannelValueType):
-        return Vector4ChannelValueType(Vector4.zero()) as V;
-      case const (Vector3ChannelValueType):
-        return Vector3ChannelValueType(Vector3.zero()) as V;
-      case const (Vector2ChannelValueType):
-        return Vector2ChannelValueType(Vector2.zero()) as V;
-      case const (QuaternionChannelValueType):
-        return QuaternionChannelValueType(Quaternion.identity()) as V;
+  static AnimationTrack<V> parseTrack<V extends ChannelValue>(Map<String, dynamic> track, ChannelValueFactory factory) {
+
+    var rawKeyframes = track["keyframes"] as List;
+
+    final keyframes = <Keyframe<V>>[];
+
+    for (final raw in rawKeyframes) {
+      final kf = parseKeyframe<V>(raw, factory);
+      keyframes.add(kf);
     }
-    throw Exception("Unrecognized type $V");
+
+    return AnimationTrackImpl(
+      keyframes: keyframes,
+      labels: track["labels"].cast<String>(),
+      label: track["label"],
+    );
   }
 
-  static AnimatableObject fromMap(
-    Map<String, dynamic> object,
-  ) {
-    
+  static AnimatableObject fromMap(Map<String, dynamic> object,
+      {ChannelValueFactory factory = const DefaultChannelValueFactory()}) {
     var name = object["name"] as String;
-    
-    var tracks = object["tracks"].map((track) {
-      var rawKeyframes = track["keyframes"] as List;
-      var keyframes = rawKeyframes.cast<Map<String,dynamic>>()
-          .map(parseKeyframe)
-          .cast<Keyframe>()
-          .toList();
 
-      return AnimationTrackImpl(
-        keyframes,
-        track["labels"].cast<String>(),
-        track["label"],
-      );
-    }).cast<AnimationTrack>().toList();
-    return AnimatableObjectImpl(tracks, name);
+    var tracks = object["tracks"]
+        .map((track) {
+          
+
+          return switch (track['value_type']) {
+            'VEC4' => parseTrack<Vector4ChannelValue>(track, factory),
+            'VEC3' => parseTrack<Vector3ChannelValue>(track, factory),
+            'VEC2' => parseTrack<Vector2ChannelValue>(track, factory),
+            'QUAT' => parseTrack<QuaternionChannelValue>(track, factory),
+            'SCALAR' => parseTrack<ScalarChannelValue>(track, factory),
+            _ =>
+              throw Exception("Unrecognized value type ${track['value_type']}")
+          };
+        })
+        .cast<AnimationTrack>()
+        .toList();
+    return AnimatableObjectImpl(tracks: tracks, name: name);
+  }
+
+  static Type getType<T>() {
+    return T;
+  }
+
+  static String getTypeLabel(AnimationTrack track) {
+    final trackType = track.getType();
+
+    if (trackType == getType<Vector2ChannelValue>()) {
+      return "VEC2";
+    }
+
+    if (trackType == getType<Vector3ChannelValue>()) {
+      return "VEC3";
+    }
+
+    if (trackType == getType<Vector4ChannelValue>()) {
+      return "VEC4";
+    }
+
+    if (trackType == getType<QuaternionChannelValue>()) {
+      return "QUAT";
+    }
+
+    if (trackType == getType<ScalarChannelValue>()) {
+      return "SCALAR";
+    }
+
+    throw Exception();
   }
 
   static Map<String, dynamic> toMap(AnimatableObject object) {
     return {
+      'name': object.displayName.value,
       'tracks': object.tracks.map((track) {
         return {
           'label': track.label,
           'labels': track.labels,
+          'value_type': getTypeLabel(track),
           'keyframes': track.keyframes.value.map((keyframe) {
             return {
               'frame_number': keyframe.frameNumber.value,
               'value': keyframe.value.value.unwrap(),
-              'value_type': keyframe.value.value.label,
               'interpolation': keyframe.interpolation.value.toString(),
             };
           }).toList(),

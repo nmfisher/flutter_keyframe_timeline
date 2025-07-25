@@ -6,7 +6,9 @@ A Flutter package for creating keyframe-based timelines for 2D/3D animations, vi
 
 ### Core Concepts
 
-An object (e.g. a video, or a polygon on a 2D canvas) may have various properties that can be animated over time (position, rotation, scale, etc). Each property can be assigned to an `AnimationTrack`  containing zero or more `Keyframes`. Each `Keyframe` represents the value for that track at a specified frame, and an interpolation method. An `AnimatableObject` is a collection of `AnimationTrack` that belong to an object. A channel refers to a single animatable values in  a track (e.g. a "translation" track has channels "x" and "y"). The generic parameter `ChannelValueType` indicates the type of this value. 
+`AnimatableObject` represents any object that can be animated over time (e.g. a video clip, a 2D shape, 3D asset etc).  An `AnimatableObject` exposes at least one `AnimationTrack`, representing the actual property of the object that should be animated (its position, opacity, color, etc).  `ChannelValueType` represents the *type* of the value of the AnimationTrack that is being animated (a scalar double, Vector3, etc etc).  
+
+An `AnimationTrack` will contain zero or more `Keyframes`. Each `Keyframe` represents the value for that track at a specified frame, and an interpolation method. 
 
 Currently supported channel value types:
 - `ScalarChannelValueType`: Single numeric values
@@ -15,35 +17,110 @@ Currently supported channel value types:
 - `Vector4ChannelValueType`: 4D vectors (r, g, b, a)
 - `QuaternionChannelValueType`: quaternion (x, y, z, w)
 
-This package uses `ValueNotifier` to implement two-way data binding to synchronize the timeline UI and the actual underlying objects. For example, if you are animating objects on a 2D canvas, manipulating the timeline will update the position of the objects, and updating the position of the objects (e.g. by clicking and dragging on the canvas) will update the timeline.
+`TimelineWidget` is the UI component that renders the interactive timeline. It displays track groups, keyframes, and provides controls for scrubbing through frames, zooming the timeline, and selecting/moving/deleting keyframes. The `TimelineWidget` constructor exposes arguments for various styles for the timeline components (frame dragger, timeline background ticks, object list and icons, etc).
 
-### Getting Started
+When constructing a `TimelineWidget`, you must provide a `TimelineController`. This manages the state of the timeline and exposes various methods/listenables that you can use to synchronize the UI with your data. You can also use this to programatically control the current frame/list of active objects/etc, but this generally won't be necessary. 
 
-See the example app in `example`.
+To construct a `TimelineController`, you will need to pass a list of `AnimatableObject`. The easiest way to do so is to construct instances of `AnimatableObjectImpl` and `AnimationTrackImpl` from the model you use for your app.
 
-Add the package to your `pubspec.yaml`:
+e.g.
 
-```yaml
-dependencies:
-  flutter_keyframe_timeline: ^0.0.1
+```
+class MyModel {
+  ValueListenable<double> get x;
+  ValueListenable<double> get y;
+  ValueListenable<double> get z;
+  final String modelId;
+
+  void setX(double x) {
+    //
+  }
+
+  void setY(double y) {
+    // 
+  }
+
+  void setZ(double z) {
+    //
+  }
+}
+
+TimelineController createTimelineController(List<MyModel> models) {
+
+  final objects = <AnimatableObject>[];
+  for(final model in models) {
+    final positionTrack = AnimationTrackImpl<Vector3ChannelValueType>(
+        keyframes:[],
+        labels:["x", "y", "z"],
+        label:"position"
+    );
+
+    positionTrack.setValue()
+   
+    final object = AnimatableObjectImpl(
+      tracks:[
+        positionTrack
+      ],
+      name: model.name
+    );
+    objects.add(object);
+  }
+  return TimelineController.create(objects);
+ }
 ```
 
-There are three main interfaces you should be familiar with:
+With this approach, the values manipulated in the timeline and the values in your original model are kept separate; you would need to add listeners to update one when the other updates, and vice versa. This package uses `ValueNotifier`/`ValueListenable` are used to implement two-way data binding to synchronize the timeline UI and the actual underlying objects. 
 
-1) `TimelineWidget`
+```
 
-The main UI component that renders the interactive timeline. It displays track groups, keyframes, and provides controls for scrubbing through frames, zooming, and editing keyframes. Takes a `TimelineController` and optional `TimelineStyle` for customization.
 
-2) `TimelineController`
+TimelineController createTimelineController(List<MyModel> models) {
 
-The central controller that manages timeline state and coordinates between the UI and your data. While mostly internal, you'll need to listen to `controller.active` to sync selection between timeline and your objects (or call methods like `setActive()` when your objects are selected externally).
+  final objects = <AnimatableObject>[];
+  for(final model in models) {
+    final positionTrack = AnimationTrackImpl<Vector3ChannelValueType>(
+        keyframes:[],
+        labels:["x", "y", "z"],
+        label:"position"
+    );
+    positionTrack.value.addListener(() {
+      var unwrapped = positionTrack.value.value.unwrap();
+      model.setX(unwrapped[0]);
+      model.setY(unwrapped[1]);
+      model.setZ(unwrapped[2]);
+    });
 
-3) `TrackController`
+    // make sure you dispose of this listener properly when it's no longer needed
+    Listenable.merge([model.x, model.y, model.z]).addListener(() {
+      positionTrack.setValue(
+        Vector3ChannelValueType(
+          Vector3(model.x.value,model.y.value,model.z.value)
+        )
+      );
+    });
+    
+    final object =  AnimatableObjectImpl(
+      tracks:[
+        positionTrack
+      ],
+      name: model.name
+    );
+    objects.add(object);
+  }
+  return TimelineController.create(objects);
+ }
+```
 
-An interface you must implement to bridge between the timeline and your data objects. It has two key methods:
+We suggest adding a listener to the `active` property to manually toggle  selection between timeline and your objects (or call methods like `setActive()` when your objects are selected externally).
 
-- `getCurrentValue()`: Returns the current value of a track (e.g., object's position). Called when the timeline needs to read your object's current state.
-- `applyValue()`: Updates your object when timeline values change (e.g., dragging keyframes). Called when the timeline modifies your object's properties.
+
+
+
+
+
+
+
+
 
 ### Keyboard Shortcuts
 
@@ -51,7 +128,6 @@ The timeline supports keyboard shortcuts:
 - `Delete`: Delete selected keyframes
 - `Left arrow`: Previous frame
 - `Right arrow`: Next frame
-
 
 ## Contributing
 
