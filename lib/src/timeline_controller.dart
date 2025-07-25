@@ -64,6 +64,9 @@ abstract class TimelineController {
   void setActive(AnimatableObject object, bool active, {bool append = false});
 
   //
+  void updateActive(Set<AnimatableObject> objects);
+
+  //
   ValueListenable<Set<AnimatableObject>> get expanded;
 
   //
@@ -195,6 +198,13 @@ class TimelineControllerImpl extends TimelineController {
       }
       this.active.value.add(object);
     }
+    this.active.notifyListeners();
+  }
+
+  @override
+  void updateActive(Set<AnimatableObject> objects) {
+    this.active.value.clear();
+    this.active.value.addAll(objects);
     this.active.notifyListeners();
   }
 
