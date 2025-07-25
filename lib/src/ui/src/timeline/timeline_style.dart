@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
+import 'package:mix/mix.dart';
 
 typedef TextBuilder = Widget Function(BuildContext context, String text);
 
@@ -138,6 +139,8 @@ class TimelineBackgroundStyle {
   }
 }
 
+
+
 class ChannelValueEditorStyle {
   final Color textFieldFontColor;
   final double textFieldFontSize;
@@ -147,9 +150,14 @@ class ChannelValueEditorStyle {
   final Color? focusedBorderColor;
   final Color? enabledBorderColor;
   final Color? errorBorderColor;
-  final Color labelTextColor;
-  final double labelFontSize;
+  final Widget Function(String label) labelBuilder;
   final InputDecoration? inputDecoration;
+
+  static Widget buildLabel(String label) => StyledText(
+      label,
+      style: Style($text.color.black(),
+          $text.fontSize(10.0),
+    ));
 
   const ChannelValueEditorStyle({
     this.textFieldFontColor = Colors.black,
@@ -160,8 +168,7 @@ class ChannelValueEditorStyle {
     this.focusedBorderColor,
     this.enabledBorderColor,
     this.errorBorderColor,
-    this.labelTextColor = Colors.black,
-    this.labelFontSize = 11.0,
+    this.labelBuilder = buildLabel,
     this.inputDecoration,
   });
 
@@ -186,7 +193,6 @@ class ChannelValueEditorStyle {
       focusedBorderColor: focusedBorderColor ?? this.focusedBorderColor,
       enabledBorderColor: enabledBorderColor ?? this.enabledBorderColor,
       errorBorderColor: errorBorderColor ?? this.errorBorderColor,
-      labelTextColor: labelTextColor ?? this.labelTextColor,
       inputDecoration: inputDecoration ?? this.inputDecoration,
     );
   }

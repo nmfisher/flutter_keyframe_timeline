@@ -212,10 +212,7 @@ class _AnimationTrackValueEditorWidgetState
     return VBox(
       style: Style($flex.crossAxisAlignment.start()),
       children: [
-        StyledText(widget.track.label, style: Style(
-          $text.color(widget.channelValueEditorStyle.labelTextColor),
-          $text.fontSize(widget.channelValueEditorStyle.labelFontSize)),
-          ),
+        widget.channelValueEditorStyle.labelBuilder(widget.track.label),
         ValueListenableBuilder(
           valueListenable: widget.controller.currentFrame,
           builder: (_, int currentFrame, __) {

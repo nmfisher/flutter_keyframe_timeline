@@ -6,6 +6,7 @@ import 'package:flutter_keyframe_timeline_example/object_display_widget.dart';
 import 'package:flutter_keyframe_timeline_example/track_visibility_widget.dart';
 import 'package:flutter_keyframe_timeline_example/timeline_skip_control.dart';
 import 'package:logging/logging.dart';
+import 'package:mix/mix.dart';
 
 void main() {
   Logger.root.level = Level.ALL; // defaults to Level.INFO
@@ -94,135 +95,147 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                           );
                         },
-                    
-                      keyframeIconBuilder:
-                          (context, isSelected, isHovered, frameNumber) {
-                            return Transform.translate(
-                              offset: const Offset(
-                                -11,
-                                0.0,
-                              ), // Center the 16px icon
+
+                    keyframeIconBuilder:
+                        (context, isSelected, isHovered, frameNumber) {
+                          return Transform.translate(
+                            offset: const Offset(
+                              -11,
+                              0.0,
+                            ), // Center the 16px icon
+                            child: Container(
+                              padding: EdgeInsets.all(4),
                               child: Container(
-                                padding: EdgeInsets.all(4),
-                                child: Container(
-                                  width: 15,
-                                  height: 15,
-                                  decoration: BoxDecoration(
-                                    boxShadow: isSelected || isHovered
-                                        ? [
-                                            BoxShadow(
-                                              color: Colors.blue.withValues(
-                                                alpha: 0.6,
-                                              ),
-                                              spreadRadius: isSelected ? 3 : 2,
-                                              blurRadius: isSelected ? 6 : 4,
+                                width: 15,
+                                height: 15,
+                                decoration: BoxDecoration(
+                                  boxShadow: isSelected || isHovered
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.blue.withValues(
+                                              alpha: 0.6,
                                             ),
-                                          ]
-                                        : null,
-                                  ),
-                                  child: Transform.rotate(
-                                    angle:
-                                        0.785398, // 45 degrees in radians (pi/4)
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        border: Border.all(
-                                          color: Colors.black,
-                                          width: 1,
-                                        ),
+                                            spreadRadius: isSelected ? 3 : 2,
+                                            blurRadius: isSelected ? 6 : 4,
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                                child: Transform.rotate(
+                                  angle:
+                                      0.785398, // 45 degrees in radians (pi/4)
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      border: Border.all(
+                                        color: Colors.black,
+                                        width: 1,
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            );
-                          },
-                      // keyframeToggleIconBuilder: (context, hasKeyframeAtCurrentFrame, onPressed) {
-                      //   return IconButton(
-                      //     onPressed: onPressed,
-                      //     icon: Container(
-                      //       width: 18,
-                      //       height: 18,
-                      //       decoration: BoxDecoration(
-                      //         shape: BoxShape.circle,
-                      //         color: hasKeyframeAtCurrentFrame ? Colors.green : Colors.red.withValues(alpha: 0.3),
-                      //         border: Border.all(
-                      //           color: hasKeyframeAtCurrentFrame ? Colors.green.shade800 : Colors.red,
-                      //           width: 2,
-                      //         ),
-                      //       ),
-                      //       child: Icon(
-                      //         hasKeyframeAtCurrentFrame ? Icons.check : Icons.add,
-                      //         color: hasKeyframeAtCurrentFrame ? Colors.white : Colors.red,
-                      //         size: 12,
-                      //       ),
-                      //     ),
-                      //     padding: EdgeInsets.zero,
-                      //     constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
-                      //   );
-                      // },
-                      frameDragHandleStyle: FrameDragHandleStyle(
-                        backgroundColor: Color(0xFF333333),
-                        width: 50.0,
-                        height: 30.0,
-                        textBuilder: (context, text) => Text(
-                          text,
-                          style: TextStyle(
-                            color: Color(0xFFEEEEEE),
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
+                            ),
+                          );
+                        },
+                    // keyframeToggleIconBuilder: (context, hasKeyframeAtCurrentFrame, onPressed) {
+                    //   return IconButton(
+                    //     onPressed: onPressed,
+                    //     icon: Container(
+                    //       width: 18,
+                    //       height: 18,
+                    //       decoration: BoxDecoration(
+                    //         shape: BoxShape.circle,
+                    //         color: hasKeyframeAtCurrentFrame ? Colors.green : Colors.red.withValues(alpha: 0.3),
+                    //         border: Border.all(
+                    //           color: hasKeyframeAtCurrentFrame ? Colors.green.shade800 : Colors.red,
+                    //           width: 2,
+                    //         ),
+                    //       ),
+                    //       child: Icon(
+                    //         hasKeyframeAtCurrentFrame ? Icons.check : Icons.add,
+                    //         color: hasKeyframeAtCurrentFrame ? Colors.white : Colors.red,
+                    //         size: 12,
+                    //       ),
+                    //     ),
+                    //     padding: EdgeInsets.zero,
+                    //     constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                    //   );
+                    // },
+                    frameDragHandleStyle: FrameDragHandleStyle(
+                      backgroundColor: Color(0xFF333333),
+                      width: 50.0,
+                      height: 30.0,
+                      textBuilder: (context, text) => Text(
+                        text,
+                        style: TextStyle(
+                          color: Color(0xFFEEEEEE),
+                          fontSize: 14,
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                      backgroundStyle: TimelineBackgroundStyle(
-                        majorTickColor: Colors.grey.shade500,
-                        minorTickColor: Colors.grey.shade300,
-                        textColor: Colors.grey.shade700,
-                        majorTickInterval: 10,
-                        minorTickInterval: 1
-                      ),
-                      trackObjectNameStyle: TrackObjectNameStyle(
-                        iconData: Icons.folder,
-                        textColor: Colors.blue.shade800,
-                        iconColor: Colors.blue.shade600,
-                        borderColor: Colors.blue.shade200,
-                      ),
-                      channelValueEditorStyle: ChannelValueEditorStyle(
-                        textFieldFontColor: Colors.green.shade700,
-                        textFieldFontSize: 12.0,
-                        labelFontSize: 10.0,
-                        width: 65.0,
-                        backgroundColor: Colors.green.shade50,
-                        borderColor: Colors.green.shade400,
-                        enabledBorderColor: Colors.green.shade300,
-                        focusedBorderColor: Colors.green.shade600,
-                        errorBorderColor: Colors.red.shade400,
-                      ),
-                      channelValueEditorContainerBuilder: (context, textField, controller, dimensionLabel, dimensionIndex) {
-                        return Container(
-                          width: 60,
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blue.shade300),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                dimensionLabel,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.blue.shade600,
-                                ),
-                              ),
-                              textField,
-                            ],
-                          ),
+                    ),
+                    backgroundStyle: TimelineBackgroundStyle(
+                      majorTickColor: Colors.grey.shade500,
+                      minorTickColor: Colors.grey.shade300,
+                      textColor: Colors.grey.shade700,
+                      majorTickInterval: 10,
+                      minorTickInterval: 1,
+                    ),
+                    trackObjectNameStyle: TrackObjectNameStyle(
+                      iconData: Icons.folder,
+                      textColor: Colors.blue.shade800,
+                      iconColor: Colors.blue.shade600,
+                      borderColor: Colors.blue.shade200,
+                    ),
+                    channelValueEditorStyle: ChannelValueEditorStyle(
+                      textFieldFontColor: Colors.green.shade700,
+                      textFieldFontSize: 12.0,
+                      labelBuilder: (label) {
+                        return StyledText(
+                          label,
+                          style: Style($text.fontSize(10.0)),
                         );
                       },
+                      width: 65.0,
+                      backgroundColor: Colors.green.shade50,
+                      borderColor: Colors.green.shade400,
+                      enabledBorderColor: Colors.green.shade300,
+                      focusedBorderColor: Colors.green.shade600,
+                      errorBorderColor: Colors.red.shade400,
                     ),
+                    channelValueEditorContainerBuilder:
+                        (
+                          context,
+                          textField,
+                          controller,
+                          dimensionLabel,
+                          dimensionIndex,
+                        ) {
+                          return Container(
+                            width: 60,
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.blue.shade300),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  dimensionLabel,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.blue.shade600,
+                                  ),
+                                ),
+                                textField,
+                              ],
+                            ),
+                          );
+                        },
                   ),
+                ),
 
                 Positioned(
                   top: 8,
