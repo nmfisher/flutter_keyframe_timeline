@@ -66,6 +66,8 @@ abstract class AnimationTrack<V extends ChannelValueType> {
 
   //
   Future dispose();
+
+  AnimationTrack<U> cast<U extends ChannelValueType>();
 }
 
 class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
@@ -95,6 +97,10 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
     }
   }
 
+  AnimationTrack<U> cast<U extends ChannelValueType>() {
+    return AnimationTrackImpl<U>(keyframes.value.cast<Keyframe<U>>(), labels, label);
+  }
+
   void _onKeyframeFrameUpdated() {
     this.keyframes.notifyListeners();
   }
@@ -102,7 +108,6 @@ class AnimationTrackImpl<V extends ChannelValueType> extends AnimationTrack<V> {
   @override
   Future<Keyframe<V>> addOrUpdateKeyframe(int frameNumber, V value) async {
     final keyframe = KeyframeImpl<V>(frameNumber: frameNumber, value: value);
-    
 
     await addKeyframe(keyframe);
     return keyframe;
