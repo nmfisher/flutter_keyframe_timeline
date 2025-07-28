@@ -153,12 +153,12 @@ class TimelineControllerImpl implements TimelineController {
   @override
   void skipToEnd() {
     int last = 0;
-    for(final kf in selected.value) {
-      if(kf.frameNumber.value > last) {
-        last = kf.frameNumber.value
+    for (final kf in selected.value) {
+      if (kf.frameNumber.value > last) {
+        last = kf.frameNumber.value;
       }
     }
-    if(last == 0) {
+    if (last == 0) {
       setCurrentFrame(maxFrames.value);
     } else {
       setCurrentFrame(last);
@@ -168,9 +168,9 @@ class TimelineControllerImpl implements TimelineController {
   @override
   void skipToStart() {
     int first = maxFrames.value;
-    for(final kf in selected.value) {
-      if(kf.frameNumber.value < first) {
-        first = kf.frameNumber.value
+    for (final kf in selected.value) {
+      if (kf.frameNumber.value < first) {
+        first = kf.frameNumber.value;
       }
     }
     setCurrentFrame(first);
