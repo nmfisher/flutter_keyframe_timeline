@@ -1,13 +1,10 @@
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 
-import 'package:vector_math/vector_math_64.dart';
-
 class TimelineSerializer {
   static Keyframe<V> parseKeyframe<V extends ChannelValue>(
       Map<String, dynamic> json, ChannelValueFactory factory) {
     if (!json.containsKey('frame_number') ||
-        !json.containsKey('value') ||
-        !json.containsKey('value_type')) {
+        !json.containsKey('value')) {
       throw Exception('Missing required fields in JSON');
     }
 
@@ -21,9 +18,9 @@ class TimelineSerializer {
           )
         : Interpolation.constant;
 
-    late V value = factory.create(values) as V;
+    late V value = factory.create<V>(values) as V;
 
-    return KeyframeImpl(
+    return KeyframeImpl<V>(
       frameNumber: frameNumber,
       value: value,
       interpolation: interpolation,
