@@ -20,38 +20,43 @@ import 'package:mix/mix.dart';
 class TimelineWidget extends StatefulWidget {
   final TimelineController controller;
   final FrameDragHandleStyle frameDragHandleStyle;
-  final KeyframeIconBuilder? keyframeIconBuilder;
-  final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
+
+  /// Styling for the keyframe widget/icon that appears in the timeline.
+  final KeyframeIconBuilder keyframeIconBuilder;
+
+  /// Styling for the add/remove keyframe icon that appears in the object list.
+  final KeyframeToggleIconBuilder keyframeToggleIconBuilder;
+
   final TrackObjectExtraWidgetBuilder? trackObjectExtraWidgetBuilder;
   final TrackObjectNameStyle? trackObjectNameStyle;
   final TimelineBackgroundStyle backgroundStyle;
-  
-  /// Styling for the text fields used to edit the numeric values for 
+
+  /// Styling for the text fields used to edit the numeric values for
   /// each channel in an AnimationTrack.
-  /// 
+  ///
   /// This controls the visual appearance of the TextField widgets used for editing
   /// animation channel values (like position X, Y, Z coordinates). You can customize:
   /// - Text color and font size
-  /// - Background and border colors  
+  /// - Background and border colors
   /// - Complete InputDecoration for full control over appearance
-  /// 
+  ///
   /// This only affects the TextField styling, not the layout or wrapper behavior.
   final ChannelValueEditorStyle? channelValueEditorStyle;
-  
+
   /// Builder for wrapping channel value editor text fields.
-  /// 
+  ///
   /// This allows you to customize the layout and wrapper behavior around each
   /// TextField used for editing channel values. The builder receives:
   /// - The styled TextField widget (already configured with channelValueEditorStyle)
   /// - The TextEditingController for manipulating the text value externally
   /// - The dimension label (e.g., "X", "Y", "Z")
   /// - The dimension index (0, 1, 2, etc.)
-  /// 
+  ///
   /// Use this to add labels, containers, spacing, or other UI elements around
   /// the text fields. The controller allows external manipulation of the text
-  /// value (e.g., via mouse drag interactions). If null, text fields are 
+  /// value (e.g., via mouse drag interactions). If null, text fields are
   /// wrapped in a simple SizedBox.
-  /// 
+  ///
   /// Note: This only controls the wrapper/layout - the TextField styling is
   /// handled separately by channelValueEditorStyle.
   final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
@@ -60,8 +65,8 @@ class TimelineWidget extends StatefulWidget {
     super.key,
     required this.controller,
     this.frameDragHandleStyle = const FrameDragHandleStyle(),
-    this.keyframeIconBuilder,
-    this.keyframeToggleIconBuilder,
+    this.keyframeIconBuilder = kDefaultKeyframeIconBuilder,
+    this.keyframeToggleIconBuilder = kDefaultKeyframeToggleIconBuilder,
     this.trackObjectExtraWidgetBuilder,
     this.trackObjectNameStyle,
     this.backgroundStyle = const TimelineBackgroundStyle(),
@@ -71,48 +76,15 @@ class TimelineWidget extends StatefulWidget {
 
   @override
   State<TimelineWidget> createState() => _TimelineWidgetState(controller);
+
+
 }
 
 class _TimelineWidgetState<V extends AnimatableObject>
     extends State<TimelineWidget> {
   final TimelineController controller;
 
-  static Widget _defaultIconBuilder(
-    BuildContext context,
-    bool isSelected,
-    bool isHovered,
-    int frameNumber,
-  ) {
-    return Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.amber.withOpacity(0.2) : Colors.black,
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            shape: BoxShape.circle,
-            border: Border.all(width: isHovered || isSelected ? 2 : 1),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: Colors.amber.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 2,
-                    ),
-                  ]
-                : null,
-          ),
-        ),
-      ),
-    );
-  }
-
+  
   @override
   void initState() {
     super.initState();
@@ -212,9 +184,9 @@ class _TimelineWidgetState<V extends AnimatableObject>
                               child: MouseRegion(
                                 hitTestBehavior: HitTestBehavior.translucent,
                                 opaque: false,
-                                child: Listener(
+                                child: GestureDetector(
                                   behavior: HitTestBehavior.translucent,
-                                  onPointerDown: (_) {
+                                  onTap: () {
                                     _focusNode.requestFocus();
                                     widget.controller.clearSelectedKeyframes();
                                   },
@@ -223,16 +195,17 @@ class _TimelineWidgetState<V extends AnimatableObject>
                                     controller: controller,
                                     horizontalScrollController:
                                         _horizontalScrollController,
-                                    keyframeIconBuilder:
-                                        widget.keyframeIconBuilder ??
-                                        widget.keyframeIconBuilder ??
-                                        _defaultIconBuilder,
+                                    keyframeIconBuilder:widget.keyframeIconBuilder ,
                                     keyframeToggleIconBuilder:
                                         widget.keyframeToggleIconBuilder,
-                                    trackObjectExtraWidgetBuilder: widget.trackObjectExtraWidgetBuilder,
-                                    trackObjectNameStyle: widget.trackObjectNameStyle,
-                                    channelValueEditorStyle: widget.channelValueEditorStyle,
-                                    channelValueEditorContainerBuilder: widget.channelValueEditorContainerBuilder,
+                                    trackObjectExtraWidgetBuilder:
+                                        widget.trackObjectExtraWidgetBuilder,
+                                    trackObjectNameStyle:
+                                        widget.trackObjectNameStyle,
+                                    channelValueEditorStyle:
+                                        widget.channelValueEditorStyle,
+                                    channelValueEditorContainerBuilder: widget
+                                        .channelValueEditorContainerBuilder,
                                   ),
                                 ),
                               ),
@@ -248,10 +221,9 @@ class _TimelineWidgetState<V extends AnimatableObject>
                   bottom: 0,
                   left: trackNameWidth,
                   child: FrameDragHandle(
-                    scrollController: _horizontalScrollController,
-                    controller: controller,
-                    style: widget.frameDragHandleStyle
-                  ),
+                      scrollController: _horizontalScrollController,
+                      controller: controller,
+                      style: widget.frameDragHandleStyle),
                 ),
               ],
             ),

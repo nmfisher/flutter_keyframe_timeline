@@ -214,7 +214,9 @@ class AnimationTrackImpl<V extends ChannelValue> extends AnimationTrack<V> {
 
   @override
   void setValue(V value) {
-    this.value.value = value;
+    if (this.value.value != value) {
+      this.value.value = value;
+    }
   }
 }
 

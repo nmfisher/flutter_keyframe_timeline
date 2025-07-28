@@ -18,7 +18,7 @@ class TrackObjectWidget extends StatelessWidget {
   final int index;
   final double trackNameWidth;
   final KeyframeIconBuilder keyframeIconBuilder;
-  final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
+  final KeyframeToggleIconBuilder keyframeToggleIconBuilder;
   final TrackObjectExtraWidgetBuilder? additionalWidgetBuilder;
   final TrackObjectNameStyle? trackObjectNameStyle;
   final ChannelValueEditorStyle? channelValueEditorStyle;
@@ -33,7 +33,7 @@ class TrackObjectWidget extends StatelessWidget {
     required this.trackNameWidth,
     required this.keyframeIconBuilder,
     this.additionalWidgetBuilder,
-    this.keyframeToggleIconBuilder,
+    required this.keyframeToggleIconBuilder,
     this.trackObjectNameStyle,
     this.channelValueEditorStyle,
     this.channelValueEditorContainerBuilder,

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:mix/mix.dart';
@@ -8,7 +7,7 @@ class AnimationTrackValueEditorWidget extends StatefulWidget {
   final AnimatableObject object;
   final AnimationTrack track;
   final TimelineController controller;
-  final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
+  final KeyframeToggleIconBuilder keyframeToggleIconBuilder;
   final ChannelValueEditorStyle channelValueEditorStyle;
   final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
 
@@ -17,7 +16,7 @@ class AnimationTrackValueEditorWidget extends StatefulWidget {
     required this.object,
     required this.track,
     required this.controller,
-    this.keyframeToggleIconBuilder,
+    required this.keyframeToggleIconBuilder,
     this.channelValueEditorStyle = const ChannelValueEditorStyle(),
     this.channelValueEditorContainerBuilder,
   });
@@ -139,36 +138,6 @@ class _AnimationTrackValueEditorWidgetState
     );
   }
 
-  static Widget _defaultToggleIconBuilder(
-    BuildContext context,
-    bool hasKeyframeAtCurrentFrame,
-    VoidCallback onPressed,
-  ) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: Transform.rotate(
-        angle: 0.785398, // 45 degrees in radians (pi/4) for diamond shape
-        child: Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: hasKeyframeAtCurrentFrame
-                ? Colors.blue
-                : Colors.grey.withValues(alpha: 0.2),
-            border: Border.all(
-              color: hasKeyframeAtCurrentFrame
-                  ? Colors.black
-                  : Colors.grey.withValues(alpha: 0.5),
-              width: 1,
-            ),
-          ),
-        ),
-      ),
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final labels = widget.track.labels;
@@ -184,15 +153,7 @@ class _AnimationTrackValueEditorWidgetState
           }
         }
 
-        if (widget.keyframeToggleIconBuilder != null) {
-          return widget.keyframeToggleIconBuilder!(
-            context,
-            hasKeyframeAtCurrentFrame,
-            onPressed,
-          );
-        }
-
-        return _defaultToggleIconBuilder(
+        return widget.keyframeToggleIconBuilder(
           context,
           hasKeyframeAtCurrentFrame,
           onPressed,

@@ -66,43 +66,42 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onPanStart: (details) {
-          dragStart = details.localPosition;
-          initialFrame = widget.frameNumber;
+      behavior: HitTestBehavior.opaque,
+      onPanStart: (details) {
+        dragStart = details.localPosition;
+        initialFrame = widget.frameNumber;
+      },
+      onTap: () {
+        widget.onTap?.call();
+      },
+      onSecondaryTapDown: (details) {
+        if (widget.isSelected) {
+          _showContextMenu(context, details.globalPosition);
+        }
+      },
+      onPanUpdate: (details) {
+        if (dragStart != null) {
+          final dragDelta = details.localPosition.dx - dragStart!.dx;
+          final frameDelta = (dragDelta / widget.pixelsPerFrame).round();
+          final newFrame = initialFrame + frameDelta;
+          final clampedFrame = newFrame.clamp(0, double.infinity).toInt();
+          widget.onFrameNumberChanged?.call(clampedFrame);
+        }
+      },
+      onPanEnd: (_) {
+        dragStart = null;
+      },
+      child: MouseHoverWidget(
+        builder: (isHovered) {
+          return AbsorbPointer(
+              child: widget.keyframeIconBuilder(
+            context,
+            widget.isSelected,
+            isHovered,
+            widget.frameNumber,
+          ));
         },
-        onTap: () {
-
-          widget.onTap?.call();
-        },
-        onSecondaryTapDown: (details) {
-          if (widget.isSelected) {
-            _showContextMenu(context, details.globalPosition);
-          }
-        },
-        onPanUpdate: (details) {
-          if (dragStart != null) {
-            final dragDelta = details.localPosition.dx - dragStart!.dx;
-            final frameDelta = (dragDelta / widget.pixelsPerFrame).round();
-            final newFrame = initialFrame + frameDelta;
-            final clampedFrame = newFrame.clamp(0, double.infinity).toInt();
-            widget.onFrameNumberChanged?.call(clampedFrame);
-          }
-        },
-        onPanEnd: (_) {
-          dragStart = null;
-        },
-        child: MouseHoverWidget(
-          builder: (isHovered) {
-            return AbsorbPointer(child:widget.keyframeIconBuilder(
-              context,
-              widget.isSelected,
-              isHovered,
-              widget.frameNumber,
-            ));
-          },
-        ),
-      
+      ),
     );
   }
 }

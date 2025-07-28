@@ -9,7 +9,7 @@ class TrackObjectsWidget extends StatefulWidget {
   final ScrollController horizontalScrollController;
   final double trackNameWidth;
   final KeyframeIconBuilder keyframeIconBuilder;
-  final KeyframeToggleIconBuilder? keyframeToggleIconBuilder;
+  final KeyframeToggleIconBuilder keyframeToggleIconBuilder;
   final TrackObjectExtraWidgetBuilder? trackObjectExtraWidgetBuilder;
   final TrackObjectNameStyle? trackObjectNameStyle;
   final ChannelValueEditorStyle? channelValueEditorStyle;
@@ -20,7 +20,7 @@ class TrackObjectsWidget extends StatefulWidget {
     required this.horizontalScrollController,
     required this.trackNameWidth,
     required this.keyframeIconBuilder,
-    this.keyframeToggleIconBuilder,
+    required this.keyframeToggleIconBuilder,
     this.trackObjectExtraWidgetBuilder,
     this.trackObjectNameStyle,
     this.channelValueEditorStyle,
