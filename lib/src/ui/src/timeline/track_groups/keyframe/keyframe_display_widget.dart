@@ -83,8 +83,6 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
         if (dragStart != null) {
           final dragDelta = details.localPosition.dx - dragStart!.dx;
           final frameDelta = (dragDelta / widget.pixelsPerFrame).round();
-          // final newFrame = initialFrame + frameDelta;
-          // final clampedFrame = newFrame.clamp(0, double.infinity).toInt();
           widget.onFrameNumberChanged
               ?.call((frameDelta: frameDelta, startFrame: initialFrame));
         }
