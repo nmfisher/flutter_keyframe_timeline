@@ -62,7 +62,6 @@ class TrackKeyframesWidget extends StatelessWidget {
                         },
                         onFrameNumberChanged: (value) {
                           controller.moveSelectedKeyframes(value.frameDelta);
-                          // kf.setFrameNumber(value);
                         },
                       ),
                     );

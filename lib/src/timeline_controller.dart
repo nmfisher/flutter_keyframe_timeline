@@ -177,7 +177,6 @@ class TimelineControllerImpl implements TimelineController {
     selected.value.add(keyframe);
     _selected[keyframe] = track;
     selected.notifyListeners();
-    print("Selceted : ${_selected.length}");
   }
 
   @override
@@ -263,7 +262,6 @@ class TimelineControllerImpl implements TimelineController {
   //
   @override
   void moveSelectedKeyframes(int frameDelta) {
-    print("moving ${_selected.keys.length} selected keyfrmes");
     for (final kf in _selected.keys) {
       if (!_initial.containsKey(kf)) {
         _initial[kf] = kf.frameNumber.value;

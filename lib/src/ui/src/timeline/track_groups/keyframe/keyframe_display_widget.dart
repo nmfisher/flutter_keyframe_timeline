@@ -68,7 +68,6 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onPanStart: (details) {
-        print("PAN START");
         dragStart = details.localPosition;
         initialFrame = widget.frameNumber;
       },
