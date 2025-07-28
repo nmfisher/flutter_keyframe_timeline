@@ -39,23 +39,13 @@ abstract class TimelineController {
   void select(Keyframe keyframe, AnimationTrack track, {bool append = false});
 
   //
+  void moveSelectedKeyframes(int frameDelta);
+
+  //
   void clearSelectedKeyframes();
 
   //
   void deleteSelectedKeyframes();
-
-  // //
-  // U getCurrentValue<U extends ChannelValue>(
-  //   AnimatableObject target,
-  //   AnimationTrack<U> track,
-  // );
-
-  // //
-  // void setActualValue<U extends ChannelValue>(
-  //   AnimatableObject object,
-  //   AnimationTrack<U> track,
-  //   List<num> values,
-  // );
 
   //
   ValueListenable<Set<AnimatableObject>> get active;
@@ -75,8 +65,7 @@ abstract class TimelineController {
   // Dispose this instance and all associated ValueNotifiers.
   void dispose();
 
-  factory TimelineController.create(
-      List<AnimatableObject> initial) {
+  factory TimelineController.create(List<AnimatableObject> initial) {
     return TimelineControllerImpl._(initial);
   }
 }
@@ -183,13 +172,18 @@ class TimelineControllerImpl implements TimelineController {
       clearSelectedKeyframes(notify: false);
     }
 
+    _initial.clear();
+
     selected.value.add(keyframe);
     _selected[keyframe] = track;
     selected.notifyListeners();
+    print("Selceted : ${_selected.length}");
   }
 
   @override
   void clearSelectedKeyframes({bool notify = true}) {
+    _initial.clear();
+
     selected.value.clear();
     _selected.clear();
     if (notify) {
@@ -253,7 +247,6 @@ class TimelineControllerImpl implements TimelineController {
     this.expanded.notifyListeners();
   }
 
-
   //
   @override
   void deleteSelectedKeyframes() {
@@ -262,5 +255,21 @@ class TimelineControllerImpl implements TimelineController {
       track.removeKeyframeAt(kf.frameNumber.value);
     }
     clearSelectedKeyframes(notify: true);
+    _initial.clear();
+  }
+
+  final _initial = <Keyframe, int>{};
+
+  //
+  @override
+  void moveSelectedKeyframes(int frameDelta) {
+    print("moving ${_selected.keys.length} selected keyfrmes");
+    for (final kf in _selected.keys) {
+      if (!_initial.containsKey(kf)) {
+        _initial[kf] = kf.frameNumber.value;
+      }
+      var initial = _initial[kf]!;
+      kf.setFrameNumber(initial + frameDelta);
+    }
   }
 }

@@ -60,8 +60,9 @@ class TrackKeyframesWidget extends StatelessWidget {
                             append: HardwareKeyboard.instance.isShiftPressed,
                           );
                         },
-                        onFrameNumberChanged: (int value) {
-                          kf.setFrameNumber(value);
+                        onFrameNumberChanged: (value) {
+                          controller.moveSelectedKeyframes(value.frameDelta);
+                          // kf.setFrameNumber(value);
                         },
                       ),
                     );
@@ -86,17 +87,17 @@ class _KeyframeFlowDelegate extends FlowDelegate {
     required this.scrollController,
     required ValueListenable<List<Keyframe>> keyframes,
   }) : super(
-         repaint: Listenable.merge([
-           scrollController,
-           controller.currentFrame,
-           controller.maxFrames,
-           controller.pixelsPerFrame,
-           keyframes,
-           ...keyframes.value.map((kf) => kf.frameNumber),
-         ]),
-       ) { 
-        this.keyframes = keyframes.value.toList();
-       }
+          repaint: Listenable.merge([
+            scrollController,
+            controller.currentFrame,
+            controller.maxFrames,
+            controller.pixelsPerFrame,
+            keyframes,
+            ...keyframes.value.map((kf) => kf.frameNumber),
+          ]),
+        ) {
+    this.keyframes = keyframes.value.toList();
+  }
 
   @override
   void paintChildren(FlowPaintingContext context) {

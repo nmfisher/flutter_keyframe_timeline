@@ -10,7 +10,7 @@ class KeyframeDisplayWidget extends StatefulWidget {
   final bool isSelected;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
-  final ValueChanged<int> onFrameNumberChanged;
+  final ValueChanged<({int startFrame, int frameDelta})> onFrameNumberChanged;
   final KeyframeIconBuilder keyframeIconBuilder;
 
   const KeyframeDisplayWidget({
@@ -68,6 +68,7 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onPanStart: (details) {
+        print("PAN START");
         dragStart = details.localPosition;
         initialFrame = widget.frameNumber;
       },
@@ -83,9 +84,10 @@ class _KeyframeDisplayWidgetState extends State<KeyframeDisplayWidget> {
         if (dragStart != null) {
           final dragDelta = details.localPosition.dx - dragStart!.dx;
           final frameDelta = (dragDelta / widget.pixelsPerFrame).round();
-          final newFrame = initialFrame + frameDelta;
-          final clampedFrame = newFrame.clamp(0, double.infinity).toInt();
-          widget.onFrameNumberChanged?.call(clampedFrame);
+          // final newFrame = initialFrame + frameDelta;
+          // final clampedFrame = newFrame.clamp(0, double.infinity).toInt();
+          widget.onFrameNumberChanged
+              ?.call((frameDelta: frameDelta, startFrame: initialFrame));
         }
       },
       onPanEnd: (_) {
