@@ -116,7 +116,7 @@ class TrackObjectWidget extends StatelessWidget {
                       children: [
                         SizedBox(
                           width: trackNameWidth,
-                          child: AnimationTrackValueEditorWidget(
+                          child: TrackValueEditorWidget(
                             object: object,
                             track: track,
                             controller: controller,

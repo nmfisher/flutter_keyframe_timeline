@@ -6,7 +6,7 @@ abstract class TimelineObject {
   ValueListenable<String> get displayName;
 
   //
-  List<AnimationTrack> get tracks;
+  List<Track> get tracks;
 
   //
   bool hasKeyframesAtFrame(int frame);
@@ -16,8 +16,9 @@ abstract class TimelineObject {
 }
 
 class TimelineObjectImpl extends TimelineObject {
+  
   @override
-  final List<AnimationTrack> tracks;
+  final List<Track> tracks;
 
   TimelineObjectImpl({required this.tracks, required String name}) {
     this.displayName.value = name;

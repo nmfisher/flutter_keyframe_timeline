@@ -19,25 +19,25 @@ class RandomObject {
   double get scaleY => _scaleY;
   Color get color => _color;
 
-  late final positionTrack = AnimationTrackImpl(
+  late final positionTrack = TrackImpl(
     keyframes: <Keyframe<Vector2ChannelValue>>[],
     labels: ["x", "y"],
     label: "position",
     defaultValues: [0.0, 0.0, 0.0]
   );
-  late final rotationTrack = AnimationTrackImpl(
+  late final rotationTrack = TrackImpl(
     keyframes: <Keyframe<ScalarChannelValue>>[],
     labels: ["rads"],
     label: "rotation",
     defaultValues: [0.0]
   );
-  late final scaleTrack = AnimationTrackImpl(
+  late final scaleTrack = TrackImpl(
     keyframes: <Keyframe<Vector2ChannelValue>>[],
     labels: ["x", "y"],
     label: "scale",
     defaultValues: [1.0, 1.0, 1.0]
   );
-  late final colorTrack = AnimationTrackImpl(
+  late final colorTrack = TrackImpl(
     keyframes: <Keyframe<Vector4ChannelValue>>[],
     labels: ["r", "g", "b", "a"],
     label: "color",
@@ -158,7 +158,7 @@ class RandomObject {
     }
   }
 
-  void setActualValue(AnimationTrack track, List<num> values) {
+  void setActualValue(Track track, List<num> values) {
     if (track == positionTrack) {
       _position = Offset(values[0].toDouble(), values[1].toDouble());
     } else if (track == scaleTrack) {
@@ -263,7 +263,7 @@ class ObjectHolder  {
   // @override
   // U getCurrentValue<U extends ChannelValue>(
   //   TimelineObject animatableObject,
-  //   AnimationTrack<U> track,
+  //   Track<U> track,
   // ) {
   //   final object = _lookup[animatableObject]!;
   //   if (track == object.colorTrack) {
@@ -297,7 +297,7 @@ class ObjectHolder  {
   // @override
   // void setActualValue<U extends ChannelValue>(
   //   TimelineObject animatableObject,
-  //   AnimationTrack<U> track,
+  //   Track<U> track,
   //   List<num> values,
   // ) {
   //   var object = _lookup[animatableObject];

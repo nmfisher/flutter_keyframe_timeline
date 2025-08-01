@@ -36,7 +36,7 @@ abstract class TimelineController {
   ValueListenable<Set<Keyframe>> get selected;
 
   //
-  void select(Keyframe keyframe, AnimationTrack track, {bool append = false});
+  void select(Keyframe keyframe, Track track, {bool append = false});
 
   //
   void moveSelectedKeyframes(int frameDelta);
@@ -79,7 +79,7 @@ abstract class TimelineController {
 //   //
 //   U getCurrentValue<U extends ChannelValue>(
 //     TimelineObject target,
-//     AnimationTrack<U> track,
+//     Track<U> track,
 //   );
 
 //   // Get the current value for [track] in [target]. This retrieves the actual
@@ -90,7 +90,7 @@ abstract class TimelineController {
 //   //
 //   void setActualValue<U extends ChannelValue>(
 //     TimelineObject object,
-//     AnimationTrack<U> track,
+//     Track<U> track,
 //     List<num> values,
 //   );
 // }
@@ -180,10 +180,10 @@ class TimelineControllerImpl implements TimelineController {
   ValueNotifier<Set<Keyframe<ChannelValue>>> selected =
       ValueNotifier<Set<Keyframe<ChannelValue>>>({});
 
-  final _selected = <Keyframe, AnimationTrack>{};
+  final _selected = <Keyframe, Track>{};
 
   @override
-  void select(Keyframe keyframe, AnimationTrack track, {bool append = false}) {
+  void select(Keyframe keyframe, Track track, {bool append = false}) {
     if (!append) {
       clearSelectedKeyframes(notify: false);
     }

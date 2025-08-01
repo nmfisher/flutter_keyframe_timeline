@@ -32,7 +32,7 @@ class TimelineWidget extends StatefulWidget {
   final TimelineBackgroundStyle backgroundStyle;
 
   /// Styling for the text fields used to edit the numeric values for
-  /// each channel in an AnimationTrack.
+  /// each channel in an Track.
   ///
   /// This controls the visual appearance of the TextField widgets used for editing
   /// animation channel values (like position X, Y, Z coordinates). You can customize:

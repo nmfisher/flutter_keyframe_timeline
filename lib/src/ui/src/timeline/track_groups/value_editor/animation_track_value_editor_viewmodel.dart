@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 
-abstract class AnimationTrackValueEditorViewModel<V extends ChannelValue> {
+abstract class TrackValueEditorViewModel<V extends ChannelValue> {
   // Returns true if this track has a keyframe at the current frame,
   // false otherwise.
   ValueListenable<bool> get hasKeyframeAtCurrentFrame;
@@ -23,8 +23,8 @@ abstract class AnimationTrackValueEditorViewModel<V extends ChannelValue> {
   Future dispose();
 }
 
-class AnimationTrackValueEditorViewModelImpl<V extends ChannelValue>
-    extends AnimationTrackValueEditorViewModel<V> {
+class TrackValueEditorViewModelImpl<V extends ChannelValue>
+    extends TrackValueEditorViewModel<V> {
   final Set<Keyframe> keyframes = {};
 
   @override
@@ -35,10 +35,10 @@ class AnimationTrackValueEditorViewModelImpl<V extends ChannelValue>
   final ValueNotifier<List<num>> values = ValueNotifier<List<num>>([]);
 
   final TimelineObject object;
-  final AnimationTrack<V> track;
+  final Track<V> track;
   final TimelineController controller;
 
-  AnimationTrackValueEditorViewModelImpl(
+  TrackValueEditorViewModelImpl(
       this.object, this.track, this.controller) {
     track.keyframes.addListener(_onKeyframesUpdated);
     _onKeyframesUpdated();

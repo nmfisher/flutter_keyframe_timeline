@@ -4,11 +4,11 @@ import 'channel_types.dart';
 import 'keyframe.dart';
 
 //
-// AnimationTrack<V> contains zero or more keyframes for a given channel.
+// Track<V> contains zero or more keyframes for a given channel.
 // The generic parameter [V] corresponds to the type of the values attached to
 // the keyframes/channel (Vector3, Quaternion, etc).
 //
-abstract class AnimationTrack<V extends ChannelValue> {
+abstract class Track<V extends ChannelValue> {
   //
   Type getType() => V;
 
@@ -70,7 +70,7 @@ abstract class AnimationTrack<V extends ChannelValue> {
   Future dispose();
 
   //
-  AnimationTrack<U> cast<U extends ChannelValue>();
+  Track<U> cast<U extends ChannelValue>();
 
   //
   ValueListenable<V> get value;
@@ -79,7 +79,7 @@ abstract class AnimationTrack<V extends ChannelValue> {
   void setValue(V value);
 }
 
-class AnimationTrackImpl<V extends ChannelValue> extends AnimationTrack<V> {
+class TrackImpl<V extends ChannelValue> extends Track<V> {
   late final _logger = Logger(this.runtimeType.toString());
 
   @override
@@ -99,7 +99,7 @@ class AnimationTrackImpl<V extends ChannelValue> extends AnimationTrack<V> {
 
   final List<num> defaultValues;
 
-  AnimationTrackImpl(
+  TrackImpl(
       {this.factory = const DefaultChannelValueFactory(),
       required List<Keyframe<V>> keyframes,
       required this.labels,
@@ -114,8 +114,8 @@ class AnimationTrackImpl<V extends ChannelValue> extends AnimationTrack<V> {
   }
 
   @override
-  AnimationTrack<U> cast<U extends ChannelValue>() {
-    return AnimationTrackImpl<U>(
+  Track<U> cast<U extends ChannelValue>() {
+    return TrackImpl<U>(
         keyframes: keyframes.value.cast<Keyframe<U>>(),
         labels: labels,
         label: label,

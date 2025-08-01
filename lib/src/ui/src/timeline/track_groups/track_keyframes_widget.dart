@@ -6,7 +6,7 @@ import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'keyframe/keyframe_display_widget.dart';
 
 class TrackKeyframesWidget extends StatelessWidget {
-  final AnimationTrack track;
+  final Track track;
   final TimelineController controller;
   final ScrollController scrollController;
   final KeyframeIconBuilder keyframeIconBuilder;

@@ -3,15 +3,15 @@ import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:mix/mix.dart';
 import 'animation_track_value_editor_viewmodel.dart';
 
-class AnimationTrackValueEditorWidget extends StatefulWidget {
+class TrackValueEditorWidget extends StatefulWidget {
   final TimelineObject object;
-  final AnimationTrack track;
+  final Track track;
   final TimelineController controller;
   final KeyframeToggleIconBuilder keyframeToggleIconBuilder;
   final ChannelValueEditorStyle channelValueEditorStyle;
   final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
 
-  const AnimationTrackValueEditorWidget({
+  const TrackValueEditorWidget({
     super.key,
     required this.object,
     required this.track,
@@ -22,14 +22,14 @@ class AnimationTrackValueEditorWidget extends StatefulWidget {
   });
 
   @override
-  State<AnimationTrackValueEditorWidget> createState() =>
-      _AnimationTrackValueEditorWidgetState();
+  State<TrackValueEditorWidget> createState() =>
+      _TrackValueEditorWidgetState();
 }
 
-class _AnimationTrackValueEditorWidgetState
-    extends State<AnimationTrackValueEditorWidget> {
-  late final AnimationTrackValueEditorViewModel viewModel =
-      AnimationTrackValueEditorViewModelImpl(
+class _TrackValueEditorWidgetState
+    extends State<TrackValueEditorWidget> {
+  late final TrackValueEditorViewModel viewModel =
+      TrackValueEditorViewModelImpl(
     widget.object,
     widget.track,
     widget.controller,
