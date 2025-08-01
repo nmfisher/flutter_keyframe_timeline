@@ -1,18 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
-import 'composite_track.dart';
-import 'base_track.dart';
 
 abstract class TimelineObject {
   //
   ValueListenable<String> get displayName;
 
   //
-  CompositeTrack get compositeTrack;
-  
+  List<BaseTrack> get tracks;
+
   //
-  @deprecated
-  List<Track> get tracks;
+  List<V> getTracks<V extends BaseTrack>();
 
   //
   bool hasKeyframesAtFrame(int frame);
@@ -24,37 +21,31 @@ abstract class TimelineObject {
 class TimelineObjectImpl extends TimelineObject {
   
   @override
-  final CompositeTrack compositeTrack;
+  final List<BaseTrack> tracks;
   
   @override
   ValueNotifier<String> displayName = ValueNotifier<String>("");
 
   TimelineObjectImpl({
-    CompositeTrack? compositeTrack, 
-    List<Track>? tracks, 
+    required this.tracks, 
     required String name
-  }) : compositeTrack = compositeTrack ?? CompositeTrack(label: name) {
+  }) {
     this.displayName.value = name;
-    
-    if (tracks != null) {
-      for (final track in tracks) {
-        this.compositeTrack.addTrack(track);
-      }
-    }
   }
-  
+
   @override
-  @deprecated
-  List<Track> get tracks {
-    return compositeTrack.tracks.value.whereType<Track>().toList();
+  List<V> getTracks<V extends BaseTrack>() {
+    return tracks.whereType<V>().toList();
   }
 
   @override
   Iterable<Keyframe> getKeyframesAtFrame(int frame) sync* {
     for (final track in tracks) {
-      final kf = track.keyframeAt(frame);
-      if (kf != null) {
-        yield kf;
+      if (track is KeyframeTrack) {
+        final kf = track.keyframeAt(frame);
+        if (kf != null) {
+          yield kf;
+        }
       }
     }
   }
@@ -62,9 +53,11 @@ class TimelineObjectImpl extends TimelineObject {
   @override
   bool hasKeyframesAtFrame(int frame) {
     for (final track in tracks) {
-      final kf = track.keyframeAt(frame);
-      if (kf != null) {
-        return true;
+      if (track is KeyframeTrack) {
+        final kf = track.keyframeAt(frame);
+        if (kf != null) {
+          return true;
+        }
       }
     }
     return false;

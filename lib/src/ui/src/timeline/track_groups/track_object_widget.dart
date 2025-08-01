@@ -105,7 +105,7 @@ class TrackObjectWidget extends StatelessWidget {
             SizedBox(width: trackNameWidth, child: _objectName(isExpanded, context)),
 
             if (isExpanded)
-              ...object.tracks
+              ...object.getTracks<KeyframeTrack>()
                   .map(
                     (track) => HBox(
                       style: Style(

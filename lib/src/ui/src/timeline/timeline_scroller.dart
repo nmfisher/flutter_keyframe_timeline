@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
+import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart' hide Clip;
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/middle_mouse_scroll_view.dart';
 
 class TimelineScroller extends StatelessWidget {

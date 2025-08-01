@@ -12,7 +12,7 @@ abstract class Keyframe<V extends ChannelValue> {
   // Update the frame number for this keyframe.
   Future setFrameNumber(int frameNumber);
 
-  // The interpolation method for this keyframe. See [Track.calculate]
+  // The interpolation method for this keyframe. See [KeyframeTrack.calculate]
   // for an explanation of how this is applied.
   ValueListenable<Interpolation> get interpolation;
 

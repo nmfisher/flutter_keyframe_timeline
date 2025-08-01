@@ -27,7 +27,7 @@ class TimelineSerializer {
     );
   }
 
-  static Track<V> parseTrack<V extends ChannelValue>(Map<String, dynamic> track, ChannelValueFactory factory, List<num> defaultValues) {
+  static KeyframeTrack<V> parseTrack<V extends ChannelValue>(Map<String, dynamic> track, ChannelValueFactory factory, List<num> defaultValues) {
 
     var rawKeyframes = track["keyframes"] as List;
 
@@ -39,7 +39,7 @@ class TimelineSerializer {
     }
 
 
-    return TrackImpl<V>(
+    return KeyframeTrackImpl<V>(
       defaultValues:defaultValues,
       keyframes: keyframes,
       labels: track["labels"].cast<String>(),
@@ -65,7 +65,7 @@ class TimelineSerializer {
               throw Exception("Unrecognized value type ${track['value_type']}")
           };
         })
-        .cast<Track>()
+        .cast<BaseTrack>()
         .toList();
     return TimelineObjectImpl(tracks: tracks, name: name);
   }
@@ -74,7 +74,7 @@ class TimelineSerializer {
     return T;
   }
 
-  static String getTypeLabel(Track track) {
+  static String getTypeLabel(KeyframeTrack track) {
     final trackType = track.getType();
 
     if (trackType == getType<Vector2ChannelValue>()) {
@@ -103,7 +103,7 @@ class TimelineSerializer {
   static Map<String, dynamic> toMap(TimelineObject object) {
     return {
       'name': object.displayName.value,
-      'tracks': object.tracks.map((track) {
+      'tracks': object.tracks.whereType<KeyframeTrack>().map((track) {
         return {
           'label': track.label,
           'labels': track.labels,

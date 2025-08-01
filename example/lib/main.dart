@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyframe_timeline_example/object/objects.dart';
 import 'package:flutter_keyframe_timeline_example/object_display_widget.dart';
-import 'package:flutter_keyframe_timeline_example/track_visibility_widget.dart';
+import 'package:flutter_keyframe_timeline_example/track_object_visibility_widget.dart';
 import 'package:flutter_keyframe_timeline_example/timeline_skip_control.dart';
 import 'package:logging/logging.dart';
 import 'package:mix/mix.dart';

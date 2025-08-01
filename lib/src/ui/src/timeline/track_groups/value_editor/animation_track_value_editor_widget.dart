@@ -5,7 +5,7 @@ import 'animation_track_value_editor_viewmodel.dart';
 
 class TrackValueEditorWidget extends StatefulWidget {
   final TimelineObject object;
-  final Track track;
+  final KeyframeTrack track;
   final TimelineController controller;
   final KeyframeToggleIconBuilder keyframeToggleIconBuilder;
   final ChannelValueEditorStyle channelValueEditorStyle;

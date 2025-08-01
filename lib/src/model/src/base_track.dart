@@ -1,17 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'track_item.dart';
 import 'time_range.dart';
+import 'track_type.dart';
 
-enum TrackType {
-  animation,
-  video,
-  audio,
-  effect,
-  composite,
-}
-
-abstract class BaseTrack {
-  TrackType get type;
+abstract class BaseTrack<T extends TrackType> {
+  T get type;
   
   String get label;
   
@@ -49,15 +42,15 @@ abstract class BaseTrack {
   
   Future<void> dispose();
   
-  BaseTrack clone();
+  BaseTrack<T> clone();
 }
 
-abstract class BaseTrackImpl extends BaseTrack {
+abstract class BaseTrackImpl<T extends TrackType> extends BaseTrack<T> {
   @override
   final String label;
   
   @override
-  final TrackType type;
+  final T type;
   
   @override
   bool enabled;

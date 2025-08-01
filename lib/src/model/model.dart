@@ -1,12 +1,14 @@
-export 'src/track.dart';
+export 'src/keyframe_track.dart';
 export 'src/channel_types.dart';
 export 'src/keyframe.dart';
 export 'src/timeline_object.dart';
 export 'src/timeline_serializer.dart';
 export 'src/time_range.dart';
 export 'src/track_item.dart';
+export 'src/track_type.dart';
 export 'src/base_track.dart';
 export 'src/keyframe_track_item.dart';
 export 'src/clip.dart';
 export 'src/transition.dart';
-export 'src/composite_track.dart';
+export 'src/video_track.dart';
+export 'src/audio_track.dart';

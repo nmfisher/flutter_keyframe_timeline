@@ -36,14 +36,14 @@ abstract class TimelineController {
   ValueListenable<Set<Keyframe>> get selected;
 
   //
-  void select(Keyframe keyframe, Track track, {bool append = false});
+  void select(Keyframe keyframe, KeyframeTrack track, {bool append = false});
 
   //
   void moveSelectedKeyframes(int frameDelta);
-  
+
   //
   void addClipToObject(TimelineObject object, dynamic clip);
-  
+
   //
   void addTransitionToObject(TimelineObject object, dynamic transition);
 
@@ -76,31 +76,6 @@ abstract class TimelineController {
   }
 }
 
-// abstract class TrackValueController {
-//   // Get the current value for [track] in [target]. This retrieves the actual
-//   // value, not the value computed from any keyframes. For example,
-//   // calling this method for the position track when [target] is actually
-//   // located at (0,1,2) will return (0,1,2), even if the location as calcualted
-//   // from the keyframes would otherwise be different.
-//   //
-//   U getCurrentValue<U extends ChannelValue>(
-//     TimelineObject target,
-//     Track<U> track,
-//   );
-
-//   // Get the current value for [track] in [target]. This retrieves the actual
-//   // value, not the value computed from any keyframes. For example,
-//   // calling this method for the position track when [target] is actually
-//   // located at (0,1,2) will return (0,1,2), even if the location as calcualted
-//   // from the keyframes would otherwise be different.
-//   //
-//   void setActualValue<U extends ChannelValue>(
-//     TimelineObject object,
-//     Track<U> track,
-//     List<num> values,
-//   );
-// }
-
 class TimelineControllerImpl implements TimelineController {
   @override
   final ValueNotifier<List<TimelineObject>> animatableObjects =
@@ -113,7 +88,8 @@ class TimelineControllerImpl implements TimelineController {
 
   void _onCurrentFrameChanged() {
     for (final object in animatableObjects.value) {
-      for (final track in object.tracks) {
+      final keyframeTracks = object.getTracks<KeyframeTrack>();
+      for (final track in keyframeTracks) {
         if (track.keyframes.value.isNotEmpty) {
           var value = track.calculate(currentFrame.value);
           track.setValue(value);
@@ -186,10 +162,10 @@ class TimelineControllerImpl implements TimelineController {
   ValueNotifier<Set<Keyframe<ChannelValue>>> selected =
       ValueNotifier<Set<Keyframe<ChannelValue>>>({});
 
-  final _selected = <Keyframe, Track>{};
+  final _selected = <Keyframe, KeyframeTrack>{};
 
   @override
-  void select(Keyframe keyframe, Track track, {bool append = false}) {
+  void select(Keyframe keyframe, KeyframeTrack track, {bool append = false}) {
     if (!append) {
       clearSelectedKeyframes(notify: false);
     }
@@ -292,13 +268,13 @@ class TimelineControllerImpl implements TimelineController {
       kf.setFrameNumber(initial + frameDelta);
     }
   }
-  
+
   @override
   void addClipToObject(TimelineObject object, dynamic clip) {
     // Implementation would depend on having proper imports
     // For now, this is a placeholder for the new clip functionality
   }
-  
+
   @override
   void addTransitionToObject(TimelineObject object, dynamic transition) {
     // Implementation would depend on having proper imports

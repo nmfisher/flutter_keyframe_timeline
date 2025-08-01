@@ -5,13 +5,14 @@ import 'keyframe.dart';
 import 'base_track.dart';
 import 'track_item.dart';
 import 'keyframe_track_item.dart';
+import 'track_type.dart';
 
 //
-// AnimationTrack<V> contains zero or more keyframes for a given channel.
+// KeyframeTrack<V> contains zero or more keyframes for a given channel.
 // The generic parameter [V] corresponds to the type of the values attached to
 // the keyframes/channel (Vector3, Quaternion, etc).
 //
-abstract class Track<V extends ChannelValue> extends BaseTrack {
+abstract class KeyframeTrack<V extends ChannelValue> extends BaseTrack<AnimationTrackType> {
   //
   Type getType() => V;
 
@@ -73,7 +74,7 @@ abstract class Track<V extends ChannelValue> extends BaseTrack {
   Future dispose();
 
   //
-  Track<U> cast<U extends ChannelValue>();
+  KeyframeTrack<U> cast<U extends ChannelValue>();
 
   //
   ValueListenable<V> get value;
@@ -82,7 +83,7 @@ abstract class Track<V extends ChannelValue> extends BaseTrack {
   void setValue(V value);
 }
 
-class TrackImpl<V extends ChannelValue> extends BaseTrackImpl implements Track<V> {
+class KeyframeTrackImpl<V extends ChannelValue> extends BaseTrackImpl<AnimationTrackType> implements KeyframeTrack<V> {
   late final _logger = Logger(this.runtimeType.toString());
 
   @override
@@ -99,13 +100,13 @@ class TrackImpl<V extends ChannelValue> extends BaseTrackImpl implements Track<V
 
   final List<num> defaultValues;
 
-  TrackImpl(
+  KeyframeTrackImpl(
       {this.factory = const DefaultChannelValueFactory(),
       required List<Keyframe<V>> keyframes,
       required this.labels,
       required String label,
       required this.defaultValues}) : super(
-    type: TrackType.animation,
+    type: TrackTypes.animation,
     label: label,
     enabled: true,
     muted: false,
@@ -124,8 +125,11 @@ class TrackImpl<V extends ChannelValue> extends BaseTrackImpl implements Track<V
   }
 
   @override
-  Track<U> cast<U extends ChannelValue>() {
-    return TrackImpl<U>(
+  Type getType() => V;
+
+  @override
+  KeyframeTrack<U> cast<U extends ChannelValue>() {
+    return KeyframeTrackImpl<U>(
         keyframes: keyframes.value.cast<Keyframe<U>>(),
         labels: labels,
         label: label,
@@ -245,8 +249,8 @@ class TrackImpl<V extends ChannelValue> extends BaseTrackImpl implements Track<V
   }
 
   @override
-  BaseTrack clone() {
-    return TrackImpl<V>(
+  BaseTrack<AnimationTrackType> clone() {
+    return KeyframeTrackImpl<V>(
       factory: factory,
       keyframes: keyframes.value.map((kf) => KeyframeImpl<V>(
         frameNumber: kf.frameNumber.value,
