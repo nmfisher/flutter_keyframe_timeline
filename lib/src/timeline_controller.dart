@@ -40,6 +40,12 @@ abstract class TimelineController {
 
   //
   void moveSelectedKeyframes(int frameDelta);
+  
+  //
+  void addClipToObject(TimelineObject object, dynamic clip);
+  
+  //
+  void addTransitionToObject(TimelineObject object, dynamic transition);
 
   //
   void clearSelectedKeyframes();
@@ -285,5 +291,17 @@ class TimelineControllerImpl implements TimelineController {
       var initial = _initial[kf]!;
       kf.setFrameNumber(initial + frameDelta);
     }
+  }
+  
+  @override
+  void addClipToObject(TimelineObject object, dynamic clip) {
+    // Implementation would depend on having proper imports
+    // For now, this is a placeholder for the new clip functionality
+  }
+  
+  @override
+  void addTransitionToObject(TimelineObject object, dynamic transition) {
+    // Implementation would depend on having proper imports
+    // For now, this is a placeholder for the new transition functionality
   }
 }

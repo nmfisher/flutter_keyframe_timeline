@@ -2,13 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'channel_types.dart';
 import 'keyframe.dart';
+import 'base_track.dart';
+import 'track_item.dart';
+import 'keyframe_track_item.dart';
 
 //
-// Track<V> contains zero or more keyframes for a given channel.
+// AnimationTrack<V> contains zero or more keyframes for a given channel.
 // The generic parameter [V] corresponds to the type of the values attached to
 // the keyframes/channel (Vector3, Quaternion, etc).
 //
-abstract class Track<V extends ChannelValue> {
+abstract class Track<V extends ChannelValue> extends BaseTrack {
   //
   Type getType() => V;
 
@@ -79,7 +82,7 @@ abstract class Track<V extends ChannelValue> {
   void setValue(V value);
 }
 
-class TrackImpl<V extends ChannelValue> extends Track<V> {
+class TrackImpl<V extends ChannelValue> extends BaseTrackImpl implements Track<V> {
   late final _logger = Logger(this.runtimeType.toString());
 
   @override
@@ -88,9 +91,6 @@ class TrackImpl<V extends ChannelValue> extends Track<V> {
 
   @override
   final List<String> labels;
-
-  @override
-  final String label;
 
   @override
   late final ValueNotifier<V> value;
@@ -103,14 +103,24 @@ class TrackImpl<V extends ChannelValue> extends Track<V> {
       {this.factory = const DefaultChannelValueFactory(),
       required List<Keyframe<V>> keyframes,
       required this.labels,
-      required this.label,
-      required this.defaultValues}) {
+      required String label,
+      required this.defaultValues}) : super(
+    type: TrackType.animation,
+    label: label,
+    enabled: true,
+    muted: false,
+    locked: false,
+  ) {
     final v = factory.create<V>(defaultValues);
     this.value = ValueNotifier<V>(v);
     for (final kf in keyframes) {
       this.keyframes.value.add(kf);
       kf.frameNumber.addListener(_onKeyframeFrameUpdated);
+      
+      final keyframeItem = KeyframeTrackItem<V>(keyframe: kf);
+      items.value.add(keyframeItem);
     }
+    items.notifyListeners();
   }
 
   @override
@@ -139,6 +149,9 @@ class TrackImpl<V extends ChannelValue> extends Track<V> {
     await removeKeyframeAt(keyframe.frameNumber.value);
     keyframes.value.add(keyframe);
 
+    final keyframeItem = KeyframeTrackItem<V>(keyframe: keyframe);
+    await addItem(keyframeItem);
+
     keyframes.notifyListeners();
     _logger.info(
       "Added keyframe at ${keyframe.frameNumber.value} with values ${keyframe.value.value.unwrap()} ",
@@ -151,6 +164,16 @@ class TrackImpl<V extends ChannelValue> extends Track<V> {
     if (existing == null) {
       return;
     }
+    
+    final keyframeItems = items.value
+        .whereType<KeyframeTrackItem<V>>()
+        .where((item) => item.keyframe == existing)
+        .toList();
+    
+    for (final item in keyframeItems) {
+      await removeItem(item);
+    }
+    
     await existing?.dispose();
     keyframes.value.remove(existing);
     keyframes.notifyListeners();
@@ -170,6 +193,8 @@ class TrackImpl<V extends ChannelValue> extends Track<V> {
     }
     keyframes.value.clear();
     keyframes.dispose();
+    value.dispose();
+    await super.dispose();
   }
 
   @override
@@ -217,6 +242,21 @@ class TrackImpl<V extends ChannelValue> extends Track<V> {
     if (this.value.value != value) {
       this.value.value = value;
     }
+  }
+
+  @override
+  BaseTrack clone() {
+    return TrackImpl<V>(
+      factory: factory,
+      keyframes: keyframes.value.map((kf) => KeyframeImpl<V>(
+        frameNumber: kf.frameNumber.value,
+        value: kf.value.value,
+        interpolation: kf.interpolation.value,
+      )).toList(),
+      labels: List<String>.from(labels),
+      label: label,
+      defaultValues: List<num>.from(defaultValues),
+    );
   }
 }
 
