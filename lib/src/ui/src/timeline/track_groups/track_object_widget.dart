@@ -10,6 +10,9 @@ import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/track
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/value_editor/animation_track_value_editor_widget.dart';
 import 'package:mix/mix.dart';
 
+// Import for clip widget
+import 'clip_widget.dart';
+
 class TrackObjectWidget extends StatelessWidget {
   final TimelineController controller;
   final ScrollController scrollController;
@@ -135,6 +138,41 @@ class TrackObjectWidget extends StatelessWidget {
                             track: track,
                             keyframeIconBuilder: keyframeIconBuilder,
                             connectionStyle: keyframeConnectionStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                  .cast<Widget>(),
+              
+              // Add VideoTrack rendering
+              ...object.getTracks<VideoTrack>()
+                  .map(
+                    (videoTrack) => HBox(
+                      style: Style(
+                        $box.border.bottom(color: trackObjectNameStyle?.borderColor ?? Colors.black),
+                        $box.padding.vertical(8),
+                        $flex.crossAxisAlignment.start(),
+                      ),
+                      children: [
+                        SizedBox(
+                          width: trackNameWidth,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 24.0),
+                            child: StyledText(
+                              videoTrack.label,
+                              style: Style(
+                                $text.fontSize(12),
+                                $text.color(Colors.black.withOpacity(0.7)),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: ClipWidget(
+                            videoTrack: videoTrack,
+                            controller: controller,
+                            scrollController: scrollController,
                           ),
                         ),
                       ],

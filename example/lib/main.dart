@@ -87,8 +87,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           bool trackObjectIsExpanded,
                         ) {
                           final object = _objectHolder.get(animatableObject);
+                          // Only show widget for RandomObject (VideoObject doesn't have visibility controls)
+                          if (object is! RandomObject) {
+                            return SizedBox.shrink();
+                          }
                           return TrackObjectVisibilityWidget(
-                            object: object!,
+                            object: object,
                             isActive: trackObjectIsActive,
                             isExpanded: trackObjectIsExpanded,
                             onRemove: () {
@@ -247,6 +251,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       TimelineZoomControl(timelineController: _controller),
                       SizedBox(width: 8),
                       TimelineSkipControl(timelineController: _controller),
+                      SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          _objectHolder.addNewVideoObject();
+                        },
+                        child: Text('Add Video'),
+                      ),
                     ],
                   ),
                 ),

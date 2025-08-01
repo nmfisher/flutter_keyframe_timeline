@@ -3,6 +3,103 @@ import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'package:logging/logging.dart';
+import 'package:uuid/uuid.dart';
+
+class VideoObject {
+  final String name;
+  final String id;
+  late VideoTrack videoTrack;
+  
+  final VoidCallback onUpdate;
+  
+  // Pixel data: List of frames, each frame is 100x100 pixels (grayscale 0-255)
+  late final List<List<List<int>>> pixelData;
+  
+  // Clip representing the video's position in the timeline
+  late final Clip videoClip;
+  
+  VideoObject({
+    required this.onUpdate,
+    required this.name,
+    int startFrame = 0,
+  }) : id = const Uuid().v4().substring(0, 8) {
+    videoTrack = VideoTrack(
+      label: "Video Track $name",
+    );
+    
+    // Generate 60 frames of 100x100 pixels, transitioning from black to white
+    pixelData = _generatePixelData();
+    
+    // Create a media source for this video
+    final mediaSource = GeneratedMediaSource(
+      path: "generated://video/$name",
+      type: ClipType.video,
+      parameters: {"name": name, "frames": pixelData.length},
+      durationFrames: pixelData.length,
+    );
+    
+    // Create the clip that represents this video in the timeline
+    videoClip = Clip(
+      source: mediaSource,
+      trackRange: TimeRange(
+        startFrame: startFrame,
+        endFrame: startFrame + pixelData.length,
+      ),
+      sourceRange: TimeRange(
+        startFrame: 0,
+        endFrame: pixelData.length,
+      ),
+    );
+    
+    // Add the clip to the video track
+    videoTrack.addClip(videoClip);
+  }
+  
+  List<List<List<int>>> _generatePixelData() {
+    const int frames = 60;
+    const int width = 100;
+    const int height = 100;
+    
+    return List.generate(frames, (frame) {
+      // Calculate grayscale value for this frame (0 = black, 255 = white)
+      final int grayValue = (frame * 255 ~/ (frames - 1)).clamp(0, 255);
+      
+      // Create 100x100 frame with all pixels having the same grayscale value
+      return List.generate(height, (_) {
+        return List.generate(width, (_) => grayValue);
+      });
+    });
+  }
+  
+  // Method to move the video clip to a new start frame
+  void setStartFrame(int newStartFrame) {
+    final duration = videoClip.timeRange.value.duration;
+    videoClip.setTimeRange(TimeRange(
+      startFrame: newStartFrame,
+      endFrame: newStartFrame + duration,
+    ));
+    onUpdate();
+  }
+  
+  // Method to sync clip position when dragged from timeline
+  void syncClipPosition() {
+    onUpdate();
+  }
+  
+  // Get the current start frame
+  int get startFrame => videoClip.timeRange.value.startFrame;
+  
+  // Get the current end frame
+  int get endFrame => videoClip.timeRange.value.endFrame;
+  
+  // Get the duration in frames
+  int get duration => videoClip.timeRange.value.duration;
+  
+  late final TimelineObjectImpl animatableObject = TimelineObjectImpl(
+    tracks: [videoTrack],
+    name: "Video $name",
+  );
+}
 
 class RandomObject {
   final String name;
@@ -180,20 +277,28 @@ class RandomObject {
 class ObjectHolder  {
   final _rnd = Random();
 
-  final _lookup = <TimelineObject, RandomObject>{};
+  final _lookup = <TimelineObject, dynamic>{};
 
-  late List<RandomObject> objects;
+  late List<dynamic> objects;
   late List<TimelineObject> animatableObjects;
 
   final void Function() onUpdate;
   TimelineController? _timelineController;
 
-  RandomObject? get(TimelineObject object) {
+  dynamic get(TimelineObject object) {
     return _lookup[object];
   }
 
   void setTimelineController(TimelineController controller) {
     _timelineController = controller;
+  }
+
+  String _generateRandomName(int length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    return String.fromCharCodes(Iterable.generate(
+      length, 
+      (_) => chars.codeUnitAt(_rnd.nextInt(chars.length)),
+    ));
   }
 
   void removeObject(TimelineObject animatableObject) {
@@ -234,9 +339,27 @@ class ObjectHolder  {
 
     onUpdate.call();
   }
+  
+  void addNewVideoObject() {
+    final randomName = _generateRandomName(8);
+    final videoObject = VideoObject(
+      onUpdate: onUpdate,
+      name: randomName,
+    );
+    
+    objects.add(videoObject);
+    animatableObjects.add(videoObject.animatableObject);
+    _lookup[videoObject.animatableObject] = videoObject;
+    
+    if (_timelineController != null) {
+      _timelineController!.addObject(videoObject.animatableObject);
+    }
+    
+    onUpdate.call();
+  }
 
   ObjectHolder(int numObjects, this.onUpdate) {
-    objects = List.generate(numObjects, (index) {
+    objects = List<dynamic>.generate(numObjects, (index) {
       final object = RandomObject(
         onUpdate: onUpdate,
         name: "object${index}",
@@ -256,7 +379,7 @@ class ObjectHolder  {
     });
 
     animatableObjects = objects
-        .map((object) => object.animatableObject)
+        .map<TimelineObject>((object) => object.animatableObject)
         .toList();
   }
 

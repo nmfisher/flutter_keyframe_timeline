@@ -24,8 +24,16 @@ class VideoTrack extends BaseTrackImpl<VideoTrackType> {
     await addItem(clip);
   }
   
+  Future<void> removeClip(Clip clip) async {
+    await removeItem(clip);
+  }
+  
   Future<void> addTransition(Transition transition) async {
     await addItem(transition);
+  }
+  
+  Future<void> removeTransition(Transition transition) async {
+    await removeItem(transition);
   }
   
   List<Clip> get clips {
@@ -43,6 +51,13 @@ class VideoTrack extends BaseTrackImpl<VideoTrackType> {
     ).toList();
   }
   
+  List<Transition> getTransitionsInRange(int startFrame, int endFrame) {
+    return transitions.where((transition) => 
+      transition.timeRange.value.startFrame < endFrame && 
+      transition.timeRange.value.endFrame > startFrame
+    ).toList();
+  }
+  
   @override
   BaseTrack<VideoTrackType> clone() {
     final clonedItems = items.value.map((item) => item.clone()).toList();
@@ -53,5 +68,10 @@ class VideoTrack extends BaseTrackImpl<VideoTrackType> {
       locked: locked,
       initialItems: clonedItems,
     );
+  }
+
+  @override
+  Future<void> dispose() async {
+    await super.dispose();
   }
 }

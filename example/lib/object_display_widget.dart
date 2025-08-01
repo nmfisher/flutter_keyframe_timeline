@@ -19,6 +19,18 @@ class ObjectDisplayWidget extends StatefulWidget {
 
 class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
   RandomObject? _selectedObject;
+  
+  Widget _renderVideoFrame(VideoObject videoObj, int currentFrame) {
+    // Clamp frame to available range
+    final frameIndex = currentFrame.clamp(0, videoObj.pixelData.length - 1);
+    final frameData = videoObj.pixelData[frameIndex];
+    
+    // Create a custom painter to render the grayscale pixel data
+    return CustomPaint(
+      painter: _VideoFramePainter(frameData),
+      size: const Size(60, 60),
+    );
+  }
 
   @override
   void initState() {
@@ -38,9 +50,16 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
           (obj) => obj.animatableObject == animatableObject,
           orElse: () => widget.objectHolder.objects.first,
         );
-        setState(() {
-          _selectedObject = activeObject;
-        });
+        // Only select RandomObject instances (VideoObject doesn't have display properties)
+        if (activeObject is RandomObject) {
+          setState(() {
+            _selectedObject = activeObject;
+          });
+        } else {
+          setState(() {
+            _selectedObject = null;
+          });
+        }
       }
     });
   }
@@ -55,12 +74,19 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Random objects (existing functionality)
         ...widget.objectHolder.objects.map((obj) {
           final isSelected = _selectedObject == obj;
+          
+          // Only RandomObject has position and isVisible properties
+          if (obj is! RandomObject) {
+            return SizedBox.shrink();
+          }
+          
           return ValueListenableBuilder(
             valueListenable: obj.isVisible,
             builder: (_, isVisible, __) {
-              if (!isVisible) {
+              if (isVisible == false) {
                 return SizedBox.shrink();
               }
               return Positioned(
@@ -127,6 +153,90 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
             },
           );
         }),
+        
+        // Video objects - display at bottom left in horizontal list with drag functionality
+        Positioned(
+          left: 10,
+          bottom: 10,
+          child: ValueListenableBuilder(
+            valueListenable: widget.timelineController.currentFrame,
+            builder: (_, currentFrame, __) {
+              final videoObjects = widget.objectHolder.objects.whereType<VideoObject>().toList();
+              
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: videoObjects.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final videoObj = entry.value;
+                  final isSelected = widget.timelineController.active.value.contains(videoObj.animatableObject);
+                  
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Video frame preview
+                        GestureDetector(
+                          onTap: () {
+                            widget.timelineController.setActive(videoObj.animatableObject, true);
+                          },
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              border: isSelected
+                                  ? Border.all(color: Colors.red, width: 3)
+                                  : Border.all(color: Colors.grey, width: 1),
+                            ),
+                            child: _renderVideoFrame(videoObj, currentFrame),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        // Video info and drag handle
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.red.withOpacity(0.2) : Colors.grey.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '${videoObj.startFrame}-${videoObj.endFrame}',
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(width: 4),
+                              GestureDetector(
+                                onPanUpdate: (details) {
+                                  // Drag horizontally to change start frame
+                                  final pixelsPerFrame = widget.timelineController.pixelsPerFrame.value;
+                                  final frameDelta = (details.delta.dx / pixelsPerFrame).round();
+                                  if (frameDelta != 0) {
+                                    final newStartFrame = (videoObj.startFrame + frameDelta).clamp(0, 1000);
+                                    videoObj.setStartFrame(newStartFrame);
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(2),
+                                  child: Icon(
+                                    Icons.drag_handle,
+                                    size: 16,
+                                    color: isSelected ? Colors.red : Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ),
         Positioned(
           top: 10,
           right: 10,
@@ -199,5 +309,34 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
         ),
       ],
     );
+  }
+}
+
+class _VideoFramePainter extends CustomPainter {
+  final List<List<int>> frameData;
+  
+  _VideoFramePainter(this.frameData);
+  
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+    final pixelWidth = size.width / frameData.first.length;
+    final pixelHeight = size.height / frameData.length;
+    
+    for (int y = 0; y < frameData.length; y++) {
+      for (int x = 0; x < frameData[y].length; x++) {
+        final grayValue = frameData[y][x];
+        paint.color = Color.fromARGB(255, grayValue, grayValue, grayValue);
+        canvas.drawRect(
+          Rect.fromLTWH(x * pixelWidth, y * pixelHeight, pixelWidth, pixelHeight),
+          paint,
+        );
+      }
+    }
+  }
+  
+  @override
+  bool shouldRepaint(covariant _VideoFramePainter oldDelegate) {
+    return oldDelegate.frameData != frameData;
   }
 }
