@@ -197,6 +197,38 @@ class TimelineBackgroundStyle {
   }
 }
 
+class KeyframeConnectionStyle {
+  final Color lineColor;
+  final double lineWidth;
+  final Color selectedLineColor;
+  final double selectedLineWidth;
+  final bool showConnections;
+
+  const KeyframeConnectionStyle({
+    this.lineColor = Colors.grey,
+    this.lineWidth = 2.0,
+    this.selectedLineColor = Colors.amber,
+    this.selectedLineWidth = 3.0,
+    this.showConnections = true,
+  });
+
+  KeyframeConnectionStyle copyWith({
+    Color? lineColor,
+    double? lineWidth,
+    Color? selectedLineColor,
+    double? selectedLineWidth,
+    bool? showConnections,
+  }) {
+    return KeyframeConnectionStyle(
+      lineColor: lineColor ?? this.lineColor,
+      lineWidth: lineWidth ?? this.lineWidth,
+      selectedLineColor: selectedLineColor ?? this.selectedLineColor,
+      selectedLineWidth: selectedLineWidth ?? this.selectedLineWidth,
+      showConnections: showConnections ?? this.showConnections,
+    );
+  }
+}
+
 class ChannelValueEditorStyle {
   final Color textFieldFontColor;
   final double textFieldFontSize;

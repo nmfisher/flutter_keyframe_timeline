@@ -23,6 +23,7 @@ class TrackObjectWidget extends StatelessWidget {
   final TrackObjectNameStyle? trackObjectNameStyle;
   final ChannelValueEditorStyle? channelValueEditorStyle;
   final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
+  final KeyframeConnectionStyle keyframeConnectionStyle;
 
   const TrackObjectWidget({
     super.key,
@@ -37,6 +38,7 @@ class TrackObjectWidget extends StatelessWidget {
     this.trackObjectNameStyle,
     this.channelValueEditorStyle,
     this.channelValueEditorContainerBuilder,
+    required this.keyframeConnectionStyle,
   });
 
   Widget _objectName(bool isExpanded, BuildContext context) {
@@ -132,6 +134,7 @@ class TrackObjectWidget extends StatelessWidget {
                             scrollController: scrollController,
                             track: track,
                             keyframeIconBuilder: keyframeIconBuilder,
+                            connectionStyle: keyframeConnectionStyle,
                           ),
                         ),
                       ],

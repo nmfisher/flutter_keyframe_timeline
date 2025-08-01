@@ -10,6 +10,7 @@ class TrackKeyframesWidget extends StatelessWidget {
   final TimelineController controller;
   final ScrollController scrollController;
   final KeyframeIconBuilder keyframeIconBuilder;
+  final KeyframeConnectionStyle connectionStyle;
 
   const TrackKeyframesWidget({
     super.key,
@@ -17,6 +18,7 @@ class TrackKeyframesWidget extends StatelessWidget {
     required this.controller,
     required this.scrollController,
     required this.keyframeIconBuilder,
+    required this.connectionStyle,
   });
 
   @override
@@ -31,43 +33,51 @@ class TrackKeyframesWidget extends StatelessWidget {
             height: constraints.maxHeight.isFinite
                 ? constraints.maxHeight
                 : 50, // Fallback height
-            child: Flow(
-              clipBehavior: Clip.none,
-              delegate: _KeyframeFlowDelegate(
+            child: CustomPaint(
+              painter: _KeyframeConnectionPainter(
+                keyframes: track.keyframes.value,
                 controller: controller,
                 scrollController: scrollController,
-                keyframes: track.keyframes,
+                connectionStyle: connectionStyle,
               ),
-              children: track.keyframes.value.map((kf) {
-                return ValueListenableBuilder(
-                  valueListenable: controller.selected,
-                  builder: (_, selected, __) {
-                    var isSelected = selected.contains(kf);
-                    return Align(
-                      alignment: Alignment.centerLeft,
-                      child: KeyframeDisplayWidget(
-                        pixelsPerFrame: controller.pixelsPerFrame.value,
-                        frameNumber: kf.frameNumber.value,
-                        isSelected: isSelected,
-                        keyframeIconBuilder: keyframeIconBuilder,
-                        onDelete: () {
-                          track.removeKeyframeAt(kf.frameNumber.value);
-                        },
-                        onTap: () {
-                          controller.select(
-                            kf,
-                            track,
-                            append: HardwareKeyboard.instance.isShiftPressed,
-                          );
-                        },
-                        onFrameNumberChanged: (value) {
-                          controller.moveSelectedKeyframes(value.frameDelta);
-                        },
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
+              child: Flow(
+                clipBehavior: Clip.none,
+                delegate: _KeyframeFlowDelegate(
+                  controller: controller,
+                  scrollController: scrollController,
+                  keyframes: track.keyframes,
+                ),
+                children: track.keyframes.value.map((kf) {
+                  return ValueListenableBuilder(
+                    valueListenable: controller.selected,
+                    builder: (_, selected, __) {
+                      var isSelected = selected.contains(kf);
+                      return Align(
+                        alignment: Alignment.centerLeft,
+                        child: KeyframeDisplayWidget(
+                          pixelsPerFrame: controller.pixelsPerFrame.value,
+                          frameNumber: kf.frameNumber.value,
+                          isSelected: isSelected,
+                          keyframeIconBuilder: keyframeIconBuilder,
+                          onDelete: () {
+                            track.removeKeyframeAt(kf.frameNumber.value);
+                          },
+                          onTap: () {
+                            controller.select(
+                              kf,
+                              track,
+                              append: HardwareKeyboard.instance.isShiftPressed,
+                            );
+                          },
+                          onFrameNumberChanged: (value) {
+                            controller.moveSelectedKeyframes(value.frameDelta);
+                          },
+                        ),
+                      );
+                    },
+                  );
+                }).toList(),
+              ),
             ),
           );
         },
@@ -100,6 +110,7 @@ class _KeyframeFlowDelegate extends FlowDelegate {
 
   @override
   void paintChildren(FlowPaintingContext context) {
+    // Draw keyframes
     for (int i = 0; i < context.childCount; i++) {
       final keyframe = keyframes[i];
       final frameNumber = keyframe.frameNumber.value;
@@ -118,6 +129,73 @@ class _KeyframeFlowDelegate extends FlowDelegate {
 
   @override
   bool shouldRepaint(covariant _KeyframeFlowDelegate oldDelegate) {
+    return true;
+  }
+}
+
+class _KeyframeConnectionPainter extends CustomPainter {
+  final List<Keyframe> keyframes;
+  final TimelineController controller;
+  final ScrollController scrollController;
+  final KeyframeConnectionStyle connectionStyle;
+
+  _KeyframeConnectionPainter({
+    required this.keyframes,
+    required this.controller,
+    required this.scrollController,
+    required this.connectionStyle,
+  }) : super(
+          repaint: Listenable.merge([
+            scrollController,
+            controller.currentFrame,
+            controller.maxFrames,
+            controller.pixelsPerFrame,
+            controller.selected,
+            ...keyframes.map((kf) => kf.frameNumber),
+          ]),
+        );
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (!connectionStyle.showConnections || keyframes.length <= 1) {
+      return;
+    }
+
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final sortedKeyframes = List<Keyframe>.from(keyframes)
+      ..sort((a, b) => a.frameNumber.value.compareTo(b.frameNumber.value));
+    
+    final selectedKeyframes = controller.selected.value;
+    final pixelsPerFrame = controller.pixelsPerFrame.value;
+
+    for (int i = 0; i < sortedKeyframes.length - 1; i++) {
+      final currentKeyframe = sortedKeyframes[i];
+      final nextKeyframe = sortedKeyframes[i + 1];
+      
+      final startX = (currentKeyframe.frameNumber.value * pixelsPerFrame) - scrollController.offset;
+      final endX = (nextKeyframe.frameNumber.value * pixelsPerFrame) - scrollController.offset;
+      
+      // Only draw line if at least part of it is visible
+      if ((endX >= 0 && startX <= size.width) || 
+          (startX >= 0 && endX <= size.width)) {
+        final isCurrentSelected = selectedKeyframes.contains(currentKeyframe);
+        final isNextSelected = selectedKeyframes.contains(nextKeyframe);
+        final isSelected = isCurrentSelected || isNextSelected;
+        
+        paint.color = isSelected ? connectionStyle.selectedLineColor : connectionStyle.lineColor;
+        paint.strokeWidth = isSelected ? connectionStyle.selectedLineWidth : connectionStyle.lineWidth;
+        
+        final y = size.height / 2;
+        canvas.drawLine(Offset(startX, y), Offset(endX, y), paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _KeyframeConnectionPainter oldDelegate) {
     return true;
   }
 }

@@ -61,6 +61,9 @@ class TimelineWidget extends StatefulWidget {
   /// handled separately by channelValueEditorStyle.
   final ChannelValueTextFieldWidgetBuilder? channelValueEditorContainerBuilder;
 
+  /// Styling for the lines connecting consecutive keyframes in the timeline.
+  final KeyframeConnectionStyle keyframeConnectionStyle;
+
   const TimelineWidget({
     super.key,
     required this.controller,
@@ -72,6 +75,7 @@ class TimelineWidget extends StatefulWidget {
     this.backgroundStyle = const TimelineBackgroundStyle(),
     this.channelValueEditorStyle,
     this.channelValueEditorContainerBuilder,
+    this.keyframeConnectionStyle = const KeyframeConnectionStyle(),
   });
 
   @override
@@ -206,6 +210,7 @@ class _TimelineWidgetState<V extends TimelineObject>
                                         widget.channelValueEditorStyle,
                                     channelValueEditorContainerBuilder: widget
                                         .channelValueEditorContainerBuilder,
+                                    keyframeConnectionStyle: widget.keyframeConnectionStyle,
                                   ),
                                 ),
                               ),
