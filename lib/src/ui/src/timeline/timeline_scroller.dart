@@ -25,7 +25,6 @@ class TimelineScroller extends StatelessWidget {
       ),
       child: MiddleMouseScrollView(
         physics: ClampingScrollPhysics(),
-        hitTestBehavior: HitTestBehavior.translucent,
         clipBehavior: Clip.hardEdge,
         controller: scrollController,
         scrollDirection: Axis.horizontal,
@@ -38,13 +37,13 @@ class TimelineScroller extends StatelessWidget {
         },
         slivers: [
           SliverToBoxAdapter(
-            child: Listener(child:Container(
+            child: Container(
               color: Colors.transparent,
               width:
                   controller.maxFrames.value.toDouble() *
                   controller.pixelsPerFrame.value,
               child: inner,
-            )),
+            ),
           ),
         ],
       ),

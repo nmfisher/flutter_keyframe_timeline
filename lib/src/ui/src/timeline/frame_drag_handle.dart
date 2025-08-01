@@ -92,6 +92,7 @@ class _FrameDragHandleState extends State<FrameDragHandle> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   MouseRegion(
+                    opaque: false,
                     onEnter: _handleMouseEnter,
                     onExit: _handleMouseExit,
                     cursor: isDragging

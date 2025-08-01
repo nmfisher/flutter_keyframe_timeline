@@ -80,15 +80,12 @@ class TimelineWidget extends StatefulWidget {
 
   @override
   State<TimelineWidget> createState() => _TimelineWidgetState(controller);
-
-
 }
 
 class _TimelineWidgetState<V extends TimelineObject>
     extends State<TimelineWidget> {
   final TimelineController controller;
 
-  
   @override
   void initState() {
     super.initState();
@@ -175,22 +172,23 @@ class _TimelineWidgetState<V extends TimelineObject>
                               height: constraints.maxHeight,
                               right: 0,
                               left: trackNameWidth,
-                              child: MouseRegion(
-                                child: TimelineScroller(
-                                  inner: Container(),
-                                  controller: controller,
-                                  scrollController: _horizontalScrollController,
+                              child: TimelineScroller(
+                                inner: Container(
+                                  color: Colors.transparent,
                                 ),
+                                controller: controller,
+                                scrollController: _horizontalScrollController,
                               ),
                             ),
                             Padding(
                               padding: EdgeInsets.only(top: 30),
                               child: MouseRegion(
                                 hitTestBehavior: HitTestBehavior.translucent,
-                                opaque: false,
+                                opaque: true,
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.translucent,
                                   onTap: () {
+
                                     _focusNode.requestFocus();
                                     widget.controller.clearSelectedKeyframes();
                                   },
@@ -199,7 +197,8 @@ class _TimelineWidgetState<V extends TimelineObject>
                                     controller: controller,
                                     horizontalScrollController:
                                         _horizontalScrollController,
-                                    keyframeIconBuilder:widget.keyframeIconBuilder ,
+                                    keyframeIconBuilder:
+                                        widget.keyframeIconBuilder,
                                     keyframeToggleIconBuilder:
                                         widget.keyframeToggleIconBuilder,
                                     trackObjectExtraWidgetBuilder:
@@ -210,7 +209,8 @@ class _TimelineWidgetState<V extends TimelineObject>
                                         widget.channelValueEditorStyle,
                                     channelValueEditorContainerBuilder: widget
                                         .channelValueEditorContainerBuilder,
-                                    keyframeConnectionStyle: widget.keyframeConnectionStyle,
+                                    keyframeConnectionStyle:
+                                        widget.keyframeConnectionStyle,
                                   ),
                                 ),
                               ),

@@ -6,7 +6,6 @@ class MiddleMouseScrollView extends StatefulWidget {
   final ScrollController? controller;
   final ScrollPhysics? physics;
   final Axis scrollDirection;
-  final HitTestBehavior hitTestBehavior;
   final void Function(Offset localPosition) onPrimaryMouseDown;
   final Clip clipBehavior;
 
@@ -16,7 +15,6 @@ class MiddleMouseScrollView extends StatefulWidget {
     this.controller,
     this.physics,
     required this.scrollDirection,
-    required this.hitTestBehavior,
     required this.clipBehavior,
     required this.onPrimaryMouseDown,
   });
@@ -63,9 +61,8 @@ class _MiddleMouseScrollViewState extends State<MiddleMouseScrollView> {
     if (!_isMiddleMousePressed || _lastMousePosition == null) return;
 
     final delta = event.position - _lastMousePosition!;
-    final scrollDelta = widget.scrollDirection == Axis.vertical
-        ? -delta.dy
-        : -delta.dx;
+    final scrollDelta =
+        widget.scrollDirection == Axis.vertical ? -delta.dy : -delta.dx;
 
     _scrollController.position.moveTo(
       _scrollController.position.pixels + scrollDelta,
@@ -79,44 +76,35 @@ class _MiddleMouseScrollViewState extends State<MiddleMouseScrollView> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (d) {
-        _primaryMouseStart = d.localPosition;
-      },
-      onTapUp: (d) {
-        final travelled = (d.localPosition - _primaryMouseStart!).distance;
-        if (travelled < 2) {
-          widget.onPrimaryMouseDown.call(d.localPosition);
+    return Listener(
+      onPointerDown: (PointerDownEvent event) {
+        print("MMSV down");
+        if (event.buttons & kMiddleMouseButton != 0) {
+          print("set state");
+          setState(() {
+            _isMiddleMousePressed = true;
+            _lastMousePosition = event.position;
+          });
         }
       },
-      child: Listener(
-        onPointerDown: (PointerDownEvent event) {
-          if (event.buttons & kMiddleMouseButton != 0) {
-            setState(() {
-              _isMiddleMousePressed = true;
-              _lastMousePosition = event.position;
-            });
-          }
-        },
-        onPointerUp: (PointerUpEvent event) {
-          if (_isMiddleMousePressed) {
-            setState(() {
-              _isMiddleMousePressed = false;
-              _lastMousePosition = null;
-            });
-          }
-        },
-        onPointerMove: _handlePointerMove,
-        onPointerSignal: _handleMiddleMouseScroll,
-        behavior: HitTestBehavior.translucent,
-        child: CustomScrollView(
-          hitTestBehavior: HitTestBehavior.translucent,
-          scrollDirection: widget.scrollDirection,
-          clipBehavior: widget.clipBehavior,
-          controller: _scrollController,
-          physics: widget.physics ?? const NeverScrollableScrollPhysics(),
-          slivers: widget.slivers,
-        ),
+      onPointerUp: (PointerUpEvent event) {
+        if (_isMiddleMousePressed) {
+          setState(() {
+            _isMiddleMousePressed = false;
+            _lastMousePosition = null;
+          });
+        }
+      },
+      onPointerMove: _handlePointerMove,
+      onPointerSignal: _handleMiddleMouseScroll,
+      behavior: HitTestBehavior.opaque,
+      child: CustomScrollView(
+        hitTestBehavior: HitTestBehavior.translucent,
+        scrollDirection: widget.scrollDirection,
+        clipBehavior: widget.clipBehavior,
+        controller: _scrollController,
+        physics: widget.physics ?? const NeverScrollableScrollPhysics(),
+        slivers: widget.slivers,
       ),
     );
   }
