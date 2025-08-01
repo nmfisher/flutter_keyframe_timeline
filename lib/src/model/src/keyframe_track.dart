@@ -3,9 +3,8 @@ import 'package:logging/logging.dart';
 import 'channel_types.dart';
 import 'keyframe.dart';
 import 'base_track.dart';
-import 'track_item.dart';
-import 'keyframe_track_item.dart';
 import 'track_type.dart';
+import 'track_item.dart';
 
 //
 // KeyframeTrack<V> contains zero or more keyframes for a given channel.
@@ -40,7 +39,7 @@ abstract class KeyframeTrack<V extends ChannelValue> extends BaseTrack<Animation
   bool hasKeyframeAt(int frame);
 
   //
-  // A map of frame numbers to keyframes.
+  // Returns a ValueListenable for the keyframes (computed from items).
   //
   ValueListenable<List<Keyframe<V>>> get keyframes;
 
@@ -71,9 +70,6 @@ abstract class KeyframeTrack<V extends ChannelValue> extends BaseTrack<Animation
   String get label;
 
   //
-  Future dispose();
-
-  //
   KeyframeTrack<U> cast<U extends ChannelValue>();
 
   //
@@ -85,10 +81,6 @@ abstract class KeyframeTrack<V extends ChannelValue> extends BaseTrack<Animation
 
 class KeyframeTrackImpl<V extends ChannelValue> extends BaseTrackImpl<AnimationTrackType> implements KeyframeTrack<V> {
   late final _logger = Logger(this.runtimeType.toString());
-
-  @override
-  final ValueNotifier<List<Keyframe<V>>> keyframes =
-      ValueNotifier<List<Keyframe<V>>>([]);
 
   @override
   final List<String> labels;
@@ -115,11 +107,8 @@ class KeyframeTrackImpl<V extends ChannelValue> extends BaseTrackImpl<AnimationT
     final v = factory.create<V>(defaultValues);
     this.value = ValueNotifier<V>(v);
     for (final kf in keyframes) {
-      this.keyframes.value.add(kf);
       kf.frameNumber.addListener(_onKeyframeFrameUpdated);
-      
-      final keyframeItem = KeyframeTrackItem<V>(keyframe: kf);
-      items.value.add(keyframeItem);
+      items.value.add(kf);
     }
     items.notifyListeners();
   }
@@ -128,16 +117,21 @@ class KeyframeTrackImpl<V extends ChannelValue> extends BaseTrackImpl<AnimationT
   Type getType() => V;
 
   @override
+  ValueListenable<List<Keyframe<V>>> get keyframes {
+    return _KeyframesListenable<V>(items);
+  }
+
+  @override
   KeyframeTrack<U> cast<U extends ChannelValue>() {
     return KeyframeTrackImpl<U>(
-        keyframes: keyframes.value.cast<Keyframe<U>>(),
+        keyframes: items.value.whereType<Keyframe<V>>().cast<Keyframe<U>>().toList(),
         labels: labels,
         label: label,
         defaultValues: defaultValues);
   }
 
   void _onKeyframeFrameUpdated() {
-    this.keyframes.notifyListeners();
+    items.notifyListeners();
   }
 
   @override
@@ -151,12 +145,9 @@ class KeyframeTrackImpl<V extends ChannelValue> extends BaseTrackImpl<AnimationT
   Future addKeyframe(Keyframe<V> keyframe) async {
     keyframe.frameNumber.addListener(_onKeyframeFrameUpdated);
     await removeKeyframeAt(keyframe.frameNumber.value);
-    keyframes.value.add(keyframe);
 
-    final keyframeItem = KeyframeTrackItem<V>(keyframe: keyframe);
-    await addItem(keyframeItem);
+    await addItem(keyframe);
 
-    keyframes.notifyListeners();
     _logger.info(
       "Added keyframe at ${keyframe.frameNumber.value} with values ${keyframe.value.value.unwrap()} ",
     );
@@ -169,50 +160,37 @@ class KeyframeTrackImpl<V extends ChannelValue> extends BaseTrackImpl<AnimationT
       return;
     }
     
-    final keyframeItems = items.value
-        .whereType<KeyframeTrackItem<V>>()
-        .where((item) => item.keyframe == existing)
-        .toList();
-    
-    for (final item in keyframeItems) {
-      await removeItem(item);
-    }
-    
-    await existing?.dispose();
-    keyframes.value.remove(existing);
-    keyframes.notifyListeners();
+    await removeItem(existing);
   }
 
   @override
   Keyframe<V>? keyframeAt(int frame) {
-    return keyframes.value
-            .firstWhereOrNull((kf) => kf.frameNumber.value == frame)
-        as Keyframe<V>?;
+    return items.value.whereType<Keyframe<V>>()
+            .firstWhereOrNull((kf) => kf.frameNumber.value == frame);
   }
 
   @override
   Future dispose() async {
-    for (final keyframe in keyframes.value) {
-      keyframe.dispose();
+    for (final keyframe in items.value.whereType<Keyframe<V>>()) {
+      await keyframe.dispose();
     }
-    keyframes.value.clear();
-    keyframes.dispose();
     value.dispose();
     await super.dispose();
   }
 
   @override
   V calculate(int frameNumber, {V? initial}) {
-    if (keyframes.value.isEmpty) {
+    final keyframes = items.value.whereType<Keyframe<V>>().toList();
+    if (keyframes.isEmpty) {
       return initial ?? value.value;
     }
 
     Keyframe? start;
     Keyframe? end;
 
-    keyframes.value.sort();
+    keyframes.sort();
 
-    for (final kf in keyframes.value) {
+    for (final kf in keyframes) {
       if (kf.frameNumber.value > frameNumber) {
         end = kf;
         break;
@@ -223,11 +201,11 @@ class KeyframeTrackImpl<V extends ChannelValue> extends BaseTrackImpl<AnimationT
     }
 
     if (start == null) {
-      return keyframes.value.first.value.value;
+      return keyframes.first.value.value;
     }
 
     if (end == null) {
-      return keyframes.value.last.value.value;
+      return keyframes.last.value.value;
     }
 
     var linearRatio = (frameNumber - start.frameNumber.value) /
@@ -252,7 +230,7 @@ class KeyframeTrackImpl<V extends ChannelValue> extends BaseTrackImpl<AnimationT
   BaseTrack<AnimationTrackType> clone() {
     return KeyframeTrackImpl<V>(
       factory: factory,
-      keyframes: keyframes.value.map((kf) => KeyframeImpl<V>(
+      keyframes: items.value.whereType<Keyframe<V>>().map((kf) => KeyframeImpl<V>(
         frameNumber: kf.frameNumber.value,
         value: kf.value.value,
         interpolation: kf.interpolation.value,
@@ -264,8 +242,30 @@ class KeyframeTrackImpl<V extends ChannelValue> extends BaseTrackImpl<AnimationT
   }
 }
 
-extension on List<Keyframe> {
-  Keyframe? firstWhereOrNull(bool Function(dynamic keyframe) param0) {
-    return cast<Keyframe?>().firstWhere(param0, orElse: () => null);
+class _KeyframesListenable<V extends ChannelValue> extends ValueListenable<List<Keyframe<V>>> {
+  final ValueListenable<List<TrackItem>> _items;
+  
+  _KeyframesListenable(this._items);
+  
+  @override
+  List<Keyframe<V>> get value => _items.value.whereType<Keyframe<V>>().toList();
+  
+  @override
+  void addListener(VoidCallback listener) {
+    _items.addListener(listener);
+  }
+  
+  @override
+  void removeListener(VoidCallback listener) {
+    _items.removeListener(listener);
+  }
+}
+
+extension KeyframeListExtension<V extends ChannelValue> on Iterable<Keyframe<V>> {
+  Keyframe<V>? firstWhereOrNull(bool Function(Keyframe<V> keyframe) test) {
+    for (final element in this) {
+      if (test(element)) return element;
+    }
+    return null;
   }
 }

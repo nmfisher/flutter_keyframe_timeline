@@ -152,7 +152,6 @@ class _TrackValueEditorWidgetState
             viewModel.deleteKeyframeForCurrentFrame();
           }
         }
-
         return widget.keyframeToggleIconBuilder(
           context,
           hasKeyframeAtCurrentFrame,

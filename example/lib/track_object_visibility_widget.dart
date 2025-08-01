@@ -4,7 +4,6 @@ import 'package:flutter_keyframe_timeline_example/object/objects.dart';
 import 'package:mix/mix.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-
 class TrackObjectVisibilityWidget extends StatelessWidget {
   final RandomObject object;
   final bool isActive;

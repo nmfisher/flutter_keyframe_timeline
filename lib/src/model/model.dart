@@ -7,7 +7,6 @@ export 'src/time_range.dart';
 export 'src/track_item.dart';
 export 'src/track_type.dart';
 export 'src/base_track.dart';
-export 'src/keyframe_track_item.dart';
 export 'src/clip.dart';
 export 'src/transition.dart';
 export 'src/video_track.dart';

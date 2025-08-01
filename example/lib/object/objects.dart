@@ -19,25 +19,25 @@ class RandomObject {
   double get scaleY => _scaleY;
   Color get color => _color;
 
-  late final positionTrack = TrackImpl(
+  late final positionTrack = KeyframeTrackImpl(
     keyframes: <Keyframe<Vector2ChannelValue>>[],
     labels: ["x", "y"],
     label: "position",
     defaultValues: [0.0, 0.0, 0.0]
   );
-  late final rotationTrack = TrackImpl(
+  late final rotationTrack = KeyframeTrackImpl(
     keyframes: <Keyframe<ScalarChannelValue>>[],
     labels: ["rads"],
     label: "rotation",
     defaultValues: [0.0]
   );
-  late final scaleTrack = TrackImpl(
+  late final scaleTrack = KeyframeTrackImpl(
     keyframes: <Keyframe<Vector2ChannelValue>>[],
     labels: ["x", "y"],
     label: "scale",
     defaultValues: [1.0, 1.0, 1.0]
   );
-  late final colorTrack = TrackImpl(
+  late final colorTrack = KeyframeTrackImpl(
     keyframes: <Keyframe<Vector4ChannelValue>>[],
     labels: ["r", "g", "b", "a"],
     label: "color",
@@ -158,7 +158,7 @@ class RandomObject {
     }
   }
 
-  void setActualValue(Track track, List<num> values) {
+  void setActualValue(KeyframeTrack track, List<num> values) {
     if (track == positionTrack) {
       _position = Offset(values[0].toDouble(), values[1].toDouble());
     } else if (track == scaleTrack) {
