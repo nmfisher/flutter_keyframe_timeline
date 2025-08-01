@@ -51,9 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _objectHolder = ObjectHolder(_numObjects, () {
       setState(() {});
     });
-    _controller = TimelineController.create(
-      _objectHolder.animatableObjects,
-    );
+    _controller = TimelineController.create(_objectHolder.animatableObjects);
     _objectHolder.setTimelineController(_controller);
     final map = TimelineSerializer.toMap(_objectHolder.animatableObjects.first);
     final foo = TimelineSerializer.fromMap(map);
@@ -219,13 +217,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           dimensionIndex,
                         ) {
                           return Container(
-                            width: 60,
+                            width: 120,
                             padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.blue.shade300),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: Column(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
@@ -235,14 +233,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                     color: Colors.blue.shade600,
                                   ),
                                 ),
-                                textField,
+                                SizedBox(width: 3),
+                                Expanded(child: textField),
                               ],
                             ),
                           );
                         },
                   ),
                 ),
-
                 Positioned(
                   top: 8,
                   left: 8,

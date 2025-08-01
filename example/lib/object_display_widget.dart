@@ -21,9 +21,9 @@ class _ObjectDisplayWidgetState extends State<ObjectDisplayWidget> {
   RandomObject? _selectedObject;
   
   Widget _renderVideoFrame(VideoObject videoObj, int currentFrame) {
-    // Clamp frame to available range
-    final frameIndex = currentFrame.clamp(0, videoObj.pixelData.length - 1);
-    final frameData = videoObj.pixelData[frameIndex];
+    // Calculate the video frame index accounting for clip offset
+    final videoFrameIndex = (currentFrame - videoObj.startFrame).clamp(0, videoObj.pixelData.length - 1);
+    final frameData = videoObj.pixelData[videoFrameIndex];
     
     // Create a custom painter to render the grayscale pixel data
     return CustomPaint(
