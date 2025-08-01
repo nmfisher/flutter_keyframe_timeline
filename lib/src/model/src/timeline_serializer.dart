@@ -47,7 +47,7 @@ class TimelineSerializer {
     );
   }
 
-  static AnimatableObject fromMap(Map<String, dynamic> object,
+  static TimelineObject fromMap(Map<String, dynamic> object,
       {ChannelValueFactory factory = const DefaultChannelValueFactory()}) {
     var name = object["name"] as String;
 
@@ -67,7 +67,7 @@ class TimelineSerializer {
         })
         .cast<AnimationTrack>()
         .toList();
-    return AnimatableObjectImpl(tracks: tracks, name: name);
+    return TimelineObjectImpl(tracks: tracks, name: name);
   }
 
   static Type getType<T>() {
@@ -100,7 +100,7 @@ class TimelineSerializer {
     throw Exception();
   }
 
-  static Map<String, dynamic> toMap(AnimatableObject object) {
+  static Map<String, dynamic> toMap(TimelineObject object) {
     return {
       'name': object.displayName.value,
       'tracks': object.tracks.map((track) {

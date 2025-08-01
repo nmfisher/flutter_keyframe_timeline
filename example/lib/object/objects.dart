@@ -44,7 +44,7 @@ class RandomObject {
     defaultValues: [1.0, 1.0, 1.0, 1.0]
   );
 
-  late final AnimatableObjectImpl animatableObject;
+  late final TimelineObjectImpl animatableObject;
 
   //
   ValueNotifier<bool> isVisible = ValueNotifier<bool>(true);
@@ -63,7 +63,7 @@ class RandomObject {
        _scaleX = scaleX,
        _scaleY = scaleY,
        _color = color {
-    animatableObject = AnimatableObjectImpl(
+    animatableObject = TimelineObjectImpl(
       tracks: [positionTrack, rotationTrack, scaleTrack, colorTrack],
       name: name,
     );
@@ -180,15 +180,15 @@ class RandomObject {
 class ObjectHolder  {
   final _rnd = Random();
 
-  final _lookup = <AnimatableObject, RandomObject>{};
+  final _lookup = <TimelineObject, RandomObject>{};
 
   late List<RandomObject> objects;
-  late List<AnimatableObject> animatableObjects;
+  late List<TimelineObject> animatableObjects;
 
   final void Function() onUpdate;
   TimelineController? _timelineController;
 
-  RandomObject? get(AnimatableObject object) {
+  RandomObject? get(TimelineObject object) {
     return _lookup[object];
   }
 
@@ -196,7 +196,7 @@ class ObjectHolder  {
     _timelineController = controller;
   }
 
-  void removeObject(AnimatableObject animatableObject) {
+  void removeObject(TimelineObject animatableObject) {
     final object = _lookup[animatableObject];
     if (object != null) {
       objects.remove(object);
@@ -262,7 +262,7 @@ class ObjectHolder  {
 
   // @override
   // U getCurrentValue<U extends ChannelValue>(
-  //   AnimatableObject animatableObject,
+  //   TimelineObject animatableObject,
   //   AnimationTrack<U> track,
   // ) {
   //   final object = _lookup[animatableObject]!;
@@ -296,7 +296,7 @@ class ObjectHolder  {
 
   // @override
   // void setActualValue<U extends ChannelValue>(
-  //   AnimatableObject animatableObject,
+  //   TimelineObject animatableObject,
   //   AnimationTrack<U> track,
   //   List<num> values,
   // ) {

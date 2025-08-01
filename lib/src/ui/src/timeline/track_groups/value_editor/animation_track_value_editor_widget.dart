@@ -4,7 +4,7 @@ import 'package:mix/mix.dart';
 import 'animation_track_value_editor_viewmodel.dart';
 
 class AnimationTrackValueEditorWidget extends StatefulWidget {
-  final AnimatableObject object;
+  final TimelineObject object;
   final AnimationTrack track;
   final TimelineController controller;
   final KeyframeToggleIconBuilder keyframeToggleIconBuilder;

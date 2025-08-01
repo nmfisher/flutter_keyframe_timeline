@@ -3,13 +3,13 @@ import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 
 abstract class TimelineController {
   //
-  ValueNotifier<List<AnimatableObject>> get animatableObjects;
+  ValueNotifier<List<TimelineObject>> get animatableObjects;
 
   //
-  void addObject(AnimatableObject object);
+  void addObject(TimelineObject object);
 
   //
-  void deleteObject(AnimatableObject object);
+  void deleteObject(TimelineObject object);
 
   //
   ValueListenable<int> get pixelsPerFrame;
@@ -48,24 +48,24 @@ abstract class TimelineController {
   void deleteSelectedKeyframes();
 
   //
-  ValueListenable<Set<AnimatableObject>> get active;
+  ValueListenable<Set<TimelineObject>> get active;
 
   //
-  void setActive(AnimatableObject object, bool active, {bool append = false});
+  void setActive(TimelineObject object, bool active, {bool append = false});
 
   //
-  void updateActive(Set<AnimatableObject> objects);
+  void updateActive(Set<TimelineObject> objects);
 
   //
-  ValueListenable<Set<AnimatableObject>> get expanded;
+  ValueListenable<Set<TimelineObject>> get expanded;
 
   //
-  void setExpanded(AnimatableObject object, bool expanded);
+  void setExpanded(TimelineObject object, bool expanded);
 
   // Dispose this instance and all associated ValueNotifiers.
   void dispose();
 
-  factory TimelineController.create(List<AnimatableObject> initial) {
+  factory TimelineController.create(List<TimelineObject> initial) {
     return TimelineControllerImpl._(initial);
   }
 }
@@ -78,7 +78,7 @@ abstract class TimelineController {
 //   // from the keyframes would otherwise be different.
 //   //
 //   U getCurrentValue<U extends ChannelValue>(
-//     AnimatableObject target,
+//     TimelineObject target,
 //     AnimationTrack<U> track,
 //   );
 
@@ -89,7 +89,7 @@ abstract class TimelineController {
 //   // from the keyframes would otherwise be different.
 //   //
 //   void setActualValue<U extends ChannelValue>(
-//     AnimatableObject object,
+//     TimelineObject object,
 //     AnimationTrack<U> track,
 //     List<num> values,
 //   );
@@ -97,10 +97,10 @@ abstract class TimelineController {
 
 class TimelineControllerImpl implements TimelineController {
   @override
-  final ValueNotifier<List<AnimatableObject>> animatableObjects =
-      ValueNotifier<List<AnimatableObject>>([]);
+  final ValueNotifier<List<TimelineObject>> animatableObjects =
+      ValueNotifier<List<TimelineObject>>([]);
 
-  TimelineControllerImpl._(List<AnimatableObject> initial) {
+  TimelineControllerImpl._(List<TimelineObject> initial) {
     animatableObjects.value.addAll(initial);
     this.currentFrame.addListener(_onCurrentFrameChanged);
   }
@@ -207,11 +207,11 @@ class TimelineControllerImpl implements TimelineController {
   }
 
   @override
-  ValueNotifier<Set<AnimatableObject>> active =
-      ValueNotifier<Set<AnimatableObject>>({});
+  ValueNotifier<Set<TimelineObject>> active =
+      ValueNotifier<Set<TimelineObject>>({});
 
   @override
-  void setActive(AnimatableObject object, bool active, {bool append = false}) {
+  void setActive(TimelineObject object, bool active, {bool append = false}) {
     if (!active) {
       this.active.value.remove(object);
     } else {
@@ -224,20 +224,20 @@ class TimelineControllerImpl implements TimelineController {
   }
 
   @override
-  void updateActive(Set<AnimatableObject> objects) {
+  void updateActive(Set<TimelineObject> objects) {
     this.active.value.clear();
     this.active.value.addAll(objects);
     this.active.notifyListeners();
   }
 
   @override
-  void addObject(AnimatableObject object) {
+  void addObject(TimelineObject object) {
     this.animatableObjects.value.add(object);
     this.animatableObjects.notifyListeners();
   }
 
   @override
-  void deleteObject(AnimatableObject object) {
+  void deleteObject(TimelineObject object) {
     this.active.value.remove(object);
     this.selected.value.remove(object);
     this.animatableObjects.value.remove(object);
@@ -248,12 +248,12 @@ class TimelineControllerImpl implements TimelineController {
 
   //
   @override
-  ValueNotifier<Set<AnimatableObject>> expanded =
-      ValueNotifier<Set<AnimatableObject>>({});
+  ValueNotifier<Set<TimelineObject>> expanded =
+      ValueNotifier<Set<TimelineObject>>({});
 
   //
   @override
-  void setExpanded(AnimatableObject object, bool expanded) {
+  void setExpanded(TimelineObject object, bool expanded) {
     if (expanded) {
       this.expanded.value.add(object);
     } else {

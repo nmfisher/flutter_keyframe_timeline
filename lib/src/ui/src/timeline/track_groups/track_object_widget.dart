@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyframe_timeline/src/model/model.dart';
-import 'package:flutter_keyframe_timeline/src/model/src/animatable_object.dart';
+import 'package:flutter_keyframe_timeline/src/model/src/timeline_object.dart';
 import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/expand_icon.dart';
 
@@ -13,7 +13,7 @@ import 'package:mix/mix.dart';
 class TrackObjectWidget extends StatelessWidget {
   final TimelineController controller;
   final ScrollController scrollController;
-  final AnimatableObject object;
+  final TimelineObject object;
 
   final int index;
   final double trackNameWidth;

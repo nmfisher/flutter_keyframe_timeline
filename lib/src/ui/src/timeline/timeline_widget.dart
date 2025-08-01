@@ -80,7 +80,7 @@ class TimelineWidget extends StatefulWidget {
 
 }
 
-class _TimelineWidgetState<V extends AnimatableObject>
+class _TimelineWidgetState<V extends TimelineObject>
     extends State<TimelineWidget> {
   final TimelineController controller;
 

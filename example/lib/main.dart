@@ -82,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     trackObjectExtraWidgetBuilder:
                         (
                           BuildContext context,
-                          AnimatableObject animatableObject,
+                          TimelineObject animatableObject,
                           bool trackObjectIsActive,
                           bool trackObjectIsExpanded,
                         ) {

@@ -121,7 +121,7 @@ Widget kDefaultKeyframeToggleIconBuilder(BuildContext context,
 
 typedef TrackObjectExtraWidgetBuilder = Widget Function(
     BuildContext context,
-    AnimatableObject object,
+    TimelineObject object,
     bool trackObjectIsActive,
     bool trackObjectIsExpanded);
 

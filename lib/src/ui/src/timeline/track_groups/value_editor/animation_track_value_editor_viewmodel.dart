@@ -34,7 +34,7 @@ class AnimationTrackValueEditorViewModelImpl<V extends ChannelValue>
 
   final ValueNotifier<List<num>> values = ValueNotifier<List<num>>([]);
 
-  final AnimatableObject object;
+  final TimelineObject object;
   final AnimationTrack<V> track;
   final TimelineController controller;
 
