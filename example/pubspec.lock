@@ -84,7 +84,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.0.1-pre3"
+    version: "0.0.2-pre1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -255,6 +255,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.6"
+  timeline_dart:
+    dependency: transitive
+    description:
+      path: "../../timeline_dart"
+      relative: true
+    source: path
+    version: "1.0.0"
   typed_data:
     dependency: transitive
     description:

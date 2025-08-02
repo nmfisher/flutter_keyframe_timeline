@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_keyframe_timeline/src/model/model.dart';
+import 'package:timeline_dart/timeline_dart.dart';
 import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/frame_drag_handle.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_background.dart';
@@ -188,7 +188,6 @@ class _TimelineWidgetState<V extends TimelineObject>
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.translucent,
                                   onTap: () {
-
                                     _focusNode.requestFocus();
                                     widget.controller.clearSelectedKeyframes();
                                   },

@@ -5,8 +5,10 @@ import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart' hide C
 
 import 'keyframe/keyframe_display_widget.dart';
 
+import 'package:timeline_dart/timeline_dart.dart' as dart;
+
 class TrackKeyframesWidget extends StatelessWidget {
-  final KeyframeTrack track;
+  final FlutterKeyframeTrack track;
   final TimelineController controller;
   final ScrollController scrollController;
   final KeyframeIconBuilder keyframeIconBuilder;
@@ -24,7 +26,7 @@ class TrackKeyframesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: track.keyframes,
+      valueListenable: track.keyframesListenable,
       builder: (_, keyframes, __) => LayoutBuilder(
         builder: (context, constraints) {
           // Calculate the total width needed for all keyframes
@@ -35,7 +37,7 @@ class TrackKeyframesWidget extends StatelessWidget {
                 : 50, // Fallback height
             child: CustomPaint(
               painter: _KeyframeConnectionPainter(
-                keyframes: track.keyframes.value,
+                keyframes: keyframes,
                 controller: controller,
                 scrollController: scrollController,
                 connectionStyle: connectionStyle,
@@ -45,9 +47,9 @@ class TrackKeyframesWidget extends StatelessWidget {
                 delegate: _KeyframeFlowDelegate(
                   controller: controller,
                   scrollController: scrollController,
-                  keyframes: track.keyframes,
+                  keyframes: track.keyframesListenable,
                 ),
-                children: track.keyframes.value.map((kf) {
+                children: keyframes.map((kf) {
                   return ValueListenableBuilder(
                     valueListenable: controller.selected,
                     builder: (_, selected, __) {
@@ -56,11 +58,11 @@ class TrackKeyframesWidget extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         child: KeyframeDisplayWidget(
                           pixelsPerFrame: controller.pixelsPerFrame.value,
-                          frameNumber: kf.frameNumber.value,
+                          frameNumber: kf.frameNumber,
                           isSelected: isSelected,
                           keyframeIconBuilder: keyframeIconBuilder,
                           onDelete: () {
-                            track.removeKeyframeAt(kf.frameNumber.value);
+                            track.removeKeyframeAt(kf.frameNumber);
                           },
                           onTap: () {
                             controller.select(
@@ -89,12 +91,12 @@ class TrackKeyframesWidget extends StatelessWidget {
 class _KeyframeFlowDelegate extends FlowDelegate {
   final TimelineController controller;
   final ScrollController scrollController;
-  late final List<Keyframe> keyframes;
+  late final List<dart.Keyframe> keyframes;
 
   _KeyframeFlowDelegate({
     required this.controller,
     required this.scrollController,
-    required ValueListenable<List<Keyframe>> keyframes,
+    required ValueListenable<List<dart.Keyframe>> keyframes,
   }) : super(
           repaint: Listenable.merge([
             scrollController,
@@ -102,7 +104,6 @@ class _KeyframeFlowDelegate extends FlowDelegate {
             controller.maxFrames,
             controller.pixelsPerFrame,
             keyframes,
-            ...keyframes.value.map((kf) => kf.frameNumber),
           ]),
         ) {
     this.keyframes = keyframes.value.toList();
@@ -113,7 +114,7 @@ class _KeyframeFlowDelegate extends FlowDelegate {
     // Draw keyframes
     for (int i = 0; i < context.childCount; i++) {
       final keyframe = keyframes[i];
-      final frameNumber = keyframe.frameNumber.value;
+      final frameNumber = keyframe.frameNumber;
       final pixelsPerFrame = controller.pixelsPerFrame.value;
 
       final xPosition =
@@ -134,7 +135,7 @@ class _KeyframeFlowDelegate extends FlowDelegate {
 }
 
 class _KeyframeConnectionPainter extends CustomPainter {
-  final List<Keyframe> keyframes;
+  final List<dart.Keyframe> keyframes;
   final TimelineController controller;
   final ScrollController scrollController;
   final KeyframeConnectionStyle connectionStyle;
@@ -151,7 +152,6 @@ class _KeyframeConnectionPainter extends CustomPainter {
             controller.maxFrames,
             controller.pixelsPerFrame,
             controller.selected,
-            ...keyframes.map((kf) => kf.frameNumber),
           ]),
         );
 
@@ -165,8 +165,8 @@ class _KeyframeConnectionPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    final sortedKeyframes = List<Keyframe>.from(keyframes)
-      ..sort((a, b) => a.frameNumber.value.compareTo(b.frameNumber.value));
+    final sortedKeyframes = List<dart.Keyframe>.from(keyframes)
+      ..sort((a, b) => a.frameNumber.compareTo(b.frameNumber));
     
     final selectedKeyframes = controller.selected.value;
     final pixelsPerFrame = controller.pixelsPerFrame.value;
@@ -175,8 +175,8 @@ class _KeyframeConnectionPainter extends CustomPainter {
       final currentKeyframe = sortedKeyframes[i];
       final nextKeyframe = sortedKeyframes[i + 1];
       
-      final startX = (currentKeyframe.frameNumber.value * pixelsPerFrame) - scrollController.offset;
-      final endX = (nextKeyframe.frameNumber.value * pixelsPerFrame) - scrollController.offset;
+      final startX = (currentKeyframe.frameNumber * pixelsPerFrame) - scrollController.offset;
+      final endX = (nextKeyframe.frameNumber * pixelsPerFrame) - scrollController.offset;
       
       // Only draw line if at least part of it is visible
       if ((endX >= 0 && startX <= size.width) || 

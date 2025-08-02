@@ -39,13 +39,13 @@ class VideoObject {
     );
     
     // Create the clip that represents this video in the timeline
-    videoClip = Clip(
+    videoClip = dart.Clip(
       source: mediaSource,
-      trackRange: TimeRange(
+      trackRange: dart.TimeRange(
         startFrame: startFrame,
         endFrame: startFrame + pixelData.length,
       ),
-      sourceRange: TimeRange(
+      sourceRange: dart.TimeRange(
         startFrame: 0,
         endFrame: pixelData.length,
       ),
@@ -73,8 +73,8 @@ class VideoObject {
   
   // Method to move the video clip to a new start frame
   void setStartFrame(int newStartFrame) {
-    final duration = videoClip.timeRange.value.duration;
-    videoClip.setTimeRange(TimeRange(
+    final duration = videoClip.timeRange.duration;
+    videoClip.setTimeRange(dart.TimeRange(
       startFrame: newStartFrame,
       endFrame: newStartFrame + duration,
     ));
@@ -87,17 +87,19 @@ class VideoObject {
   }
   
   // Get the current start frame
-  int get startFrame => videoClip.timeRange.value.startFrame;
+  int get startFrame => videoClip.timeRange.startFrame;
   
   // Get the current end frame
-  int get endFrame => videoClip.timeRange.value.endFrame;
+  int get endFrame => videoClip.timeRange.endFrame;
   
   // Get the duration in frames
-  int get duration => videoClip.timeRange.value.duration;
+  int get duration => videoClip.timeRange.duration;
   
-  late final TimelineObjectImpl animatableObject = TimelineObjectImpl(
-    tracks: [videoTrack],
-    name: "Video $name",
+  late FlutterTimelineObject animatableObject = FlutterTimelineObject.fromDart(
+    TimelineObjectImpl(
+      tracks: [videoTrack],
+      name: "Video $name",
+    )
   );
 }
 
@@ -141,7 +143,7 @@ class RandomObject {
     defaultValues: [1.0, 1.0, 1.0, 1.0]
   );
 
-  late final TimelineObjectImpl animatableObject;
+  late FlutterTimelineObject animatableObject;
 
   //
   ValueNotifier<bool> isVisible = ValueNotifier<bool>(true);
@@ -160,9 +162,11 @@ class RandomObject {
        _scaleX = scaleX,
        _scaleY = scaleY,
        _color = color {
-    animatableObject = TimelineObjectImpl(
-      tracks: [positionTrack, rotationTrack, scaleTrack, colorTrack],
-      name: name,
+    animatableObject = FlutterTimelineObject.fromDart(
+      TimelineObjectImpl(
+        tracks: [positionTrack, rotationTrack, scaleTrack, colorTrack],
+        name: name,
+      )
     );
 
     setPosition(position);
@@ -277,15 +281,15 @@ class RandomObject {
 class ObjectHolder  {
   final _rnd = Random();
 
-  final _lookup = <TimelineObject, dynamic>{};
+  final _lookup = <FlutterTimelineObject, dynamic>{};
 
   late List<dynamic> objects;
-  late List<TimelineObject> animatableObjects;
+  late List<FlutterTimelineObject> animatableObjects;
 
   final void Function() onUpdate;
   TimelineController? _timelineController;
 
-  dynamic get(TimelineObject object) {
+  dynamic get(FlutterTimelineObject object) {
     return _lookup[object];
   }
 
@@ -301,7 +305,7 @@ class ObjectHolder  {
     ));
   }
 
-  void removeObject(TimelineObject animatableObject) {
+  void removeObject(FlutterTimelineObject animatableObject) {
     final object = _lookup[animatableObject];
     if (object != null) {
       objects.remove(object);
@@ -379,7 +383,7 @@ class ObjectHolder  {
     });
 
     animatableObjects = objects
-        .map<TimelineObject>((object) => object.animatableObject)
+        .map<FlutterTimelineObject>((object) => object.animatableObject)
         .toList();
   }
 

@@ -1,15 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
+import 'package:timeline_dart/timeline_dart.dart' as dart;
 
 abstract class TimelineController {
   //
-  ValueNotifier<List<TimelineObject>> get animatableObjects;
+  ValueNotifier<List<FlutterTimelineObject>> get animatableObjects;
 
   //
-  void addObject(TimelineObject object);
+  void addObject(FlutterTimelineObject object);
 
   //
-  void deleteObject(TimelineObject object);
+  void deleteObject(FlutterTimelineObject object);
 
   //
   ValueListenable<int> get pixelsPerFrame;
@@ -71,17 +72,17 @@ abstract class TimelineController {
   // Dispose this instance and all associated ValueNotifiers.
   void dispose();
 
-  factory TimelineController.create(List<TimelineObject> initial) {
+  factory TimelineController.create(List<FlutterTimelineObject> initial) {
     return TimelineControllerImpl._(initial);
   }
 }
 
 class TimelineControllerImpl implements TimelineController {
   @override
-  final ValueNotifier<List<TimelineObject>> animatableObjects =
-      ValueNotifier<List<TimelineObject>>([]);
+  final ValueNotifier<List<FlutterTimelineObject>> animatableObjects =
+      ValueNotifier<List<FlutterTimelineObject>>([]);
 
-  TimelineControllerImpl._(List<TimelineObject> initial) {
+  TimelineControllerImpl._(List<FlutterTimelineObject> initial) {
     animatableObjects.value.addAll(initial);
     this.currentFrame.addListener(_onCurrentFrameChanged);
   }
@@ -90,7 +91,7 @@ class TimelineControllerImpl implements TimelineController {
     for (final object in animatableObjects.value) {
       final keyframeTracks = object.getTracks<KeyframeTrack>();
       for (final track in keyframeTracks) {
-        if (track.keyframes.value.isNotEmpty) {
+        if (track.keyframes.isNotEmpty) {
           var value = track.calculate(currentFrame.value);
           track.setValue(value);
         }
@@ -136,8 +137,8 @@ class TimelineControllerImpl implements TimelineController {
   void skipToEnd() {
     int last = 0;
     for (final kf in selected.value) {
-      if (kf.frameNumber.value > last) {
-        last = kf.frameNumber.value;
+      if (kf.frameNumber > last) {
+        last = kf.frameNumber;
       }
     }
     if (last == 0) {
@@ -151,8 +152,8 @@ class TimelineControllerImpl implements TimelineController {
   void skipToStart() {
     int first = maxFrames.value;
     for (final kf in selected.value) {
-      if (kf.frameNumber.value < first) {
-        first = kf.frameNumber.value;
+      if (kf.frameNumber < first) {
+        first = kf.frameNumber;
       }
     }
     setCurrentFrame(first);
@@ -213,7 +214,7 @@ class TimelineControllerImpl implements TimelineController {
   }
 
   @override
-  void addObject(TimelineObject object) {
+  void addObject(FlutterTimelineObject object) {
     this.animatableObjects.value.add(object);
     this.animatableObjects.notifyListeners();
   }
@@ -249,7 +250,7 @@ class TimelineControllerImpl implements TimelineController {
   void deleteSelectedKeyframes() {
     for (final kf in selected.value) {
       var track = _selected[kf]!;
-      track.removeKeyframeAt(kf.frameNumber.value);
+      track.removeKeyframeAt(kf.frameNumber);
     }
     clearSelectedKeyframes(notify: true);
     _initial.clear();
@@ -262,7 +263,7 @@ class TimelineControllerImpl implements TimelineController {
   void moveSelectedKeyframes(int frameDelta) {
     for (final kf in _selected.keys) {
       if (!_initial.containsKey(kf)) {
-        _initial[kf] = kf.frameNumber.value;
+        _initial[kf] = kf.frameNumber;
       }
       var initial = _initial[kf]!;
       kf.setFrameNumber(initial + frameDelta);

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter_keyframe_timeline/src/model/model.dart';
+import 'package:timeline_dart/timeline_dart.dart' as dart;
 import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
-import 'package:flutter_keyframe_timeline/src/ui/src/shared/mouse_hover_widget.dart';
+import 'package:flutter_keyframe_timeline/src/wrapper/flutter_video_track.dart';
+import 'package:flutter_keyframe_timeline/src/wrapper/wrapper_factory.dart' as wrapper;
 
 class ClipWidget extends StatefulWidget {
-  final VideoTrack videoTrack;
+  final FlutterVideoTrack videoTrack;
   final TimelineController controller;
   final ScrollController scrollController;
 
@@ -27,8 +27,9 @@ class _ClipWidgetState extends State<ClipWidget> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: widget.videoTrack.items,
+      valueListenable: widget.videoTrack.itemsListenable,
       builder: (_, items, __) {
+        final clips = items.whereType<dart.Clip>().toList();
         return SizedBox(
           height: 40,
           child: Stack(
@@ -37,13 +38,13 @@ class _ClipWidgetState extends State<ClipWidget> {
               Container(
                 height: 30,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: Colors.grey.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
 
               // Render clips
-              ...items.whereType<Clip>().map((clip) => _buildClipWidget(clip)),
+              ...clips.map((clip) => _buildClipWidget(clip)),
             ],
           ),
         );
@@ -51,9 +52,11 @@ class _ClipWidgetState extends State<ClipWidget> {
     );
   }
 
-  Widget _buildClipWidget(Clip clip) {
+  Widget _buildClipWidget(dart.Clip clip) {
+    final flutterClip = wrapper.WrapperFactory.wrapClip(clip);
+    
     return ValueListenableBuilder(
-      valueListenable: clip.timeRange,
+      valueListenable: flutterClip.timeRangeListenable,
       builder: (_, timeRange, __) {
         return ValueListenableBuilder(
           valueListenable: widget.controller.pixelsPerFrame,
@@ -69,7 +72,7 @@ class _ClipWidgetState extends State<ClipWidget> {
               top: 5,
               width: width,
               height: 30,
-              child: MouseRegion(child:ValueListenableBuilder(
+              child: ValueListenableBuilder(
                 valueListenable: widget.controller.active,
                 builder: (_, active, __) {
                   final isActive = active.contains(clip);
@@ -88,9 +91,9 @@ class _ClipWidgetState extends State<ClipWidget> {
                         final frameDelta = (dragDelta / pixelsPerFrame).round();
                         
                         if (frameDelta != 0) {
-                          final newStartFrame = (initialStartFrame + frameDelta);
+                          final newStartFrame = initialStartFrame + frameDelta;
                           final newEndFrame = newStartFrame + (endFrame - startFrame);
-                          clip.setTimeRange(TimeRange(
+                          clip.setTimeRange(dart.TimeRange(
                             startFrame: newStartFrame,
                             endFrame: newEndFrame,
                           ));
@@ -101,67 +104,67 @@ class _ClipWidgetState extends State<ClipWidget> {
                       dragStart = null;
                     },
                     child: Container(
+                      margin: const EdgeInsets.only(left: 1, right: 1, top: 2, bottom: 2),
+                      decoration: BoxDecoration(
+                        color: isActive 
+                            ? Colors.purple.withValues(alpha: 0.8)
+                            : Colors.purple.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: isActive
+                              ? Colors.purple.shade900
+                              : Colors.purple.shade700,
+                          width: isActive ? 2 : 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Left drag handle
+                          Container(
+                            width: 12,
+                            height: 30,
                             decoration: BoxDecoration(
-                              color: isActive
-                                  ? Colors.blue
-                                  : Colors.blue,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: isActive
-                                    ? Colors.blue.shade900
-                                    : Colors.blue.shade700,
-                                width: isActive ? 2 : 1,
+                              color: Colors.purple.shade900.withValues(alpha: 0.5),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(4),
+                                bottomLeft: Radius.circular(4),
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                // Left drag handle
-                                Container(
-                                  width: 12,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade900.withOpacity(0.5),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(4),
-                                      bottomLeft: Radius.circular(4),
-                                    ),
-                                  ),
-                                ),
+                          ),
 
-                                // Clip content
-                                Expanded(
-                                  child: Center(
-                                    child: Text(
-                                      '${clip.source.path.split('/').last}',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
+                          // Clip content
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                clip.source.path.split('/').last,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
                                 ),
-
-                                // Right drag handle
-                                Container(
-                                  width: 12,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.shade900.withOpacity(0.5),
-                                    borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(4),
-                                      bottomRight: Radius.circular(4),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                        
+                          ),
+
+                          // Right drag handle
+                          Container(
+                            width: 12,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: Colors.purple.shade900.withValues(alpha: 0.5),
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(4),
+                                bottomRight: Radius.circular(4),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
-              )),
+              ),
             );
           },
         );

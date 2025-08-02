@@ -32,23 +32,24 @@ class TrackValueEditorViewModelImpl<V extends ChannelValue>
     false,
   );
 
+  @override
   final ValueNotifier<List<num>> values = ValueNotifier<List<num>>([]);
 
-  final TimelineObject object;
-  final KeyframeTrack<V> track;
+  final FlutterTimelineObject object;
+  final FlutterKeyframeTrack<V> track;
   final TimelineController controller;
 
   TrackValueEditorViewModelImpl(
       this.object, this.track, this.controller) {
-    track.keyframes.addListener(_onKeyframesUpdated);
+    track.keyframesListenable.addListener(_onKeyframesUpdated);
     _onKeyframesUpdated();
-    track.value.addListener(_onActualValueChanged);
+    track.valueListenable.addListener(_onActualValueChanged);
     controller.currentFrame.addListener(_onFrameChange);
     _onActualValueChanged();
   }
 
   void _onActualValueChanged() {
-    values.value = track.value.value!.unwrap();
+    values.value = track.value.value.unwrap();
   }
 
   void _onFrameChange() {
@@ -58,8 +59,8 @@ class TrackValueEditorViewModelImpl<V extends ChannelValue>
 
   void _updateHasKeyframeAtCurrentFrame() {
     var hasKeyframeAtCurrentFrame = false;
-    for (final kf in this.keyframes) {
-      if (kf.frameNumber.value == controller.currentFrame.value) {
+    for (final kf in keyframes) {
+      if (kf.frameNumber == controller.currentFrame.value) {
         hasKeyframeAtCurrentFrame = true;
       }
     }
@@ -67,15 +68,7 @@ class TrackValueEditorViewModelImpl<V extends ChannelValue>
   }
 
   void _onKeyframesUpdated() {
-    final newValue = track.keyframes.value.toSet();
-    final removed = keyframes.difference(newValue);
-    final added = newValue.difference(keyframes);
-    for (final kf in removed) {
-      kf.frameNumber.removeListener(_onKeyframeUpdated);
-    }
-    for (final kf in added) {
-      kf.frameNumber.addListener(_onKeyframeUpdated);
-    }
+    final newValue = track.keyframesListenable.value.toSet();
     keyframes.clear();
     keyframes.addAll(newValue);
     _updateHasKeyframeAtCurrentFrame();
@@ -83,30 +76,18 @@ class TrackValueEditorViewModelImpl<V extends ChannelValue>
 
   @override
   Future dispose() async {
-    track.value.removeListener(_onActualValueChanged);
-
+    track.valueListenable.removeListener(_onActualValueChanged);
     controller.currentFrame.removeListener(_onFrameChange);
-
-    for (final kf in this.keyframes) {
-      kf.frameNumber.removeListener(_onKeyframeUpdated);
-    }
-
-    track.keyframes.removeListener(_onKeyframesUpdated);
+    track.keyframesListenable.removeListener(_onKeyframesUpdated);
     hasKeyframeAtCurrentFrame.dispose();
   }
 
-  void _onKeyframeUpdated() {
-    _updateHasKeyframeAtCurrentFrame();
-  }
-
-  ///
   @override
   Future deleteKeyframeForCurrentFrame() async {
     final currentFrame = controller.currentFrame.value;
     track.removeKeyframeAt(currentFrame);
   }
 
-  ///
   @override
   Future addKeyframeForCurrentFrame() async {
     final currentFrame = controller.currentFrame.value;
@@ -115,7 +96,7 @@ class TrackValueEditorViewModelImpl<V extends ChannelValue>
 
   @override
   void setActualValue(int channelIndex, double value) {
-    final newValue = track.value.value!.copyWith(channelIndex, value);
+    final newValue = track.value.value.copyWith(channelIndex, value);
     track.setValue(newValue as V);
   }
 }

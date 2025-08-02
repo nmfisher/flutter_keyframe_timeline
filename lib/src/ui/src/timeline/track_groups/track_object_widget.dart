@@ -1,12 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_keyframe_timeline/src/model/model.dart';
-import 'package:flutter_keyframe_timeline/src/model/src/timeline_object.dart';
-import 'package:flutter_keyframe_timeline/src/timeline_controller.dart';
+import 'package:flutter_keyframe_timeline/flutter_keyframe_timeline.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/shared/expand_icon.dart';
 
-import 'package:flutter_keyframe_timeline/src/ui/src/timeline/timeline_style.dart';
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/track_keyframes_widget.dart';
+import 'package:flutter_keyframe_timeline/src/wrapper/wrapper_factory.dart' as wrapper;
 import 'package:flutter_keyframe_timeline/src/ui/src/timeline/track_groups/value_editor/animation_track_value_editor_widget.dart';
 import 'package:mix/mix.dart';
 
@@ -16,7 +14,7 @@ import 'clip_widget.dart';
 class TrackObjectWidget extends StatelessWidget {
   final TimelineController controller;
   final ScrollController scrollController;
-  final TimelineObject object;
+  final FlutterTimelineObject object;
 
   final int index;
   final double trackNameWidth;
@@ -72,11 +70,13 @@ class TrackObjectWidget extends StatelessWidget {
                     ),
                     Expanded(
                       child: ValueListenableBuilder(
-                        valueListenable: object.displayName,
+                        valueListenable: object.displayNameListenable,
                         builder: (_, displayName, __) => StyledText(
                           displayName,
                           style: Style(
-                            $text.color((trackObjectNameStyle?.textColor ?? Colors.black).withOpacity(isActive ? 1.0 : 0.5)),
+                            $text.color((trackObjectNameStyle?.textColor ??
+                                    Colors.black)
+                                .withValues(alpha: isActive ? 1.0 : 0.5)),
                             $text.overflow.ellipsis(),
                           ),
                         ),
@@ -86,8 +86,8 @@ class TrackObjectWidget extends StatelessWidget {
                 ),
               ),
             ),
-            if(additionalWidgetBuilder != null)
-            additionalWidgetBuilder!(context, object, isActive, isExpanded)
+            if (additionalWidgetBuilder != null)
+              additionalWidgetBuilder!(context, object, isActive, isExpanded)
           ],
         );
       },
@@ -104,17 +104,25 @@ class TrackObjectWidget extends StatelessWidget {
           style: Style(
             $flex.crossAxisAlignment.start(),
             $box.color.transparent(),
-            $box.border.only(top: BorderSideDto(color: ColorDto(trackObjectNameStyle?.borderColor ?? Colors.black))),
+            $box.border.only(
+                top: BorderSideDto(
+                    color: ColorDto(
+                        trackObjectNameStyle?.borderColor ?? Colors.black))),
           ),
           children: [
-            SizedBox(width: trackNameWidth, child: _objectName(isExpanded, context)),
+            SizedBox(
+                width: trackNameWidth, child: _objectName(isExpanded, context)),
 
             if (isExpanded)
-              ...object.getTracks<KeyframeTrack>()
+              ...object
+                  .getTracks<KeyframeTrack>()
+                  .cast<FlutterKeyframeTrack>()
                   .map(
                     (track) => HBox(
                       style: Style(
-                        $box.border.bottom(color: trackObjectNameStyle?.borderColor ?? Colors.black),
+                        $box.border.bottom(
+                            color: trackObjectNameStyle?.borderColor ??
+                                Colors.black),
                         $box.padding.vertical(12),
                         $flex.crossAxisAlignment.start(),
                       ),
@@ -127,15 +135,17 @@ class TrackObjectWidget extends StatelessWidget {
                             controller: controller,
                             keyframeToggleIconBuilder:
                                 keyframeToggleIconBuilder,
-                            channelValueEditorStyle: channelValueEditorStyle ?? const ChannelValueEditorStyle(),
-                            channelValueEditorContainerBuilder: channelValueEditorContainerBuilder,
+                            channelValueEditorStyle: channelValueEditorStyle ??
+                                const ChannelValueEditorStyle(),
+                            channelValueEditorContainerBuilder:
+                                channelValueEditorContainerBuilder,
                           ),
                         ),
                         Expanded(
                           child: TrackKeyframesWidget(
                             controller: controller,
                             scrollController: scrollController,
-                            track: track,
+                            track: wrapper.WrapperFactory.wrapBaseTrack(track),
                             keyframeIconBuilder: keyframeIconBuilder,
                             connectionStyle: keyframeConnectionStyle,
                           ),
@@ -144,41 +154,45 @@ class TrackObjectWidget extends StatelessWidget {
                     ),
                   )
                   .cast<Widget>(),
-              
-              // Add VideoTrack rendering
-              ...object.getTracks<VideoTrack>()
-                  .map(
-                    (videoTrack) => HBox(
-                      style: Style(
-                        $box.border.bottom(color: trackObjectNameStyle?.borderColor ?? Colors.black),
-                        $box.padding.vertical(8),
-                        $flex.crossAxisAlignment.start(),
-                      ),
-                      children: [
-                        SizedBox(
-                          width: trackNameWidth,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 24.0),
-                            child: StyledText(
-                              videoTrack.label,
-                              style: Style(
-                                $text.fontSize(12),
-                                $text.color(Colors.black.withOpacity(0.7)),
-                              ),
+
+            // Add VideoTrack rendering
+            ...object
+                .getTracks<VideoTrack>()
+                .cast<FlutterVideoTrack>()
+                .map(
+                  (videoTrack) => HBox(
+                    style: Style(
+                      $box.border.bottom(
+                          color: trackObjectNameStyle?.borderColor ??
+                              Colors.black),
+                      $box.padding.vertical(8),
+                      $flex.crossAxisAlignment.start(),
+                    ),
+                    children: [
+                      SizedBox(
+                        width: trackNameWidth,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 24.0),
+                          child: StyledText(
+                            videoTrack.label,
+                            style: Style(
+                              $text.fontSize(12),
+                              $text.color(Colors.black.withValues(alpha: 0.7)),
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: ClipWidget(
-                            videoTrack: videoTrack,
-                            controller: controller,
-                            scrollController: scrollController,
-                          ),
+                      ),
+                      Expanded(
+                        child: ClipWidget(
+                          videoTrack: videoTrack,
+                          controller: controller,
+                          scrollController: scrollController,
                         ),
-                      ],
-                    ),
-                  )
-                  .cast<Widget>(),
+                      ),
+                    ],
+                  ),
+                )
+                .cast<Widget>(),
           ],
         );
       },
